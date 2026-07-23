@@ -469,17 +469,33 @@ async function sendDiscordNotification(payload) {
   }
 }
 
-function notifyRecipeChange(recipe, isNew) {
+function notifyRecipeChange(recipe, isNew, oldRecipe = null) {
+  let fields = [];
+  
+  if (isNew) {
+    fields = [
+      { name: "ชื่อเมนู", value: recipe.name || '-', inline: true },
+      { name: "หมวดหมู่", value: recipe.category || '-', inline: true },
+      { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
+    ];
+  } else {
+    fields = [
+      { name: "ชื่อเมนู (เก่า)", value: oldRecipe.name || '-', inline: true },
+      { name: "ชื่อเมนู (ใหม่)", value: recipe.name || '-', inline: true },
+      { name: '\u200B', value: '\u200B', inline: true },
+      { name: "หมวดหมู่ (เก่า)", value: oldRecipe.category || '-', inline: true },
+      { name: "หมวดหมู่ (ใหม่)", value: recipe.category || '-', inline: true },
+      { name: '\u200B', value: '\u200B', inline: true },
+      { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
+    ];
+  }
+
   sendDiscordNotification({
     username: "Wingstop Ops Manual",
     embeds: [{
       title: isNew ? "📝 มีการเพิ่มสูตรอาหารใหม่!" : "✏️ มีการแก้ไขสูตรอาหาร",
       color: isNew ? 45044 : 16766720,
-      fields: [
-        { name: "ชื่อเมนู", value: recipe.name || '-', inline: true },
-        { name: "หมวดหมู่", value: recipe.category || '-', inline: true },
-        { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
-      ],
+      fields: fields,
       timestamp: new Date().toISOString()
     }]
   });
@@ -500,14 +516,16 @@ function notifyRecipeDelete(recipe) {
   });
 }
 
-function notifyCategoryChange(cat) {
+function notifyCategoryChange(oldCat, newCat) {
   sendDiscordNotification({
     username: "Wingstop Ops Manual",
     embeds: [{
       title: "✏️ มีการแก้ไขข้อมูลหมวดหมู่ / เช็คลิสต์",
       color: 3447003,
       fields: [
-        { name: "ชื่อหมวดหมู่", value: cat.title || '-', inline: true },
+        { name: "ชื่อหมวดหมู่", value: newCat.title || '-', inline: false },
+        { name: "ข้อมูลก่อนแก้ (เก่า)", value: (oldCat.steps.join('\n') || '-').substring(0, 1024), inline: false },
+        { name: "ข้อมูลที่บันทึก (ใหม่)", value: (newCat.steps.join('\n') || '-').substring(0, 1024), inline: false },
         { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
       ],
       timestamp: new Date().toISOString()
@@ -770,11 +788,13 @@ el('saveCat').onclick = () => {
   const idx = DATA.categories.findIndex(c => c.id === editingCatId);
   
   if(idx !== -1) {
+    const oldCat = JSON.parse(JSON.stringify(DATA.categories[idx])); 
+    
     DATA.categories[idx].steps = steps;
     saveData();
     showToast('✅ อัปเดตข้อมูลสำเร็จ');
     
-    notifyCategoryChange(DATA.categories[idx]);
+    notifyCategoryChange(oldCat, DATA.categories[idx]);
     
     openCategoryDetail(editingCatId);
   }
@@ -957,8 +977,11 @@ el('saveRecipe').onclick = () => {
 
   if(id) {
     const idx = DATA.recipes.findIndex(x => x.id === id);
+    const oldRecipe = JSON.parse(JSON.stringify(DATA.recipes[idx]));
+    
     DATA.recipes[idx] = recipeData;
-    notifyRecipeChange(recipeData, false);
+    notifyRecipeChange(recipeData, false, oldRecipe);
+    
     openRecipeDetail(id);
     showToast('✅ อัปเดตข้อมูลเรียบร้อย');
   } else {
