@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wingstop Ops Manual</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- เพิ่ม Firebase SDK (ใช้เวอร์ชัน compat เพื่อให้เข้ากับระบบเดิมได้โดยไม่ต้องแก้โครงสร้าง) -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
 <style>
   :root {
     --ws-green: #00543C;
@@ -432,11 +436,27 @@
   </div>
 </div>
 
-<div class="toast" id="toast">✅ <span id="toastMsg">บันทึกสำเร็จ</span></div>
+<div class="toast" id="toast"><span id="toastMsg">✅ บันทึกสำเร็จ</span></div>
 
 <script>
+// --- Firebase Database Setup ---
+const firebaseConfig = {
+  apiKey: "AIzaSyBDYHAUJg1zrLsCycmasqlPSJ25XzQY354",
+  authDomain: "wingstop-c1dfd.firebaseapp.com",
+  projectId: "wingstop-c1dfd",
+  storageBucket: "wingstop-c1dfd.firebasestorage.app",
+  messagingSenderId: "68193512037",
+  appId: "1:68193512037:web:d938753a1544a6e664748c"
+};
+
+// Initialize Firebase (Compat mode for plain HTML)
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+
 // --- Discord Webhook ---
-const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1529841700644720671/EYFZJO0zt0f1gx1Uye6wYCjSN_pFoMH29gesDRCHH1E3Pe7hmAgTwwScgcaS8brwO7ps";
+const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1331295982705246238/7x7BwJmF7KDEsW3l_6fLzNofn8L4i_Xn_Oq-x9hZ8Rz1wG1Z0m4_Qj0h1Y1Z2f9wX8";
 
 function sendDiscordNotification(payload) {
   fetch(DISCORD_WEBHOOK_URL, {
@@ -477,20 +497,12 @@ function notifyRecipeDelete(recipe) {
   });
 }
 
-// --- Data Management ---
+// --- Data Management & Sync ---
 const defaultCategories = () => [
-  { id:"รอกรอกข้อมูลครับ", icon:"🌅", title:"รอกรอกข้อมูลครับ", desc:"รอกรอกข้อมูลครับ", steps:[
-    "รอกรอกข้อมูลครับ","รอกรอกข้อมูลครับ"
-  ]},
-  { id:"รอกรอกข้อมูลครับ", icon:"🌃", title:"รอกรอกข้อมูลครับ", desc:"รอกรอกข้อมูลครับ", steps:[
-    "รอกรอกข้อมูลครับ","รอกรอกข้อมูลครับ"
-  ]},
-  { id:"food", icon:"🍗", title:"รอกรอกข้อมูลครับ", desc:"รอกรอกข้อมูลครับ", steps:[
-    "รอกรอกข้อมูลครับ","รอกรอกข้อมูลครับ"
-  ]},
-  { id:"clean", icon:"🧽", title:"ข้อมูลเพิ่มเติม", desc:"รอกรอกข้อมูล (ข้อมูลที่ต้องรู้)", type: "info", steps:[
-    "รอกรอกข้อมูล","รอกรอกข้อมูลครับ"
-  ]}
+  { id:"รอกรอกข้อมูลครับ", icon:"🌅", title:"รอกรอกข้อมูลครับ", desc:"รอกรอกข้อมูลครับ", steps:["รอกรอกข้อมูลครับ","รอกรอกข้อมูลครับ"]},
+  { id:"รอกรอกข้อมูลครับ_2", icon:"🌃", title:"รอกรอกข้อมูลครับ", desc:"รอกรอกข้อมูลครับ", steps:["รอกรอกข้อมูลครับ","รอกรอกข้อมูลครับ"]},
+  { id:"food", icon:"🍗", title:"รอกรอกข้อมูลครับ", desc:"รอกรอกข้อมูลครับ", steps:["รอกรอกข้อมูลครับ","รอกรอกข้อมูลครับ"]},
+  { id:"clean", icon:"🧽", title:"ข้อมูลเพิ่มเติม", desc:"รอกรอกข้อมูล (ข้อมูลที่ต้องรู้)", type: "info", steps:["รอกรอกข้อมูล","รอกรอกข้อมูลครับ"]}
 ];
 
 const defaultRecipes = () => [
@@ -503,8 +515,12 @@ const defaultRecipes = () => [
 
 let DATA = { categories: [], recipes: [], checks: {} };
 
+// สถานะการเปิดหน้าต่างปัจจุบัน เพื่อใช้รีเฟรชอัติโนมัติเวลาแท็บอื่นแก้ข้อมูล
+let currentCategoryId = null;
+let currentRecipeId = null;
+
 function loadData() {
-  localStorage.removeItem('ws_ops_data');
+  // 1. ดึงข้อมูลจาก LocalStorage เบื้องต้นเพื่อให้เว็บแสดงผลไว
   const saved = localStorage.getItem('ws_ops_data');
   if(saved) {
     DATA = JSON.parse(saved);
@@ -519,14 +535,57 @@ function loadData() {
     cleanCat.type = 'info';
     saveData();
   }
+  
+  renderDashboard();
+
+  // 2. ดึงข้อมูลและสร้าง Listener จาก Firebase (เพื่อรองรับการซิงค์ข้ามแท็บและเครื่องอื่น)
+  db.collection('ops_manual').doc('app_data').onSnapshot((doc) => {
+    if (doc.exists) {
+      DATA = doc.data();
+      localStorage.setItem('ws_ops_data', JSON.stringify(DATA)); // อัปเดตเครื่องตัวเอง
+      refreshCurrentView(); // รีเฟรชหน้าจอ
+    } else {
+      // ถ้าเปิดใช้ครั้งแรกและในฐานข้อมูลยังไม่มีไฟล์ ให้เซฟข้อมูลเริ่มต้นขึ้นไป
+      saveData();
+    }
+  }, (error) => {
+    console.error("Firebase Sync Error:", error);
+  });
 }
-function saveData() { localStorage.setItem('ws_ops_data', JSON.stringify(DATA)); }
+
+function saveData() { 
+  // 1. บันทึกในเครื่องตัวเอง (LocalStorage)
+  localStorage.setItem('ws_ops_data', JSON.stringify(DATA)); 
+  // 2. ส่งขึ้น Firebase อัปเดตให้เครื่องอื่นหรือแท็บอื่น
+  db.collection('ops_manual').doc('app_data').set(DATA).catch(err => {
+    console.error("Error saving to Firebase: ", err);
+  });
+}
+
+// ฟังก์ชันรีเฟรชหน้าต่างอัตโนมัติเมื่อข้อมูลมีการเปลี่ยนแปลง (Realtime Sync)
+function refreshCurrentView() {
+  const activeTab = document.querySelector('.tab.active').dataset.tab;
+  const isProcOpen = el('view-proc-detail').style.display === 'block';
+  const isRecipeOpen = el('view-recipe-detail').style.display === 'block';
+
+  if (isProcOpen && currentCategoryId) {
+    // ถ้าหน้าเช็คลิสต์เปิดอยู่ ให้รีเฟรชหน้าเช็คลิสต์นั้นใหม่
+    openCategoryDetail(currentCategoryId);
+  } else if (isRecipeOpen && currentRecipeId) {
+    // ถ้าหน้าสูตรอาหารเปิดอยู่
+    openRecipeDetail(currentRecipeId);
+  } else {
+    // ถ้ายืนอยู่หน้าหลัก
+    if (activeTab === 'dashboard') renderDashboard(el('searchInput').value);
+    if (activeTab === 'recipes') renderRecipes(el('searchInput').value);
+  }
+}
 
 // --- UI / App Logic ---
 const el = id => document.getElementById(id);
 function escapeHtml(str) { return str.replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag])); }
 function showToast(msg) {
-  el('toastMsg').innerText = msg;
+  el('toastMsg').innerHTML = msg;
   const t = el('toast');
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
@@ -542,6 +601,10 @@ setInterval(updateClock, 1000);
 updateClock();
 
 function switchTab(tabId) {
+  // รีเซ็ตสถานะหน้าต่างย่อย
+  currentCategoryId = null;
+  currentRecipeId = null;
+
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
   
@@ -550,8 +613,9 @@ function switchTab(tabId) {
   el('view-proc-detail').style.display = 'none';
   el('view-recipe-detail').style.display = 'none';
   el('searchInput').value = '';
-  renderDashboard();
-  if(tabId === 'recipes') renderRecipes();
+  
+  if (tabId === 'dashboard') renderDashboard();
+  if (tabId === 'recipes') renderRecipes();
 }
 
 document.querySelectorAll('.tab').forEach(t => {
@@ -595,7 +659,10 @@ function renderDashboard(filter = '') {
   });
 }
 
-function openCategoryDetail(id) {
+window.openCategoryDetail = function(id) {
+  currentCategoryId = id;
+  currentRecipeId = null;
+
   const cat = DATA.categories.find(c => c.id === id);
   if(!cat) return;
   
@@ -681,7 +748,7 @@ el('saveCat').onclick = () => {
   if(idx !== -1) {
     DATA.categories[idx].steps = steps;
     saveData();
-    showToast('อัปเดตข้อมูลสำเร็จ');
+    showToast('✅ อัปเดตข้อมูลสำเร็จ');
     openCategoryDetail(editingCatId); // Refresh
   }
   el('catModal').classList.remove('open');
@@ -690,20 +757,28 @@ el('saveCat').onclick = () => {
 window.toggleStepCheck = function(key, idx, total) {
   const checks = DATA.checks[key];
   const pos = checks.indexOf(idx);
+  
   const elItem = el(`step-item-${key}-${idx}`);
   const elBox = elItem.querySelector('.checkbox-custom');
   
   if(pos === -1) {
     checks.push(idx);
-    elItem.classList.add('done');
-    elBox.innerText = '✓';
+    if(elItem) elItem.classList.add('done');
+    if(elBox) elBox.innerText = '✓';
   } else {
     checks.splice(pos, 1);
-    elItem.classList.remove('done');
-    elBox.innerText = '';
+    if(elItem) elItem.classList.remove('done');
+    if(elBox) elBox.innerText = '';
   }
+  
+  // เซฟไปที่ Firebase ทันที
   saveData();
   updateProgress(key, total);
+
+  // แจ้งเตือนเมื่อทำครบ
+  if (checks.length === total && pos === -1) {
+    showToast('🎉 เก่งมาก! ทำเช็คลิสต์รายการนี้ครบทุกขั้นตอนแล้ว');
+  }
 };
 
 window.resetChecklist = function(key, total) {
@@ -712,14 +787,16 @@ window.resetChecklist = function(key, total) {
   saveData();
   const catId = key.split('_')[0];
   openCategoryDetail(catId);
-  showToast('รีเซ็ตข้อมูลแล้ว');
+  showToast('✅ รีเซ็ตข้อมูลแล้ว');
 };
 
 function updateProgress(key, total) {
-  const checked = DATA.checks[key].length;
+  const checked = DATA.checks[key] ? DATA.checks[key].length : 0;
   const pct = total === 0 ? 0 : Math.round((checked / total) * 100);
-  el(`progress-fill-${key}`).style.width = `${pct}%`;
-  el(`progress-text-${key}`).innerText = `${pct}% (${checked}/${total})`;
+  const fillEl = el(`progress-fill-${key}`);
+  const txtEl = el(`progress-text-${key}`);
+  if(fillEl) fillEl.style.width = `${pct}%`;
+  if(txtEl) txtEl.innerText = `${pct}% (${checked}/${total})`;
 }
 
 // --- Recipes ---
@@ -752,7 +829,10 @@ function renderRecipes(filter = '') {
   });
 }
 
-function openRecipeDetail(id) {
+window.openRecipeDetail = function(id) {
+  currentRecipeId = id;
+  currentCategoryId = null;
+
   const r = DATA.recipes.find(x => x.id === id);
   if(!r) return;
   
@@ -848,12 +928,12 @@ el('saveRecipe').onclick = () => {
     DATA.recipes[idx] = recipeData;
     notifyRecipeChange(recipeData, false);
     openRecipeDetail(id);
-    showToast('อัปเดตข้อมูลเรียบร้อย');
+    showToast('✅ อัปเดตข้อมูลเรียบร้อย');
   } else {
     DATA.recipes.push(recipeData);
     notifyRecipeChange(recipeData, true);
     renderRecipes();
-    showToast('เพิ่มเมนูเรียบร้อย');
+    showToast('✅ เพิ่มเมนูเรียบร้อย');
   }
   
   saveData();
@@ -871,7 +951,7 @@ window.deleteRecipe = function(id) {
   }
   
   renderRecipes();
-  showToast('ลบเมนูเรียบร้อยแล้ว');
+  showToast('✅ ลบเมนูเรียบร้อยแล้ว');
 };
 
 // Search
@@ -884,8 +964,7 @@ el('searchInput').addEventListener('input', (e) => {
 
 // Init
 loadData();
-renderDashboard();
-</script>
 
+</script>
 </body>
 </html>
