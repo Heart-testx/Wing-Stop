@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wingstop Ops Manual</title>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<!-- เพิ่ม Firebase SDK (ใช้เวอร์ชัน compat เพื่อให้เข้ากับระบบเดิมได้โดยไม่ต้องแก้โครงสร้าง) -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
@@ -96,7 +95,7 @@
   }
   .section-sub { color: var(--ws-gray); font-size: 14px; margin-bottom: 20px; font-weight: 300; }
 
-  /* ---------- Category grid (Dashboard) ---------- */
+  /* ---------- Category grid ---------- */
   .cat-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 16px; margin-bottom: 26px;
@@ -350,14 +349,12 @@
     <div class="tab" data-tab="recipes">🍔 สูตรอาหารทั้งหมด</div>
   </div>
 
-  <!-- DASHBOARD TAB -->
   <div id="view-dashboard">
     <div class="section-title">มาตรฐานการทำงานประจำวัน</div>
     <div class="section-sub">เลือกหมวดหมู่เพื่อดูขั้นตอนหรือเช็คลิสต์การทำงาน</div>
     <div class="cat-grid" id="catGrid"></div>
   </div>
 
-  <!-- RECIPES TAB -->
   <div id="view-recipes" style="display:none;">
     <div class="recipe-toolbar">
       <div>
@@ -369,10 +366,7 @@
     <div class="recipe-grid" id="recipeGrid"></div>
   </div>
 
-  <!-- PROCEDURE DETAIL (Checklist / Info) -->
   <div id="view-proc-detail" style="display:none;"></div>
-
-  <!-- RECIPE DETAIL -->
   <div id="view-recipe-detail" style="display:none;"></div>
 
 </div>
@@ -449,7 +443,6 @@ const firebaseConfig = {
   appId: "1:68193512037:web:d938753a1544a6e664748c"
 };
 
-// Initialize Firebase (Compat mode for plain HTML)
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
@@ -458,12 +451,23 @@ const db = firebase.firestore();
 // --- Discord Webhook ---
 const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1529841700644720671/EYFZJO0zt0f1gx1Uye6wYCjSN_pFoMH29gesDRCHH1E3Pe7hmAgTwwScgcaS8brwO7ps";
 
-function sendDiscordNotification(payload) {
-  fetch(DISCORD_WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).catch(err => console.error("Discord error:", err));
+// ใช้ Fetch ไปที่ Discord โดยตรง (Discord รองรับ CORS สำหรับ Webhook อยู่แล้ว)
+async function sendDiscordNotification(payload) {
+  try {
+    const response = await fetch(DISCORD_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!response.ok) {
+      console.error("Discord Error:", await response.text());
+    }
+  } catch (err) {
+    console.error("Fetch error:", err);
+  }
 }
 
 function notifyRecipeChange(recipe, isNew) {
@@ -487,10 +491,25 @@ function notifyRecipeDelete(recipe) {
     username: "Wingstop Ops Manual",
     embeds: [{
       title: "🗑️ มีการลบสูตรอาหาร",
-      color: 16711680, // สีแดง
+      color: 16711680,
       fields: [
         { name: "ชื่อเมนู", value: recipe.name || '-', inline: true },
         { name: "หมวดหมู่", value: recipe.category || '-', inline: true }
+      ],
+      timestamp: new Date().toISOString()
+    }]
+  });
+}
+
+function notifyCategoryChange(cat) {
+  sendDiscordNotification({
+    username: "Wingstop Ops Manual",
+    embeds: [{
+      title: "✏️ มีการแก้ไขข้อมูลหมวดหมู่ / เช็คลิสต์",
+      color: 3447003, // สีฟ้า
+      fields: [
+        { name: "ชื่อหมวดหมู่", value: cat.title || '-', inline: true },
+        { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
       ],
       timestamp: new Date().toISOString()
     }]
@@ -514,13 +533,10 @@ const defaultRecipes = () => [
 ];
 
 let DATA = { categories: [], recipes: [], checks: {} };
-
-// สถานะการเปิดหน้าต่างปัจจุบัน เพื่อใช้รีเฟรชอัติโนมัติเวลาแท็บอื่นแก้ข้อมูล
 let currentCategoryId = null;
 let currentRecipeId = null;
 
 function loadData() {
-  // 1. ดึงข้อมูลจาก LocalStorage เบื้องต้นเพื่อให้เว็บแสดงผลไว
   const saved = localStorage.getItem('ws_ops_data');
   if(saved) {
     DATA = JSON.parse(saved);
@@ -529,7 +545,6 @@ function loadData() {
     DATA = { categories: defaultCategories(), recipes: defaultRecipes(), checks: {} };
   }
   
-  // ซิงค์การเปลี่ยน type ของหมวดทำความสะอาด หากเคยเป็นระบบเก่า
   const cleanCat = DATA.categories.find(c => c.id === 'clean');
   if(cleanCat && cleanCat.type !== 'info') {
     cleanCat.type = 'info';
@@ -538,14 +553,12 @@ function loadData() {
   
   renderDashboard();
 
-  // 2. ดึงข้อมูลและสร้าง Listener จาก Firebase (เพื่อรองรับการซิงค์ข้ามแท็บและเครื่องอื่น)
   db.collection('ops_manual').doc('app_data').onSnapshot((doc) => {
     if (doc.exists) {
       DATA = doc.data();
-      localStorage.setItem('ws_ops_data', JSON.stringify(DATA)); // อัปเดตเครื่องตัวเอง
-      refreshCurrentView(); // รีเฟรชหน้าจอ
+      localStorage.setItem('ws_ops_data', JSON.stringify(DATA));
+      refreshCurrentView();
     } else {
-      // ถ้าเปิดใช้ครั้งแรกและในฐานข้อมูลยังไม่มีไฟล์ ให้เซฟข้อมูลเริ่มต้นขึ้นไป
       saveData();
     }
   }, (error) => {
@@ -554,28 +567,22 @@ function loadData() {
 }
 
 function saveData() { 
-  // 1. บันทึกในเครื่องตัวเอง (LocalStorage)
   localStorage.setItem('ws_ops_data', JSON.stringify(DATA)); 
-  // 2. ส่งขึ้น Firebase อัปเดตให้เครื่องอื่นหรือแท็บอื่น
   db.collection('ops_manual').doc('app_data').set(DATA).catch(err => {
     console.error("Error saving to Firebase: ", err);
   });
 }
 
-// ฟังก์ชันรีเฟรชหน้าต่างอัตโนมัติเมื่อข้อมูลมีการเปลี่ยนแปลง (Realtime Sync)
 function refreshCurrentView() {
   const activeTab = document.querySelector('.tab.active').dataset.tab;
   const isProcOpen = el('view-proc-detail').style.display === 'block';
   const isRecipeOpen = el('view-recipe-detail').style.display === 'block';
 
   if (isProcOpen && currentCategoryId) {
-    // ถ้าหน้าเช็คลิสต์เปิดอยู่ ให้รีเฟรชหน้าเช็คลิสต์นั้นใหม่
     openCategoryDetail(currentCategoryId);
   } else if (isRecipeOpen && currentRecipeId) {
-    // ถ้าหน้าสูตรอาหารเปิดอยู่
     openRecipeDetail(currentRecipeId);
   } else {
-    // ถ้ายืนอยู่หน้าหลัก
     if (activeTab === 'dashboard') renderDashboard(el('searchInput').value);
     if (activeTab === 'recipes') renderRecipes(el('searchInput').value);
   }
@@ -601,7 +608,6 @@ setInterval(updateClock, 1000);
 updateClock();
 
 function switchTab(tabId) {
-  // รีเซ็ตสถานะหน้าต่างย่อย
   currentCategoryId = null;
   currentRecipeId = null;
 
@@ -741,15 +747,21 @@ window.editCategory = function(id) {
 };
 
 el('cancelCat').onclick = () => el('catModal').classList.remove('open');
+
 el('saveCat').onclick = () => {
   const stepsStr = el('cSteps').value;
   const steps = stepsStr.split('\n').map(s => s.trim()).filter(s => s);
   const idx = DATA.categories.findIndex(c => c.id === editingCatId);
+  
   if(idx !== -1) {
     DATA.categories[idx].steps = steps;
     saveData();
     showToast('✅ อัปเดตข้อมูลสำเร็จ');
-    openCategoryDetail(editingCatId); // Refresh
+    
+    // แจ้งเตือน Discord
+    notifyCategoryChange(DATA.categories[idx]);
+    
+    openCategoryDetail(editingCatId);
   }
   el('catModal').classList.remove('open');
 };
@@ -771,11 +783,9 @@ window.toggleStepCheck = function(key, idx, total) {
     if(elBox) elBox.innerText = '';
   }
   
-  // เซฟไปที่ Firebase ทันที
   saveData();
   updateProgress(key, total);
 
-  // แจ้งเตือนเมื่อทำครบ
   if (checks.length === total && pos === -1) {
     showToast('🎉 เก่งมาก! ทำเช็คลิสต์รายการนี้ครบทุกขั้นตอนแล้ว');
   }
