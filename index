@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wingstop Ops Manual</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ws-green: #00543C;
+    --ws-green-light: #0B7A4F;
+    --ws-green-pastel: #E8F5EE;
+    --ws-black: #1A1A1A;
+    --ws-white: #FFFFFF;
+    --ws-cream: #FDFBF7;
+    --ws-gray: #6B6B6B;
+    --ws-border: #E8E5DA;
+    --radius: 20px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Kanit', sans-serif;
+    background: var(--ws-cream);
+    color: var(--ws-black);
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  /* ---------- Top bar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 40;
+    background: var(--ws-green);
+    color: var(--ws-white);
+    padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 4px 15px rgba(0,84,60,0.15);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark {
+    width: 38px; height: 38px; border-radius: 12px;
+    background: var(--ws-white); color: var(--ws-green);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; flex-shrink: 0;
+  }
+  .brand-text { line-height: 1.2; }
+  .brand-text .t1 { font-weight: 700; font-size: 16px; letter-spacing: 0.2px; }
+  .brand-text .t2 { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 300; }
+  .clock { font-size: 13px; color: rgba(255,255,255,0.8); text-align: right; }
+  .clock .day { font-weight: 600; color: #fff; }
+
+  /* ---------- Layout ---------- */
+  .app { max-width: 1100px; margin: 0 auto; padding: 20px 16px 90px; }
+
+  .search-wrap {
+    position: sticky; top: 70px; z-index: 30;
+    background: var(--ws-cream);
+    padding: 10px 0 16px;
+  }
+  .search-box {
+    display: flex; align-items: center; gap: 12px;
+    background: #fff; border: 2px solid var(--ws-border);
+    border-radius: 999px; padding: 12px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    transition: 0.2s;
+  }
+  .search-box:focus-within { border-color: var(--ws-green-light); box-shadow: 0 4px 15px rgba(11,122,79,0.1); }
+  .search-box svg { flex-shrink: 0; color: var(--ws-green); opacity: 0.7; }
+  .search-box input {
+    border: none; outline: none; width: 100%;
+    font-size: 15px; font-family: inherit; background: transparent; color: var(--ws-black);
+  }
+  .search-box input::placeholder { color: #A4A4A4; }
+
+  /* ---------- Tabs ---------- */
+  .tabs { display: flex; gap: 10px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; }
+  .tab {
+    flex-shrink: 0;
+    padding: 10px 20px; border-radius: 999px;
+    background: #fff; border: 2px solid var(--ws-border);
+    font-size: 14.5px; font-weight: 600; color: var(--ws-gray);
+    cursor: pointer; transition: 0.2s;
+    display: flex; align-items: center; gap: 8px;
+    user-select: none;
+  }
+  .tab:hover { border-color: var(--ws-green-pastel); background: var(--ws-green-pastel); color: var(--ws-green); }
+  .tab.active {
+    background: var(--ws-green); color: #fff; border-color: var(--ws-green); box-shadow: 0 4px 10px rgba(0,84,60,0.2);
+  }
+
+  .section-title {
+    font-size: 22px; font-weight: 700; margin: 4px 0 6px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-sub { color: var(--ws-gray); font-size: 14px; margin-bottom: 20px; font-weight: 300; }
+
+  /* ---------- Category grid (Dashboard) ---------- */
+  .cat-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px; margin-bottom: 26px;
+  }
+  .cat-card {
+    background: #fff; border: 2px solid var(--ws-border); border-radius: var(--radius);
+    padding: 20px; cursor: pointer; transition: 0.2s;
+    display: flex; flex-direction: column; position: relative;
+  }
+  .cat-card:hover { 
+    transform: translateY(-4px); 
+    box-shadow: 0 12px 24px rgba(0,0,0,0.06); 
+    border-color: var(--ws-green-pastel); 
+  }
+  .cat-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: var(--ws-green-pastel); color: var(--ws-green);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: 14px; transition: 0.2s;
+  }
+  .cat-card:hover .cat-icon { background: var(--ws-green); color: #fff; transform: scale(1.05); }
+  .cat-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+  .cat-card p { font-size: 13.5px; color: var(--ws-gray); line-height: 1.5; flex-grow: 1; }
+  .cat-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-top: 14px; font-size: 12px; font-weight: 600;
+    color: var(--ws-green); background: var(--ws-green-pastel); 
+    padding: 4px 12px; border-radius: 999px; align-self: flex-start;
+  }
+  .cat-info-tag {
+    position: absolute; top: 16px; right: 16px;
+    background: #FFF8E7; color: #D49B00; padding: 4px 10px;
+    border-radius: 999px; font-size: 11px; font-weight: 600;
+  }
+
+  /* ---------- Procedure View ---------- */
+  .proc-card {
+    background: #fff; border: 2px solid var(--ws-border); border-radius: var(--radius);
+    padding: 24px; margin-bottom: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  }
+  .proc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+  .proc-head h2 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  
+  .progress-card {
+    background: var(--ws-green-pastel); border-radius: 16px; padding: 16px; margin-bottom: 20px;
+  }
+  .progress-info { display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; font-weight: 600; color: var(--ws-green); margin-bottom: 8px; }
+  .progress-bar { height: 10px; background: rgba(0,84,60,0.15); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--ws-green); width: 0%; transition: width 0.3s ease; }
+
+  /* Checklist Mode */
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .check-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 16px; border: 2px solid var(--ws-border); border-radius: 14px;
+    background: #FAFAFA; cursor: pointer; transition: 0.2s; user-select: none;
+  }
+  .check-item:hover { border-color: var(--ws-green-light); background: #fff; }
+  .check-item.done {
+    background: #F0F9F4; border-color: #B5E0C9; color: var(--ws-gray);
+  }
+  .check-item.done .step-text { text-decoration: line-through; }
+  
+  .checkbox-custom {
+    width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--ws-border);
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px; transition: 0.2s;
+  }
+  .check-item.done .checkbox-custom {
+    background: var(--ws-green); border-color: var(--ws-green); color: #fff;
+  }
+
+  /* Info Mode (No checklist) */
+  .info-list { display: flex; flex-direction: column; gap: 10px; }
+  .info-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 16px; border: 1px solid var(--ws-border); border-radius: 12px;
+    background: #fff;
+  }
+  .dot-custom {
+    color: var(--ws-green); font-size: 20px; line-height: 1; margin-top: -2px; font-weight: bold; flex-shrink: 0;
+  }
+
+  .step-text { font-size: 15px; line-height: 1.6; word-break: break-word; flex-grow: 1; }
+
+  .btn-reset-check {
+    border: none; background: #FFF0F0; color: #E04646; font-family: inherit;
+    padding: 8px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+    cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px;
+  }
+  .btn-reset-check:hover { background: #E04646; color: #fff; }
+
+  .back-btn {
+    border: none; background: #F0EEE7; color: var(--ws-black);
+    padding: 10px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; font-family: inherit;
+    cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s;
+  }
+  .back-btn:hover { background: #E4E1D8; transform: translateX(-2px); }
+
+  /* ---------- Recipe grid ---------- */
+  .recipe-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--ws-green); color: #fff; border: none; font-family: inherit;
+    padding: 12px 20px; border-radius: 999px; font-size: 14.5px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;
+    box-shadow: 0 4px 10px rgba(0,84,60,0.2);
+  }
+  .btn-primary:hover { background: var(--ws-green-light); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,84,60,0.3); }
+  
+  .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .recipe-card {
+    background: #fff; border: 2px solid var(--ws-border); border-radius: var(--radius);
+    padding: 20px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
+  }
+  .recipe-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); border-color: var(--ws-green-pastel); }
+  .recipe-tag {
+    display: inline-block; font-size: 11.5px; font-weight: 600; letter-spacing: 0.2px;
+    color: var(--ws-green); background: var(--ws-green-pastel); padding: 4px 12px; border-radius: 999px; margin-bottom: 12px;
+  }
+  .recipe-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .recipe-card p { font-size: 13.5px; color: var(--ws-gray); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .recipe-meta { margin-top: 14px; font-size: 12.5px; color: #9c9c94; display: flex; gap: 14px; font-weight: 500; }
+  
+  .del-btn {
+    position: absolute; top: 16px; right: 16px; width: 30px; height: 30px; border-radius: 50%;
+    border: none; background: #FFF0F0; color: #E04646; font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s; transform: scale(0.8);
+  }
+  .recipe-card:hover .del-btn { opacity: 1; transform: scale(1); }
+  .del-btn:hover { background: #E04646; color: #fff; }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--ws-gray); background: #fff; border-radius: var(--radius); border: 2px dashed var(--ws-border); }
+  .empty-state .em-icon { font-size: 46px; margin-bottom: 12px; animation: bounce 2s infinite; }
+  .empty-state p { font-size: 15px; font-weight: 500; }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+  /* ---------- Recipe detail ---------- */
+  .recipe-detail { background: #fff; border: 2px solid var(--ws-border); border-radius: var(--radius); padding: 26px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+  .rd-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+  .rd-head h2 { font-size: 24px; font-weight: 700; color: var(--ws-green); }
+  .rd-actions { display: flex; gap: 8px; }
+  
+  .btn-edit {
+    background: #FFF8E7; color: #D49B00; border: none; font-family: inherit;
+    padding: 8px 14px; border-radius: 999px; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s;
+  }
+  .btn-edit:hover { background: #FDEBB4; }
+  
+  .rd-cols { display: grid; grid-template-columns: 1fr; gap: 28px; }
+  @media(min-width: 720px) { .rd-cols { grid-template-columns: 1fr 1.5fr; } }
+  
+  .rd-block h4 {
+    font-size: 14px; font-weight: 600; letter-spacing: 0.2px;
+    color: var(--ws-green); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    background: var(--ws-green-pastel); padding: 8px 14px; border-radius: 10px;
+  }
+  .ing-list, .step-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .ing-item { padding: 10px 14px; background: #FAFAFA; border: 1px solid var(--ws-border); border-radius: 10px; font-size: 14.5px; display: flex; align-items: center; gap: 10px; }
+  .ing-item:before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ws-green-light); }
+  
+  .step-list-item {
+    padding: 12px 16px; background: #fff; border: 1px solid var(--ws-border);
+    border-radius: 12px; font-size: 14.5px; line-height: 1.5; display: flex; gap: 12px;
+  }
+  .step-num {
+    background: var(--ws-green); color: #fff; width: 24px; height: 24px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+  }
+
+  /* ---------- Modals ---------- */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; z-index: 100;
+    padding: 16px; opacity: 0; transition: 0.3s ease;
+  }
+  .modal-overlay.open { display: flex; animation: fadeIn 0.3s forwards; }
+  @keyframes fadeIn { to { opacity: 1; } }
+  
+  .modal {
+    background: #fff; width: 100%; max-width: 500px;
+    border-radius: 24px; padding: 26px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    transform: translateY(20px); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  
+  .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--ws-green); }
+  
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; color: var(--ws-gray); }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 12px 14px; border: 2px solid var(--ws-border);
+    border-radius: 12px; font-family: inherit; font-size: 14.5px; background: #FAFAFA; transition: 0.2s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    background: #fff; border-color: var(--ws-green-light); outline: none; box-shadow: 0 0 0 4px var(--ws-green-pastel);
+  }
+  
+  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+  .btn-secondary {
+    background: #F0EEE7; color: var(--ws-black); border: none; font-family: inherit;
+    padding: 10px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s;
+  }
+  .btn-secondary:hover { background: #E4E1D8; }
+
+  /* Toast Notification */
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ws-black); color: #fff; padding: 12px 24px; border-radius: 999px;
+    font-size: 14.5px; font-weight: 500; opacity: 0; pointer-events: none; transition: 0.3s;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 200; display: flex; align-items: center; gap: 10px;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  
+  /* Responsive */
+  @media(max-width: 480px) {
+    .tabs { margin-left: -16px; margin-right: -16px; padding: 0 16px 10px; }
+    .cat-grid, .recipe-grid { grid-template-columns: 1fr; }
+    .topbar { padding: 14px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">W</div>
+    <div class="brand-text">
+      <div class="t1">Wingstop</div>
+      <div class="t2">Ops Manual & System</div>
+    </div>
+  </div>
+  <div class="clock" id="clock">
+    <div class="day" id="c-day">Loading...</div>
+    <div class="time" id="c-time">--:--</div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M19 11a8 8 0 11-16 0 8 8 0 0116 0z"></path></svg>
+      <input type="text" id="searchInput" placeholder="ค้นหาหมวดหมู่, เมนู, ส่วนผสม..." autocomplete="off">
+    </div>
+  </div>
+
+  <div class="tabs" id="mainTabs">
+    <div class="tab active" data-tab="dashboard">📊 แดชบอร์ดหลัก</div>
+    <div class="tab" data-tab="recipes">🍔 สูตรอาหารทั้งหมด</div>
+  </div>
+
+  <!-- DASHBOARD TAB -->
+  <div id="view-dashboard">
+    <div class="section-title">มาตรฐานการทำงานประจำวัน</div>
+    <div class="section-sub">เลือกหมวดหมู่เพื่อดูขั้นตอนหรือเช็คลิสต์การทำงาน</div>
+    <div class="cat-grid" id="catGrid"></div>
+  </div>
+
+  <!-- RECIPES TAB -->
+  <div id="view-recipes" style="display:none;">
+    <div class="recipe-toolbar">
+      <div>
+        <div class="section-title">คู่มือสูตรอาหาร (SOP)</div>
+        <div class="section-sub">ข้อมูลสูตร ส่วนผสม และขั้นตอนการทำ</div>
+      </div>
+      <button class="btn-primary" id="btnAddRecipe">+ เพิ่มเมนูใหม่</button>
+    </div>
+    <div class="recipe-grid" id="recipeGrid"></div>
+  </div>
+
+  <!-- PROCEDURE DETAIL (Checklist / Info) -->
+  <div id="view-proc-detail" style="display:none;"></div>
+
+  <!-- RECIPE DETAIL -->
+  <div id="view-recipe-detail" style="display:none;"></div>
+
+</div>
+
+<!-- RECIPE MODAL -->
+<div class="modal-overlay" id="recipeModal">
+  <div class="modal" style="max-width:600px;">
+    <h2 id="modalTitle">เพิ่มเมนูใหม่</h2>
+    <input type="hidden" id="rId">
+    
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div class="field">
+        <label>ชื่อเมนู</label>
+        <input type="text" id="rName" placeholder="เช่น Classic Wings">
+      </div>
+      <div class="field">
+        <label>หมวดหมู่</label>
+        <select id="rCategory">
+          <option value="ไก่ทอด (Wings)">ไก่ทอด (Wings)</option>
+          <option value="ของทานเล่น (Sides)">ของทานเล่น (Sides)</option>
+          <option value="ซอส (Sauces/Dips)">ซอส (Sauces/Dips)</option>
+          <option value="เครื่องดื่ม (Drinks)">เครื่องดื่ม (Drinks)</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="field">
+      <label>คำอธิบายสั้นๆ</label>
+      <input type="text" id="rDesc" placeholder="อธิบายจุดเด่นของเมนู">
+    </div>
+    
+    <div class="field">
+      <label>ส่วนผสม (คั่นด้วยเครื่องหมายจุลภาค ,)</label>
+      <textarea id="rIng" rows="3" placeholder="ปีกไก่ 6 ชิ้น, ซอสกระเทียม 30g, น้ำมัน..."></textarea>
+    </div>
+    
+    <div class="field">
+      <label>ขั้นตอนการทำ (บรรทัดละ 1 ขั้นตอน)</label>
+      <textarea id="rSteps" rows="5" placeholder="1. นำไก่ลงทอดที่อุณหภูมิ 350F&#10;2. ทอดนาน 12 นาที&#10;3. นำมาคลุกซอส..."></textarea>
+    </div>
+    
+    <div class="modal-actions">
+      <button class="btn-secondary" id="cancelRecipe">ยกเลิก</button>
+      <button class="btn-primary" id="saveRecipe">บันทึกข้อมูล</button>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY EDIT MODAL -->
+<div class="modal-overlay" id="catModal">
+  <div class="modal">
+    <h2 id="catModalTitle">✏️ แก้ไขข้อมูล</h2>
+    <div class="field">
+      <label>รายละเอียด / ขั้นตอน (บรรทัดละ 1 ข้อ)</label>
+      <textarea id="cSteps" rows="8"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="cancelCat">ยกเลิก</button>
+      <button class="btn-primary" id="saveCat">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ <span id="toastMsg">บันทึกสำเร็จ</span></div>
+
+<script>
+// --- Discord Webhook ---
+const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1331295982705246238/7x7BwJmF7KDEsW3l_6fLzNofn8L4i_Xn_Oq-x9hZ8Rz1wG1Z0m4_Qj0h1Y1Z2f9wX8";
+
+function sendDiscordNotification(payload) {
+  fetch(DISCORD_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(err => console.error("Discord error:", err));
+}
+
+function notifyRecipeChange(recipe, isNew) {
+  sendDiscordNotification({
+    username: "Wingstop Ops Manual",
+    embeds: [{
+      title: isNew ? "📝 มีการเพิ่มสูตรอาหารใหม่!" : "✏️ มีการแก้ไขสูตรอาหาร",
+      color: isNew ? 45044 : 16766720,
+      fields: [
+        { name: "ชื่อเมนู", value: recipe.name || '-', inline: true },
+        { name: "หมวดหมู่", value: recipe.category || '-', inline: true },
+        { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
+      ],
+      timestamp: new Date().toISOString()
+    }]
+  });
+}
+
+function notifyRecipeDelete(recipe) {
+  sendDiscordNotification({
+    username: "Wingstop Ops Manual",
+    embeds: [{
+      title: "🗑️ มีการลบสูตรอาหาร",
+      color: 16711680, // สีแดง
+      fields: [
+        { name: "ชื่อเมนู", value: recipe.name || '-', inline: true },
+        { name: "หมวดหมู่", value: recipe.category || '-', inline: true }
+      ],
+      timestamp: new Date().toISOString()
+    }]
+  });
+}
+
+// --- Data Management ---
+const defaultCategories = () => [
+  { id:"open", icon:"🌅", title:"เปิดร้าน (Opening)", desc:"ขั้นตอนเตรียมความพร้อมก่อนเปิดร้านสำหรับกะเช้า", steps:[
+    "เปิดระบบไฟ แอร์ และเครื่อง POS", "อุ่นเครื่องทอด (Fryers) เซ็ตอุณหภูมิ 350°F", "เตรียมซอส ดริป และวัตถุดิบในตู้แช่", "ตรวจนับสต๊อกรายวันเบื้องต้น", "ทำความสะอาดเคาน์เตอร์และจัดเตรียมพื้นที่ให้บริการ"
+  ]},
+  { id:"close", icon:"🌃", title:"ปิดร้าน (Closing)", desc:"ขั้นตอนการเก็บกวาดและเคลียร์ระบบหลังร้านปิด", steps:[
+    "เคลียร์ออเดอร์สุดท้ายและปิดเครื่อง POS", "กรองน้ำมันและทำความสะอาดเครื่องทอด", "เก็บวัตถุดิบทั้งหมดเข้าตู้เย็น/ตู้แช่แข็ง", "เคลียร์ขยะ ทิ้งขยะ ล้างถังขยะ", "ตรวจเช็คความปลอดภัย ปิดไฟ ปิดแก็ส ล็อกประตู"
+  ]},
+  { id:"food", icon:"🍗", title:"มาตรฐานอาหาร", desc:"การควบคุมคุณภาพและอุณหภูมิ (Food Safety)", steps:[
+    "เช็คอุณหภูมิตู้เย็น (33-40°F) และตู้แช่แข็ง (0°F หรือต่ำกว่า)", "ไก่ดิบต้องเก็บแยกชั้นล่างสุดเพื่อป้องกันการปนเปื้อน", "อุณหภูมิไก่ทอดสุกต้องถึง 165°F ตรงกึ่งกลาง", "ติดป้ายอายุการใช้งาน (Shelf Life) ทุกวัตถุดิบที่เปิดแล้ว"
+  ]},
+  { id:"clean", icon:"🧽", title:"งานทำความสะอาด", desc:"ข้อมูลมาตรฐานความสะอาด (ข้อมูลที่ต้องรู้)", type: "info", steps:[
+    "ล้างมือทุกครั้งก่อนสัมผัสอาหาร (อย่างน้อย 20 วินาที)", "เปลี่ยนน้ำยาฆ่าเชื้อ (Sanitizer) ทุกๆ 2-4 ชั่วโมง", "ผ้าเช็ดโต๊ะและเคาน์เตอร์ต้องแช่ในน้ำยาตลอดเวลาเมื่อไม่ใช้", "ถูพื้นโซนครัวด้วยน้ำยาขจัดคราบมัน (Degreaser) หลังปิดร้าน", "ล้างตะแกรงทอดและอุปกรณ์ทุกชิ้นด้วยระบบ 3 อ่าง (ล้าง, ล้างน้ำเปล่า, ฆ่าเชื้อ)"
+  ]}
+];
+
+const defaultRecipes = () => [
+  {
+    id: "r1", name: "Classic Wings", category: "ไก่ทอด (Wings)", desc: "ไก่ทอดต้นตำรับ กรอบนอก ชุ่มฉ่ำด้านใน",
+    ingredients: ["ปีกไก่สด 6-12 ชิ้น", "น้ำมันสำหรับทอด (350°F)", "ซอสรสชาติต่างๆ (ตามออเดอร์)"],
+    steps: ["นำไก่ดิบใส่ตะแกรง เขย่าเศษน้ำแข็งออก", "หย่อนลงทอดในน้ำมัน 350°F ตั้งเวลา 12-14 นาที", "ยกขึ้นสะเด็ดน้ำมัน 15 วินาที", "ใส่ชามสแตนเลส เติมซอส และคลุกเคล้า (Toss) ให้ซอสเคลือบชิ้นไก่ทั่วถึง", "จัดใส่กล่อง เสิร์ฟพร้อม Ranch หรือ Bleu Cheese"]
+  }
+];
+
+let DATA = { categories: [], recipes: [], checks: {} };
+
+function loadData() {
+  const saved = localStorage.getItem('ws_ops_data');
+  if(saved) {
+    DATA = JSON.parse(saved);
+    if(!DATA.categories || DATA.categories.length === 0) DATA.categories = defaultCategories();
+  } else {
+    DATA = { categories: defaultCategories(), recipes: defaultRecipes(), checks: {} };
+  }
+  
+  // ซิงค์การเปลี่ยน type ของหมวดทำความสะอาด หากเคยเป็นระบบเก่า
+  const cleanCat = DATA.categories.find(c => c.id === 'clean');
+  if(cleanCat && cleanCat.type !== 'info') {
+    cleanCat.type = 'info';
+    saveData();
+  }
+}
+function saveData() { localStorage.setItem('ws_ops_data', JSON.stringify(DATA)); }
+
+// --- UI / App Logic ---
+const el = id => document.getElementById(id);
+function escapeHtml(str) { return str.replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag])); }
+function showToast(msg) {
+  el('toastMsg').innerText = msg;
+  const t = el('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function updateClock() {
+  const now = new Date();
+  const dOpts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  el('c-day').innerText = now.toLocaleDateString('th-TH', dOpts);
+  el('c-time').innerText = now.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+  
+  el('view-dashboard').style.display = tabId === 'dashboard' ? 'block' : 'none';
+  el('view-recipes').style.display = tabId === 'recipes' ? 'block' : 'none';
+  el('view-proc-detail').style.display = 'none';
+  el('view-recipe-detail').style.display = 'none';
+  el('searchInput').value = '';
+  renderDashboard();
+  if(tabId === 'recipes') renderRecipes();
+}
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => switchTab(t.dataset.tab));
+});
+
+// --- Dashboard (Categories) ---
+function renderDashboard(filter = '') {
+  const g = el('catGrid');
+  g.innerHTML = '';
+  const cats = DATA.categories.filter(c => c.title.toLowerCase().includes(filter.toLowerCase()) || c.desc.toLowerCase().includes(filter.toLowerCase()));
+  
+  if(cats.length === 0) {
+    g.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="em-icon">🔍</div><p>ไม่พบหมวดหมู่ที่ค้นหา</p></div>`;
+    return;
+  }
+
+  cats.forEach(c => {
+    let tagHtml = '';
+    if (c.type === 'info') {
+      tagHtml = `<div class="cat-info-tag">ℹ️ ข้อมูลที่ต้องรู้</div>`;
+    } else {
+      const today = new Date().toISOString().split('T')[0];
+      const key = `${c.id}_${today}`;
+      const checked = (DATA.checks[key] || []).length;
+      const total = c.steps.length;
+      const isDone = checked === total && total > 0;
+      tagHtml = `<div class="cat-count" style="background:${isDone ? 'var(--ws-green)' : 'var(--ws-green-pastel)'}; color:${isDone ? '#fff' : 'var(--ws-green)'}">
+        ${isDone ? '✓ เสร็จสมบูรณ์' : `ความคืบหน้า ${checked}/${total}`}
+      </div>`;
+    }
+
+    g.innerHTML += `
+      <div class="cat-card" onclick="openCategoryDetail('${c.id}')">
+        ${tagHtml}
+        <div class="cat-icon">${c.icon}</div>
+        <h3>${escapeHtml(c.title)}</h3>
+        <p>${escapeHtml(c.desc)}</p>
+      </div>
+    `;
+  });
+}
+
+function openCategoryDetail(id) {
+  const cat = DATA.categories.find(c => c.id === id);
+  if(!cat) return;
+  
+  const today = new Date().toISOString().split('T')[0];
+  const key = `${id}_${today}`;
+  if(!DATA.checks[key]) DATA.checks[key] = [];
+  
+  const isInfo = cat.type === 'info';
+  
+  el('view-dashboard').style.display = 'none';
+  el('view-recipes').style.display = 'none';
+  const detail = el('view-proc-detail');
+  detail.style.display = 'block';
+  
+  detail.innerHTML = `
+    <div class="proc-card">
+      <div class="proc-head">
+        <h2>${cat.icon} ${escapeHtml(cat.title)}</h2>
+        <div style="display:flex; gap:8px;">
+          ${isInfo
+            ? `<button class="btn-edit" onclick="editCategory('${cat.id}')">✏️ แก้ไขข้อมูล</button>`
+            : `<button class="btn-reset-check" onclick="resetChecklist('${key}', ${cat.steps.length})">🔄 รีเซ็ตเช็คลิสต์</button>`
+          }
+          <button class="back-btn" id="backToCats">← กลับหน้าหลัก</button>
+        </div>
+      </div>
+
+      ${isInfo ? '' : `
+      <div class="progress-card">
+        <div class="progress-info">
+          <span>ความคืบหน้าการทำงาน</span>
+          <span id="progress-text-${key}">กำลังคำนวณ...</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill-${key}"></div>
+        </div>
+      </div>
+      `}
+
+      <div class="${isInfo ? 'info-list' : 'checklist'}">
+        ${cat.steps.map((s,i) => {
+          if (isInfo) {
+            return `
+              <div class="info-item">
+                <div class="dot-custom">•</div>
+                <div class="step-text">${escapeHtml(s)}</div>
+              </div>
+            `;
+          } else {
+            const done = DATA.checks[key].includes(i);
+            return `
+              <div class="check-item ${done ? 'done' : ''}" id="step-item-${key}-${i}" onclick="toggleStepCheck('${key}', ${i}, ${cat.steps.length})">
+                <div class="checkbox-custom">${done ? '✓' : ''}</div>
+                <div class="step-text">${i+1}. ${escapeHtml(s)}</div>
+              </div>
+            `;
+          }
+        }).join('')}
+      </div>
+    </div>
+  `;
+  
+  el('backToCats').onclick = () => switchTab('dashboard');
+  if(!isInfo) updateProgress(key, cat.steps.length);
+}
+
+// Category Info Editor
+let editingCatId = null;
+window.editCategory = function(id) {
+  const cat = DATA.categories.find(c => c.id === id);
+  if(!cat) return;
+  editingCatId = id;
+  el('catModalTitle').innerHTML = `✏️ แก้ไขข้อมูล: ${escapeHtml(cat.title)}`;
+  el('cSteps').value = cat.steps.join('\n');
+  el('catModal').classList.add('open');
+};
+
+el('cancelCat').onclick = () => el('catModal').classList.remove('open');
+el('saveCat').onclick = () => {
+  const stepsStr = el('cSteps').value;
+  const steps = stepsStr.split('\n').map(s => s.trim()).filter(s => s);
+  const idx = DATA.categories.findIndex(c => c.id === editingCatId);
+  if(idx !== -1) {
+    DATA.categories[idx].steps = steps;
+    saveData();
+    showToast('อัปเดตข้อมูลสำเร็จ');
+    openCategoryDetail(editingCatId); // Refresh
+  }
+  el('catModal').classList.remove('open');
+};
+
+window.toggleStepCheck = function(key, idx, total) {
+  const checks = DATA.checks[key];
+  const pos = checks.indexOf(idx);
+  const elItem = el(`step-item-${key}-${idx}`);
+  const elBox = elItem.querySelector('.checkbox-custom');
+  
+  if(pos === -1) {
+    checks.push(idx);
+    elItem.classList.add('done');
+    elBox.innerText = '✓';
+  } else {
+    checks.splice(pos, 1);
+    elItem.classList.remove('done');
+    elBox.innerText = '';
+  }
+  saveData();
+  updateProgress(key, total);
+};
+
+window.resetChecklist = function(key, total) {
+  if(!confirm("ต้องการลบข้อมูลเช็คลิสต์ของวันนี้ทั้งหมดใช่หรือไม่?")) return;
+  DATA.checks[key] = [];
+  saveData();
+  const catId = key.split('_')[0];
+  openCategoryDetail(catId);
+  showToast('รีเซ็ตข้อมูลแล้ว');
+};
+
+function updateProgress(key, total) {
+  const checked = DATA.checks[key].length;
+  const pct = total === 0 ? 0 : Math.round((checked / total) * 100);
+  el(`progress-fill-${key}`).style.width = `${pct}%`;
+  el(`progress-text-${key}`).innerText = `${pct}% (${checked}/${total})`;
+}
+
+// --- Recipes ---
+function renderRecipes(filter = '') {
+  const g = el('recipeGrid');
+  g.innerHTML = '';
+  const f = filter.toLowerCase();
+  const list = DATA.recipes.filter(r => 
+    r.name.toLowerCase().includes(f) || r.category.toLowerCase().includes(f) || r.desc.toLowerCase().includes(f)
+  );
+
+  if(list.length === 0) {
+    g.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="em-icon">🍔</div><p>ไม่พบสูตรอาหาร</p></div>`;
+    return;
+  }
+
+  list.forEach(r => {
+    g.innerHTML += `
+      <div class="recipe-card" onclick="openRecipeDetail('${r.id}')">
+        <button class="del-btn" onclick="event.stopPropagation(); deleteRecipe('${r.id}')">🗑️</button>
+        <div class="recipe-tag">${escapeHtml(r.category)}</div>
+        <h3>${escapeHtml(r.name)}</h3>
+        <p>${escapeHtml(r.desc)}</p>
+        <div class="recipe-meta">
+          <span>🛒 ส่วนผสม ${r.ingredients.length}</span>
+          <span>📋 ขั้นตอน ${r.steps.length}</span>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function openRecipeDetail(id) {
+  const r = DATA.recipes.find(x => x.id === id);
+  if(!r) return;
+  
+  el('view-dashboard').style.display = 'none';
+  el('view-recipes').style.display = 'none';
+  const detail = el('view-recipe-detail');
+  detail.style.display = 'block';
+  
+  detail.innerHTML = `
+    <div class="recipe-detail">
+      <div class="rd-head">
+        <div>
+          <div style="font-size:13px; font-weight:600; color:var(--ws-green); margin-bottom:4px;">${escapeHtml(r.category)}</div>
+          <h2>${escapeHtml(r.name)}</h2>
+          <div style="color:var(--ws-gray); margin-top:6px; font-size:15px;">${escapeHtml(r.desc)}</div>
+        </div>
+        <div class="rd-actions">
+          <button class="btn-edit" onclick="editRecipe('${r.id}')">✏️ แก้ไขสูตร</button>
+          <button class="back-btn" id="backToRecipes">← ปิด</button>
+        </div>
+      </div>
+      
+      <div class="rd-cols">
+        <div class="rd-block">
+          <h4>🛒 ส่วนผสม (Ingredients)</h4>
+          <ul class="ing-list">
+            ${r.ingredients.map(i => `<li class="ing-item">${escapeHtml(i)}</li>`).join('')}
+          </ul>
+        </div>
+        <div class="rd-block">
+          <h4>📋 ขั้นตอนการทำ (Procedures)</h4>
+          <div class="step-list">
+            ${r.steps.map((s,i) => `
+              <div class="step-list-item">
+                <div class="step-num">${i+1}</div>
+                <div>${escapeHtml(s)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  el('backToRecipes').onclick = () => switchTab('recipes');
+}
+
+// Modal Recipes
+el('btnAddRecipe').onclick = () => {
+  el('rId').value = '';
+  el('rName').value = '';
+  el('rCategory').selectedIndex = 0;
+  el('rDesc').value = '';
+  el('rIng').value = '';
+  el('rSteps').value = '';
+  el('modalTitle').innerText = 'เพิ่มเมนูใหม่';
+  el('recipeModal').classList.add('open');
+};
+
+window.editRecipe = function(id) {
+  const r = DATA.recipes.find(x => x.id === id);
+  if(!r) return;
+  el('rId').value = r.id;
+  el('rName').value = r.name;
+  el('rCategory').value = r.category;
+  el('rDesc').value = r.desc;
+  el('rIng').value = r.ingredients.join(', ');
+  el('rSteps').value = r.steps.join('\n');
+  el('modalTitle').innerText = 'แก้ไขเมนู';
+  el('recipeModal').classList.add('open');
+};
+
+el('cancelRecipe').onclick = () => { el('recipeModal').classList.remove('open'); };
+
+el('saveRecipe').onclick = () => {
+  const id = el('rId').value;
+  const name = el('rName').value.trim();
+  if(!name) return alert('กรุณากรอกชื่อเมนู');
+  
+  const ings = el('rIng').value.split(',').map(s=>s.trim()).filter(s=>s);
+  const steps = el('rSteps').value.split('\n').map(s=>s.trim()).filter(s=>s);
+  
+  const recipeData = {
+    id: id || 'r_' + Date.now(),
+    name,
+    category: el('rCategory').value,
+    desc: el('rDesc').value,
+    ingredients: ings,
+    steps: steps
+  };
+
+  if(id) {
+    const idx = DATA.recipes.findIndex(x => x.id === id);
+    DATA.recipes[idx] = recipeData;
+    notifyRecipeChange(recipeData, false);
+    openRecipeDetail(id);
+    showToast('อัปเดตข้อมูลเรียบร้อย');
+  } else {
+    DATA.recipes.push(recipeData);
+    notifyRecipeChange(recipeData, true);
+    renderRecipes();
+    showToast('เพิ่มเมนูเรียบร้อย');
+  }
+  
+  saveData();
+  el('recipeModal').classList.remove('open');
+};
+
+window.deleteRecipe = function(id) {
+  if(!confirm('ยืนยันการลบเมนูนี้?')) return;
+  const targetRecipe = DATA.recipes.find(x => x.id === id);
+  DATA.recipes = DATA.recipes.filter(x => x.id !== id);
+  saveData();
+  
+  if (targetRecipe) {
+    notifyRecipeDelete(targetRecipe);
+  }
+  
+  renderRecipes();
+  showToast('ลบเมนูเรียบร้อยแล้ว');
+};
+
+// Search
+el('searchInput').addEventListener('input', (e) => {
+  const val = e.target.value;
+  const activeTab = document.querySelector('.tab.active').dataset.tab;
+  if(activeTab === 'dashboard') renderDashboard(val);
+  else renderRecipes(val);
+});
+
+// Init
+loadData();
+renderDashboard();
+</script>
+
+</body>
+</html>
