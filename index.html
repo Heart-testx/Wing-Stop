@@ -451,7 +451,6 @@ const db = firebase.firestore();
 // --- Discord Webhook ---
 const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1529841700644720671/EYFZJO0zt0f1gx1Uye6wYCjSN_pFoMH29gesDRCHH1E3Pe7hmAgTwwScgcaS8brwO7ps";
 
-// ใช้ Fetch ไปที่ Discord โดยตรง (Discord รองรับ CORS สำหรับ Webhook อยู่แล้ว)
 async function sendDiscordNotification(payload) {
   try {
     const response = await fetch(DISCORD_WEBHOOK_URL, {
@@ -506,10 +505,27 @@ function notifyCategoryChange(cat) {
     username: "Wingstop Ops Manual",
     embeds: [{
       title: "✏️ มีการแก้ไขข้อมูลหมวดหมู่ / เช็คลิสต์",
-      color: 3447003, // สีฟ้า
+      color: 3447003,
       fields: [
         { name: "ชื่อหมวดหมู่", value: cat.title || '-', inline: true },
         { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
+      ],
+      timestamp: new Date().toISOString()
+    }]
+  });
+}
+
+// ฟังก์ชันแจ้งเตือนเมื่อทำเช็คลิสต์สำเร็จครบทุกข้อ
+function notifyChecklistComplete(cat, total) {
+  sendDiscordNotification({
+    username: "Wingstop Ops Manual",
+    embeds: [{
+      title: "🎉 ทำเช็คลิสต์สำเร็จครบทุกขั้นตอน!",
+      color: 3066993, // สีเขียวสำเร็จ
+      fields: [
+        { name: "หมวดหมู่", value: cat.title || '-', inline: true },
+        { name: "ความคืบหน้า", value: `${total} / ${total} ข้อ (100%)`, inline: true },
+        { name: "สถานะ", value: "เสร็จสมบูรณ์เรียบร้อยแล้ว", inline: false }
       ],
       timestamp: new Date().toISOString()
     }]
@@ -758,7 +774,6 @@ el('saveCat').onclick = () => {
     saveData();
     showToast('✅ อัปเดตข้อมูลสำเร็จ');
     
-    // แจ้งเตือน Discord
     notifyCategoryChange(DATA.categories[idx]);
     
     openCategoryDetail(editingCatId);
@@ -786,8 +801,15 @@ window.toggleStepCheck = function(key, idx, total) {
   saveData();
   updateProgress(key, total);
 
+  // แจ้งเตือนเมื่อทำครบ 100%
   if (checks.length === total && pos === -1) {
     showToast('🎉 เก่งมาก! ทำเช็คลิสต์รายการนี้ครบทุกขั้นตอนแล้ว');
+    
+    const catId = key.split('_')[0];
+    const cat = DATA.categories.find(c => c.id === catId);
+    if (cat) {
+      notifyChecklistComplete(cat, total);
+    }
   }
 };
 
