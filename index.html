@@ -476,6 +476,9 @@ function notifyRecipeChange(recipe, isNew, oldRecipe = null) {
     fields = [
       { name: "ชื่อเมนู", value: recipe.name || '-', inline: true },
       { name: "หมวดหมู่", value: recipe.category || '-', inline: true },
+      { name: '\u200B', value: '\u200B', inline: true },
+      { name: "ส่วนผสม", value: (recipe.ingredients.join(', ') || '-').substring(0, 1024), inline: false },
+      { name: "ขั้นตอนการทำ", value: (recipe.steps.join('\n') || '-').substring(0, 1024), inline: false },
       { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
     ];
   } else {
@@ -483,9 +486,17 @@ function notifyRecipeChange(recipe, isNew, oldRecipe = null) {
       { name: "ชื่อเมนู (เก่า)", value: oldRecipe.name || '-', inline: true },
       { name: "ชื่อเมนู (ใหม่)", value: recipe.name || '-', inline: true },
       { name: '\u200B', value: '\u200B', inline: true },
+      
       { name: "หมวดหมู่ (เก่า)", value: oldRecipe.category || '-', inline: true },
       { name: "หมวดหมู่ (ใหม่)", value: recipe.category || '-', inline: true },
       { name: '\u200B', value: '\u200B', inline: true },
+
+      { name: "🛒 ส่วนผสม (เก่า)", value: (oldRecipe.ingredients.join(', ') || '-').substring(0, 1024), inline: false },
+      { name: "🛒 ส่วนผสม (ใหม่)", value: (recipe.ingredients.join(', ') || '-').substring(0, 1024), inline: false },
+      
+      { name: "📋 ขั้นตอนการทำ (เก่า)", value: (oldRecipe.steps.join('\n') || '-').substring(0, 1024), inline: false },
+      { name: "📋 ขั้นตอนการทำ (ใหม่)", value: (recipe.steps.join('\n') || '-').substring(0, 1024), inline: false },
+      
       { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
     ];
   }
