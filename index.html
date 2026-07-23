@@ -504,6 +504,7 @@ const defaultRecipes = () => [
 let DATA = { categories: [], recipes: [], checks: {} };
 
 function loadData() {
+  localStorage.removeItem('ws_ops_data');
   const saved = localStorage.getItem('ws_ops_data');
   if(saved) {
     DATA = JSON.parse(saved);
