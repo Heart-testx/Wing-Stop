@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
 <style>
   :root {
@@ -361,54 +360,6 @@
     .cat-grid, .recipe-grid { grid-template-columns: 1fr; }
     .topbar { padding: 14px 16px; }
   }
-
-  /* ---------- Auth: Login Overlay ---------- */
-  .auth-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(160deg, var(--ws-green) 0%, #06331f 100%);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 500; padding: 20px;
-  }
-  .auth-card {
-    background: #fff; width: 100%; max-width: 380px;
-    border-radius: 24px; padding: 32px 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  }
-  .auth-brand { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; text-align: center; }
-  .auth-brand .brand-mark {
-    width: 56px; height: 56px; border-radius: 16px; background: var(--ws-green-pastel);
-    color: var(--ws-green); display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 22px; margin-bottom: 12px;
-  }
-  .auth-brand h1 { font-size: 19px; font-weight: 700; color: var(--ws-black); }
-  .auth-brand p { font-size: 13px; color: var(--ws-gray); font-weight: 300; margin-top: 2px; }
-  .auth-error {
-    display: none; background: #FFF0F0; color: #E04646; font-size: 13.5px;
-    padding: 10px 14px; border-radius: 12px; margin-bottom: 14px; font-weight: 500;
-  }
-  .auth-error.show { display: block; }
-  .btn-login {
-    width: 100%; background: var(--ws-green); color: #fff; border: none; font-family: inherit;
-    padding: 13px 20px; border-radius: 999px; font-size: 15px; font-weight: 600;
-    cursor: pointer; transition: 0.2s; margin-top: 6px;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-  }
-  .btn-login:hover { background: var(--ws-green-light); transform: translateY(-1px); }
-  .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-  /* ---------- Auth: Topbar user info ---------- */
-  .clock-wrap { display: flex; align-items: center; gap: 14px; }
-  .user-info { text-align: right; }
-  .user-info .u-name { font-weight: 600; font-size: 13.5px; color: #fff; }
-  .user-info .u-role { font-size: 11px; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing: 0.3px; }
-  .btn-logout {
-    border: none; background: rgba(255,255,255,0.15); color: #fff; font-family: inherit;
-    padding: 7px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
-    cursor: pointer; transition: 0.2s; flex-shrink: 0;
-  }
-  .btn-logout:hover { background: rgba(255,255,255,0.28); }
-  @media(max-width: 480px) {
-    .user-info .u-role { display: none; }
-  }
 </style>
 </head>
 <body>
@@ -421,37 +372,9 @@
       <div class="t2">Ops Manual & System</div>
     </div>
   </div>
-  <div class="clock-wrap">
-    <div class="clock" id="clock">
-      <div class="day" id="c-day">Loading...</div>
-      <div class="time" id="c-time">--:--</div>
-    </div>
-    <div class="user-info" id="userInfo" style="display:none;">
-      <div class="u-name" id="u-name">-</div>
-      <div class="u-role" id="u-role">-</div>
-    </div>
-    <button class="btn-logout" id="btnLogout" style="display:none;" onclick="handleLogout()">ออกจากระบบ</button>
-  </div>
-</div>
-
-<!-- LOGIN OVERLAY -->
-<div class="auth-overlay" id="authOverlay">
-  <div class="auth-card">
-    <div class="auth-brand">
-      <div class="brand-mark">W</div>
-      <h1>Wingstop Ops Manual</h1>
-      <p>เข้าสู่ระบบเพื่อใช้งาน</p>
-    </div>
-    <div class="auth-error" id="authError">อีเมลหรือรหัสผ่านไม่ถูกต้อง</div>
-    <div class="field">
-      <label>อีเมล</label>
-      <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="username">
-    </div>
-    <div class="field" style="margin-bottom:4px;">
-      <label>รหัสผ่าน</label>
-      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
-    </div>
-    <button class="btn-login" id="btnLogin">เข้าสู่ระบบ</button>
+  <div class="clock" id="clock">
+    <div class="day" id="c-day">Loading...</div>
+    <div class="time" id="c-time">--:--</div>
   </div>
 </div>
 
@@ -553,7 +476,6 @@
 
 <script>
 // --- Firebase Database Setup ---
-// --- Firebase Database Setup ---
 const firebaseConfig = {
   apiKey: "AIzaSyBDYHAUJg1zrLsCycmasqlPSJ25XzQY354",
   authDomain: "wingstop-c1dfd.firebaseapp.com",
@@ -567,90 +489,6 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 const db = firebase.firestore();
-const auth = firebase.auth();
-
-// 📌 ย้ายฟังก์ชัน el มาไว้ตรงนี้ (ก่อนเรียกใช้งาน auth.onAuthStateChanged)
-const el = id => document.getElementById(id);
-
-// --- Auth state ---
-let currentUser = { uid: "", name: "", role: "" };
-function isAdmin() { return !!currentUser && currentUser.role === 'admin'; }
-```[cite: 1]
-
-function showAuthOverlay(show) {
-  el('authOverlay').style.display = show ? 'flex' : 'none';
-}
-
-auth.onAuthStateChanged(async (user) => {
-  if (user) {
-    let name = user.email;
-    let role = 'staff';
-    try {
-      const userDoc = await db.collection('users').doc(user.uid).get();
-      if (userDoc.exists) {
-        const d = userDoc.data();
-        name = d.name || name;
-        role = d.role || 'staff';
-      }
-    } catch (err) {
-      console.error('Error fetching user profile:', err);
-    }
-
-    currentUser = { uid: user.uid, name, role };
-
-    el('userInfo').style.display = 'block';
-    el('u-name').innerText = currentUser.name;
-    el('u-role').innerText = currentUser.role === 'admin' ? 'ผู้ดูแลระบบ' : 'พนักงาน';
-    el('btnLogout').style.display = 'inline-flex';
-
-    showAuthOverlay(false);
-    el('authError').classList.remove('show');
-    el('loginPassword').value = '';
-
-    el('btnAddRecipe').style.display = isAdmin() ? 'flex' : 'none';
-
-    loadData();
-  } else {
-    currentUser = null;
-    el('userInfo').style.display = 'none';
-    el('btnLogout').style.display = 'none';
-    showAuthOverlay(true);
-  }
-});
-
-async function handleLogin() {
-  const email = el('loginEmail').value.trim();
-  const password = el('loginPassword').value;
-  const btn = el('btnLogin');
-  el('authError').classList.remove('show');
-
-  if (!email || !password) {
-    el('authError').innerText = 'กรุณากรอกอีเมลและรหัสผ่าน';
-    el('authError').classList.add('show');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.innerText = 'กำลังเข้าสู่ระบบ...';
-  try {
-    await auth.signInWithEmailAndPassword(email, password);
-  } catch (err) {
-    console.error('Login error:', err);
-    el('authError').innerText = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
-    el('authError').classList.add('show');
-  } finally {
-    btn.disabled = false;
-    btn.innerText = 'เข้าสู่ระบบ';
-  }
-}
-
-function handleLogout() {
-  auth.signOut();
-}
-
-el('btnLogin').addEventListener('click', handleLogin);
-el('loginPassword').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
-el('loginEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
 
 // --- Discord Webhook ---
 const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1529841700644720671/EYFZJO0zt0f1gx1Uye6wYCjSN_pFoMH29gesDRCHH1E3Pe7hmAgTwwScgcaS8brwO7ps";
@@ -683,7 +521,7 @@ function notifyRecipeChange(recipe, isNew, oldRecipe = null) {
       { name: '\u200B', value: '\u200B', inline: true },
       { name: "ส่วนผสม", value: (recipe.ingredients.join(', ') || '-').substring(0, 1024), inline: false },
       { name: "ขั้นตอนการทำ", value: (recipe.steps.join('\n') || '-').substring(0, 1024), inline: false },
-      { name: "ผู้แก้ไข", value: (currentUser && currentUser.name) || "Staff (Web App)", inline: false }
+      { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
     ];
   } else {
     fields = [
@@ -701,7 +539,7 @@ function notifyRecipeChange(recipe, isNew, oldRecipe = null) {
       { name: "📋 ขั้นตอนการทำ (เก่า)", value: (oldRecipe.steps.join('\n') || '-').substring(0, 1024), inline: false },
       { name: "📋 ขั้นตอนการทำ (ใหม่)", value: (recipe.steps.join('\n') || '-').substring(0, 1024), inline: false },
       
-      { name: "ผู้แก้ไข", value: (currentUser && currentUser.name) || "Staff (Web App)", inline: false }
+      { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
     ];
   }
 
@@ -741,7 +579,7 @@ function notifyCategoryChange(oldCat, newCat) {
         { name: "ชื่อหมวดหมู่", value: newCat.title || '-', inline: false },
         { name: "ข้อมูลก่อนแก้ (เก่า)", value: (oldCat.steps.join('\n') || '-').substring(0, 1024), inline: false },
         { name: "ข้อมูลที่บันทึก (ใหม่)", value: (newCat.steps.join('\n') || '-').substring(0, 1024), inline: false },
-        { name: "ผู้แก้ไข", value: (currentUser && currentUser.name) || "Staff (Web App)", inline: false }
+        { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
       ],
       timestamp: new Date().toISOString()
     }]
@@ -757,9 +595,8 @@ function notifyChecklistComplete(cat, total) {
       color: 3066993, // สีเขียวสำเร็จ
       fields: [
         { name: "หมวดหมู่", value: cat.title || '-', inline: true },
-        { name: "ความคืบหน้า", value: `${total} / ${total} ข้อ (100%)`, inline: true }, // 👈 สังเกตตรงนี้ต้องใช้เครื่องหมาย ` ครอบ (ไม่ใช่ ")
-        { name: "สถานะ", value: "เสร็จสมบูรณ์เรียบร้อยแล้ว", inline: false },
-        { name: "ทำโดย", value: (currentUser && currentUser.name) || "Staff (Web App)", inline: false }
+        { name: "ความคืบหน้า", value: `${total} / ${total} ข้อ (100%)`, inline: true },
+        { name: "สถานะ", value: "เสร็จสมบูรณ์เรียบร้อยแล้ว", inline: false }
       ],
       timestamp: new Date().toISOString()
     }]
@@ -1061,11 +898,9 @@ window.openCategoryDetail = function(id) {
       <div class="proc-head">
         <h2>${cat.icon} ${escapeHtml(cat.title)}</h2>
         <div style="display:flex; gap:8px;">
-          ${isAdmin()
-            ? (isInfo
-                ? `<button class="btn-edit" onclick="editCategory('${cat.id}')">✏️ แก้ไขข้อมูล</button>`
-                : `<button class="btn-reset-check" onclick="resetChecklist('${key}', ${cat.steps.length})">🔄 รีเซ็ตเช็คลิสต์</button>`)
-            : ''
+          ${isInfo
+            ? `<button class="btn-edit" onclick="editCategory('${cat.id}')">✏️ แก้ไขข้อมูล</button>`
+            : `<button class="btn-reset-check" onclick="resetChecklist('${key}', ${cat.steps.length})">🔄 รีเซ็ตเช็คลิสต์</button>`
           }
           <button class="back-btn" id="backToCats">← กลับหน้าหลัก</button>
         </div>
@@ -1213,7 +1048,7 @@ function renderRecipes(filter = '') {
     const c = getCategoryColor(r.category);
     g.innerHTML += `
       <div class="recipe-card" style="border-left-color:${c.text};" onclick="openRecipeDetail('${r.id}')">
-        ${isAdmin() ? `<button class="del-btn" onclick="event.stopPropagation(); deleteRecipe('${r.id}')">🗑️</button>` : ''}
+        <button class="del-btn" onclick="event.stopPropagation(); deleteRecipe('${r.id}')">🗑️</button>
         <div class="recipe-tag" style="background:${c.bg}; color:${c.text};">${escapeHtml(r.category)}</div>
         <h3>${escapeHtml(r.name)}</h3>
         <p>${escapeHtml(r.desc)}</p>
@@ -1248,7 +1083,7 @@ window.openRecipeDetail = function(id) {
           <div style="color:var(--ws-gray); margin-top:6px; font-size:15px;">${escapeHtml(r.desc)}</div>
         </div>
         <div class="rd-actions">
-          ${isAdmin() ? `<button class="btn-edit" onclick="editRecipe('${r.id}')">✏️ แก้ไขสูตร</button>` : ''}
+          <button class="btn-edit" onclick="editRecipe('${r.id}')">✏️ แก้ไขสูตร</button>
           <button class="back-btn" id="backToRecipes">← ปิด</button>
         </div>
       </div>
@@ -1395,6 +1230,8 @@ el('searchClear').addEventListener('click', () => {
   runSearch('');
 });
 
+// Init
+loadData();
 
 </script>
 </body>
