@@ -757,7 +757,7 @@ function notifyChecklistComplete(cat, total) {
       color: 3066993, // สีเขียวสำเร็จ
       fields: [
         { name: "หมวดหมู่", value: cat.title || '-', inline: true },
-        { name: "ความคืบหน้า", value: `${total} / ${total} ข้อ (100%)`, inline: true },
+        { name: "ความคืบหน้า", value: `${total} / ${total} ข้อ (100%)`, inline: true }, // 👈 สังเกตตรงนี้ต้องใช้เครื่องหมาย ` ครอบ (ไม่ใช่ ")
         { name: "สถานะ", value: "เสร็จสมบูรณ์เรียบร้อยแล้ว", inline: false },
         { name: "ทำโดย", value: (currentUser && currentUser.name) || "Staff (Web App)", inline: false }
       ],
