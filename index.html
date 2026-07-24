@@ -553,6 +553,7 @@
 
 <script>
 // --- Firebase Database Setup ---
+// --- Firebase Database Setup ---
 const firebaseConfig = {
   apiKey: "AIzaSyBDYHAUJg1zrLsCycmasqlPSJ25XzQY354",
   authDomain: "wingstop-c1dfd.firebaseapp.com",
@@ -568,9 +569,13 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 const auth = firebase.auth();
 
+// 📌 ย้ายฟังก์ชัน el มาไว้ตรงนี้ (ก่อนเรียกใช้งาน auth.onAuthStateChanged)
+const el = id => document.getElementById(id);
+
 // --- Auth state ---
-let currentUser = null; // { uid, name, role }
+let currentUser = { uid: "", name: "", role: "" };
 function isAdmin() { return !!currentUser && currentUser.role === 'admin'; }
+```[cite: 1]
 
 function showAuthOverlay(show) {
   el('authOverlay').style.display = show ? 'flex' : 'none';
