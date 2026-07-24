@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
 <style>
   :root {
@@ -61,7 +62,7 @@
   .search-box {
     display: flex; align-items: center; gap: 12px;
     background: #fff; border: 2px solid var(--ws-border);
-    border-radius: 999px; padding: 12px 20px;
+    border-radius: 999px; padding: 15px 22px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.02);
     transition: 0.2s;
   }
@@ -69,9 +70,20 @@
   .search-box svg { flex-shrink: 0; color: var(--ws-green); opacity: 0.7; }
   .search-box input {
     border: none; outline: none; width: 100%;
-    font-size: 15px; font-family: inherit; background: transparent; color: var(--ws-black);
+    font-size: 16px; font-family: inherit; background: transparent; color: var(--ws-black);
   }
   .search-box input::placeholder { color: #A4A4A4; }
+  .search-clear {
+    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+    border: none; background: #F0EEE7; color: var(--ws-gray);
+    display: none; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 14px; transition: 0.2s;
+  }
+  .search-clear:hover { background: #E4E1D8; color: var(--ws-black); }
+  .search-clear.show { display: flex; }
+  .search-count {
+    font-size: 12.5px; color: var(--ws-gray); padding: 6px 4px 0; font-weight: 500;
+  }
 
   /* ---------- Tabs ---------- */
   .tabs { display: flex; gap: 10px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; }
@@ -211,10 +223,20 @@
     padding: 20px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
   }
   .recipe-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); border-color: var(--ws-green-pastel); }
+  .recipe-card { border-left-width: 5px; }
   .recipe-tag {
     display: inline-block; font-size: 11.5px; font-weight: 600; letter-spacing: 0.2px;
     color: var(--ws-green); background: var(--ws-green-pastel); padding: 4px 12px; border-radius: 999px; margin-bottom: 12px;
   }
+  .cat-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .cat-legend-item {
+    display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600;
+    padding: 7px 14px; border-radius: 999px; cursor: pointer; user-select: none;
+    background: #fff; border: 2px solid var(--ws-border); color: var(--ws-gray); transition: 0.2s;
+  }
+  .cat-legend-item:hover { border-color: var(--ws-green-pastel); }
+  .cat-legend-item.active { color: #fff; border-color: transparent; }
+  .cat-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
   .recipe-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
   .recipe-card p { font-size: 13.5px; color: var(--ws-gray); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .recipe-meta { margin-top: 14px; font-size: 12.5px; color: #9c9c94; display: flex; gap: 14px; font-weight: 500; }
@@ -296,6 +318,27 @@
     background: #fff; border-color: var(--ws-green-light); outline: none; box-shadow: 0 0 0 4px var(--ws-green-pastel);
   }
   
+  .ing-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+  .ing-row { display: grid; grid-template-columns: 1fr 110px 34px; gap: 8px; align-items: center; }
+  .ing-row input {
+    padding: 10px 12px; border: 2px solid var(--ws-border); border-radius: 10px;
+    font-family: inherit; font-size: 14px; background: #FAFAFA; transition: 0.2s;
+  }
+  .ing-row input:focus { background: #fff; border-color: var(--ws-green-light); outline: none; box-shadow: 0 0 0 4px var(--ws-green-pastel); }
+  .ing-row input.ing-qty::placeholder { color: #B8B8B0; }
+  .btn-remove-ing {
+    width: 34px; height: 34px; border-radius: 10px; border: none; background: #FFF0F0; color: #E04646;
+    cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: 0.2s;
+  }
+  .btn-remove-ing:hover { background: #E04646; color: #fff; }
+  .btn-add-ing {
+    border: 2px dashed var(--ws-border); background: transparent; color: var(--ws-green);
+    font-family: inherit; font-weight: 600; font-size: 13.5px; padding: 10px; border-radius: 10px;
+    cursor: pointer; width: 100%; transition: 0.2s;
+  }
+  .btn-add-ing:hover { border-color: var(--ws-green-light); background: var(--ws-green-pastel); }
+  .ing-hint { font-size: 12px; color: var(--ws-gray); margin: -4px 0 10px; }
+
   .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
   .btn-secondary {
     background: #F0EEE7; color: var(--ws-black); border: none; font-family: inherit;
@@ -318,6 +361,54 @@
     .cat-grid, .recipe-grid { grid-template-columns: 1fr; }
     .topbar { padding: 14px 16px; }
   }
+
+  /* ---------- Auth: Login Overlay ---------- */
+  .auth-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(160deg, var(--ws-green) 0%, #06331f 100%);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 500; padding: 20px;
+  }
+  .auth-card {
+    background: #fff; width: 100%; max-width: 380px;
+    border-radius: 24px; padding: 32px 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .auth-brand { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; text-align: center; }
+  .auth-brand .brand-mark {
+    width: 56px; height: 56px; border-radius: 16px; background: var(--ws-green-pastel);
+    color: var(--ws-green); display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 22px; margin-bottom: 12px;
+  }
+  .auth-brand h1 { font-size: 19px; font-weight: 700; color: var(--ws-black); }
+  .auth-brand p { font-size: 13px; color: var(--ws-gray); font-weight: 300; margin-top: 2px; }
+  .auth-error {
+    display: none; background: #FFF0F0; color: #E04646; font-size: 13.5px;
+    padding: 10px 14px; border-radius: 12px; margin-bottom: 14px; font-weight: 500;
+  }
+  .auth-error.show { display: block; }
+  .btn-login {
+    width: 100%; background: var(--ws-green); color: #fff; border: none; font-family: inherit;
+    padding: 13px 20px; border-radius: 999px; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: 0.2s; margin-top: 6px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-login:hover { background: var(--ws-green-light); transform: translateY(-1px); }
+  .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* ---------- Auth: Topbar user info ---------- */
+  .clock-wrap { display: flex; align-items: center; gap: 14px; }
+  .user-info { text-align: right; }
+  .user-info .u-name { font-weight: 600; font-size: 13.5px; color: #fff; }
+  .user-info .u-role { font-size: 11px; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing: 0.3px; }
+  .btn-logout {
+    border: none; background: rgba(255,255,255,0.15); color: #fff; font-family: inherit;
+    padding: 7px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+    cursor: pointer; transition: 0.2s; flex-shrink: 0;
+  }
+  .btn-logout:hover { background: rgba(255,255,255,0.28); }
+  @media(max-width: 480px) {
+    .user-info .u-role { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -330,9 +421,37 @@
       <div class="t2">Ops Manual & System</div>
     </div>
   </div>
-  <div class="clock" id="clock">
-    <div class="day" id="c-day">Loading...</div>
-    <div class="time" id="c-time">--:--</div>
+  <div class="clock-wrap">
+    <div class="clock" id="clock">
+      <div class="day" id="c-day">Loading...</div>
+      <div class="time" id="c-time">--:--</div>
+    </div>
+    <div class="user-info" id="userInfo" style="display:none;">
+      <div class="u-name" id="u-name">-</div>
+      <div class="u-role" id="u-role">-</div>
+    </div>
+    <button class="btn-logout" id="btnLogout" style="display:none;" onclick="handleLogout()">ออกจากระบบ</button>
+  </div>
+</div>
+
+<!-- LOGIN OVERLAY -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="brand-mark">W</div>
+      <h1>Wingstop Ops Manual</h1>
+      <p>เข้าสู่ระบบเพื่อใช้งาน</p>
+    </div>
+    <div class="auth-error" id="authError">อีเมลหรือรหัสผ่านไม่ถูกต้อง</div>
+    <div class="field">
+      <label>อีเมล</label>
+      <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="username">
+    </div>
+    <div class="field" style="margin-bottom:4px;">
+      <label>รหัสผ่าน</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-login" id="btnLogin">เข้าสู่ระบบ</button>
   </div>
 </div>
 
@@ -340,9 +459,12 @@
   <div class="search-wrap">
     <div class="search-box">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M19 11a8 8 0 11-16 0 8 8 0 0116 0z"></path></svg>
-      <input type="text" id="searchInput" placeholder="ค้นหาหมวดหมู่, เมนู, ส่วนผสม..." autocomplete="off">
+      <input type="text" id="searchInput" placeholder="ค้นหาหมวดหมู่, เมนู, ส่วนผสม..." autocomplete="off" list="recipeNameList">
+      <button type="button" class="search-clear" id="searchClear" title="ล้างคำค้นหา">✕</button>
     </div>
+    <div class="search-count" id="searchCount"></div>
   </div>
+  <datalist id="recipeNameList"></datalist>
 
   <div class="tabs" id="mainTabs">
     <div class="tab active" data-tab="dashboard">📊 หน้าหลัก</div>
@@ -363,6 +485,7 @@
       </div>
       <button class="btn-primary" id="btnAddRecipe">+ เพิ่มเมนูใหม่</button>
     </div>
+    <div class="cat-legend" id="catLegend"></div>
     <div class="recipe-grid" id="recipeGrid"></div>
   </div>
 
@@ -377,20 +500,13 @@
     <h2 id="modalTitle">เพิ่มเมนูใหม่</h2>
     <input type="hidden" id="rId">
     
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-      <div class="field">
-        <label>ชื่อเมนู</label>
-        <input type="text" id="rName" placeholder="เช่น Classic Wings">
-      </div>
-      <div class="field">
-        <label>หมวดหมู่</label>
-        <select id="rCategory">
-          <option value="ไก่ทอด (Wings)">ไก่ทอด (Wings)</option>
-          <option value="ของทานเล่น (Sides)">ของทานเล่น (Sides)</option>
-          <option value="ซอส (Sauces/Dips)">ซอส (Sauces/Dips)</option>
-          <option value="เครื่องดื่ม (Drinks)">เครื่องดื่ม (Drinks)</option>
-        </select>
-      </div>
+    <div class="field">
+      <label>ชื่อเมนู</label>
+      <input type="text" id="rName" placeholder="เช่น Classic Wings" style="font-size:16px; padding:14px 16px;" list="recipeNameList">
+    </div>
+    <div class="field">
+      <label>หมวดหมู่</label>
+      <select id="rCategory"></select>
     </div>
     
     <div class="field">
@@ -399,8 +515,11 @@
     </div>
     
     <div class="field">
-      <label>ส่วนผสม (คั่นด้วยเครื่องหมายจุลภาค ,)</label>
-      <textarea id="rIng" rows="3" placeholder="ปีกไก่ 6 ชิ้น, ซอสกระเทียม 30g, น้ำมัน..."></textarea>
+      <label>ส่วนผสม (Ingredients)</label>
+      <div class="ing-hint">กรอกชื่อส่วนผสม ส่วน "จำนวน" ไม่บังคับกรอก เว้นว่างได้</div>
+      <div class="ing-rows" id="ingRows"></div>
+      <button type="button" class="btn-add-ing" id="btnAddIng">+ เพิ่มส่วนผสม</button>
+      <datalist id="ingredientNameList"></datalist>
     </div>
     
     <div class="field">
@@ -447,6 +566,86 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 const db = firebase.firestore();
+const auth = firebase.auth();
+
+// --- Auth state ---
+let currentUser = null; // { uid, name, role }
+function isAdmin() { return !!currentUser && currentUser.role === 'admin'; }
+
+function showAuthOverlay(show) {
+  el('authOverlay').style.display = show ? 'flex' : 'none';
+}
+
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    let name = user.email;
+    let role = 'staff';
+    try {
+      const userDoc = await db.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        const d = userDoc.data();
+        name = d.name || name;
+        role = d.role || 'staff';
+      }
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+    }
+
+    currentUser = { uid: user.uid, name, role };
+
+    el('userInfo').style.display = 'block';
+    el('u-name').innerText = currentUser.name;
+    el('u-role').innerText = currentUser.role === 'admin' ? 'ผู้ดูแลระบบ' : 'พนักงาน';
+    el('btnLogout').style.display = 'inline-flex';
+
+    showAuthOverlay(false);
+    el('authError').classList.remove('show');
+    el('loginPassword').value = '';
+
+    el('btnAddRecipe').style.display = isAdmin() ? 'flex' : 'none';
+
+    loadData();
+  } else {
+    currentUser = null;
+    el('userInfo').style.display = 'none';
+    el('btnLogout').style.display = 'none';
+    showAuthOverlay(true);
+  }
+});
+
+async function handleLogin() {
+  const email = el('loginEmail').value.trim();
+  const password = el('loginPassword').value;
+  const btn = el('btnLogin');
+  el('authError').classList.remove('show');
+
+  if (!email || !password) {
+    el('authError').innerText = 'กรุณากรอกอีเมลและรหัสผ่าน';
+    el('authError').classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = 'กำลังเข้าสู่ระบบ...';
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+  } catch (err) {
+    console.error('Login error:', err);
+    el('authError').innerText = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+    el('authError').classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.innerText = 'เข้าสู่ระบบ';
+  }
+}
+
+function handleLogout() {
+  auth.signOut();
+}
+
+el('btnLogin').addEventListener('click', handleLogin);
+el('loginPassword').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
+el('loginEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
 
 // --- Discord Webhook ---
 const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1529841700644720671/EYFZJO0zt0f1gx1Uye6wYCjSN_pFoMH29gesDRCHH1E3Pe7hmAgTwwScgcaS8brwO7ps";
@@ -479,7 +678,7 @@ function notifyRecipeChange(recipe, isNew, oldRecipe = null) {
       { name: '\u200B', value: '\u200B', inline: true },
       { name: "ส่วนผสม", value: (recipe.ingredients.join(', ') || '-').substring(0, 1024), inline: false },
       { name: "ขั้นตอนการทำ", value: (recipe.steps.join('\n') || '-').substring(0, 1024), inline: false },
-      { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
+      { name: "ผู้แก้ไข", value: (currentUser && currentUser.name) || "Staff (Web App)", inline: false }
     ];
   } else {
     fields = [
@@ -497,7 +696,7 @@ function notifyRecipeChange(recipe, isNew, oldRecipe = null) {
       { name: "📋 ขั้นตอนการทำ (เก่า)", value: (oldRecipe.steps.join('\n') || '-').substring(0, 1024), inline: false },
       { name: "📋 ขั้นตอนการทำ (ใหม่)", value: (recipe.steps.join('\n') || '-').substring(0, 1024), inline: false },
       
-      { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
+      { name: "ผู้แก้ไข", value: (currentUser && currentUser.name) || "Staff (Web App)", inline: false }
     ];
   }
 
@@ -537,7 +736,7 @@ function notifyCategoryChange(oldCat, newCat) {
         { name: "ชื่อหมวดหมู่", value: newCat.title || '-', inline: false },
         { name: "ข้อมูลก่อนแก้ (เก่า)", value: (oldCat.steps.join('\n') || '-').substring(0, 1024), inline: false },
         { name: "ข้อมูลที่บันทึก (ใหม่)", value: (newCat.steps.join('\n') || '-').substring(0, 1024), inline: false },
-        { name: "ผู้แก้ไข", value: "Staff (Web App)", inline: false }
+        { name: "ผู้แก้ไข", value: (currentUser && currentUser.name) || "Staff (Web App)", inline: false }
       ],
       timestamp: new Date().toISOString()
     }]
@@ -554,7 +753,8 @@ function notifyChecklistComplete(cat, total) {
       fields: [
         { name: "หมวดหมู่", value: cat.title || '-', inline: true },
         { name: "ความคืบหน้า", value: `${total} / ${total} ข้อ (100%)`, inline: true },
-        { name: "สถานะ", value: "เสร็จสมบูรณ์เรียบร้อยแล้ว", inline: false }
+        { name: "สถานะ", value: "เสร็จสมบูรณ์เรียบร้อยแล้ว", inline: false },
+        { name: "ทำโดย", value: (currentUser && currentUser.name) || "Staff (Web App)", inline: false }
       ],
       timestamp: new Date().toISOString()
     }]
@@ -580,6 +780,121 @@ const defaultRecipes = () => [
 let DATA = { categories: [], recipes: [], checks: {} };
 let currentCategoryId = null;
 let currentRecipeId = null;
+let activeCategoryFilter = null; // หมวดหมู่ที่กำลังกรองอยู่ในหน้าสูตรอาหาร (null = ทั้งหมด)
+
+// --- Category Color Coding ---
+// ชุดสีที่แยกจากกันชัดเจน กำหนดให้แต่ละหมวดหมู่โดยอัตโนมัติ (คงที่เสมอสำหรับชื่อหมวดหมู่เดียวกัน)
+const CATEGORY_PALETTE = [
+  { bg: '#FFF0F0', text: '#D64545' }, // แดง
+  { bg: '#FFF8E7', text: '#B8860B' }, // เหลือง/ส้ม
+  { bg: '#E8F5EE', text: '#00543C' }, // เขียว (โทนหลัก)
+  { bg: '#EAF2FF', text: '#1D5FC4' }, // ฟ้า
+  { bg: '#F3EBFF', text: '#7A3FD1' }, // ม่วง
+  { bg: '#FFEFF6', text: '#C4288E' }, // ชมพู
+  { bg: '#FFF1E6', text: '#C4611D' }, // ส้มเข้ม
+  { bg: '#EAF7F7', text: '#0E8A8A' }, // ฟ้าอมเขียว
+];
+function getCategoryColor(category) {
+  const str = (category || 'อื่นๆ').trim();
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+  return CATEGORY_PALETTE[hash % CATEGORY_PALETTE.length];
+}
+
+function getAllCategoryNames() {
+  const names = new Set(DATA.recipes.map(r => r.category).filter(Boolean));
+  ['ไก่ทอด (Wings)', 'ของทานเล่น (Sides)', 'ซอส (Sauces/Dips)', 'เครื่องดื่ม (Drinks)'].forEach(n => names.add(n));
+  return Array.from(names);
+}
+
+function renderCategoryLegend() {
+  const legend = el('catLegend');
+  if (!legend) return;
+  const names = getAllCategoryNames();
+
+  const allActive = activeCategoryFilter === null;
+  let html = `<div class="cat-legend-item ${allActive ? 'active' : ''}" style="${allActive ? 'background:var(--ws-green);' : ''}" data-cat="">ทั้งหมด</div>`;
+  html += names.map(n => {
+    const c = getCategoryColor(n);
+    const isActive = activeCategoryFilter === n;
+    return `<div class="cat-legend-item ${isActive ? 'active' : ''}" style="${isActive ? `background:${c.text};` : ''}" data-cat="${escapeHtml(n)}">
+      <span class="cat-legend-dot" style="background:${isActive ? '#fff' : c.text}"></span>${escapeHtml(n)}
+    </div>`;
+  }).join('');
+  legend.innerHTML = html;
+
+  legend.querySelectorAll('.cat-legend-item').forEach(item => {
+    item.onclick = () => {
+      const cat = item.dataset.cat;
+      activeCategoryFilter = cat === '' ? null : cat;
+      renderCategoryLegend();
+      runSearch(el('searchInput').value);
+    };
+  });
+}
+
+function renderDatalists() {
+  const catSelect = el('rCategory');
+  if (catSelect) {
+    const prevVal = catSelect.value;
+    const names = getAllCategoryNames();
+    catSelect.innerHTML = '<option value="" disabled>-- เลือกหมวดหมู่ --</option>' +
+      names.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+    catSelect.value = names.includes(prevVal) ? prevVal : '';
+  }
+
+  const nameList = el('recipeNameList');
+  if (nameList) nameList.innerHTML = DATA.recipes.map(r => `<option value="${escapeHtml(r.name)}">`).join('');
+
+  const ingSet = new Set();
+  DATA.recipes.forEach(r => r.ingredients.forEach(i => {
+    const m = i.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+    ingSet.add(m ? m[1].trim() : i.trim());
+  }));
+  const ingList = el('ingredientNameList');
+  if (ingList) ingList.innerHTML = Array.from(ingSet).map(n => `<option value="${escapeHtml(n)}">`).join('');
+}
+
+// --- Dynamic Ingredient Rows (ชื่อ + จำนวน [ไม่บังคับ]) ---
+function addIngredientRow(name = '', qty = '') {
+  const wrap = el('ingRows');
+  const row = document.createElement('div');
+  row.className = 'ing-row';
+  row.innerHTML = `
+    <input type="text" class="ing-name" placeholder="ชื่อส่วนผสม เช่น ปีกไก่สด" value="${escapeHtml(name)}" list="ingredientNameList">
+    <input type="text" class="ing-qty" placeholder="จำนวน (ไม่บังคับ)" value="${escapeHtml(qty)}">
+    <button type="button" class="btn-remove-ing" title="ลบรายการนี้">🗑️</button>
+  `;
+  row.querySelector('.btn-remove-ing').onclick = () => row.remove();
+  wrap.appendChild(row);
+}
+
+function resetIngredientRows(ingredients = []) {
+  const wrap = el('ingRows');
+  wrap.innerHTML = '';
+  if (ingredients.length === 0) {
+    addIngredientRow();
+    return;
+  }
+  ingredients.forEach(i => {
+    // พยายามแยก "ชื่อ (จำนวน)" ออกจากกัน ถ้าไม่ตรงรูปแบบจะใส่ทั้งหมดไว้ในช่องชื่อ
+    const m = i.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+    if (m) addIngredientRow(m[1].trim(), m[2].trim());
+    else addIngredientRow(i, '');
+  });
+}
+
+function collectIngredientsFromForm() {
+  const rows = el('ingRows').querySelectorAll('.ing-row');
+  const result = [];
+  rows.forEach(row => {
+    const name = row.querySelector('.ing-name').value.trim();
+    const qty = row.querySelector('.ing-qty').value.trim();
+    if (!name) return; // ข้ามแถวที่ไม่ได้กรอกชื่อ
+    result.push(qty ? `${name} (${qty})` : name);
+  });
+  return result;
+}
 
 function loadData() {
   const saved = localStorage.getItem('ws_ops_data');
@@ -597,12 +912,16 @@ function loadData() {
   }
   
   renderDashboard();
+  renderDatalists();
+  renderCategoryLegend();
 
   db.collection('ops_manual').doc('app_data').onSnapshot((doc) => {
     if (doc.exists) {
       DATA = doc.data();
       localStorage.setItem('ws_ops_data', JSON.stringify(DATA));
       refreshCurrentView();
+      renderDatalists();
+      renderCategoryLegend();
     } else {
       saveData();
     }
@@ -655,6 +974,7 @@ updateClock();
 function switchTab(tabId) {
   currentCategoryId = null;
   currentRecipeId = null;
+  activeCategoryFilter = null;
 
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
@@ -664,9 +984,11 @@ function switchTab(tabId) {
   el('view-proc-detail').style.display = 'none';
   el('view-recipe-detail').style.display = 'none';
   el('searchInput').value = '';
+  el('searchClear').classList.remove('show');
+  el('searchCount').innerText = '';
   
   if (tabId === 'dashboard') renderDashboard();
-  if (tabId === 'recipes') renderRecipes();
+  if (tabId === 'recipes') { renderCategoryLegend(); renderRecipes(); }
 }
 
 document.querySelectorAll('.tab').forEach(t => {
@@ -699,10 +1021,11 @@ function renderDashboard(filter = '') {
       </div>`;
     }
 
+    const cc = getCategoryColor(c.title);
     g.innerHTML += `
-      <div class="cat-card" onclick="openCategoryDetail('${c.id}')">
+      <div class="cat-card" style="border-left:5px solid ${cc.text};" onclick="openCategoryDetail('${c.id}')">
         ${tagHtml}
-        <div class="cat-icon">${c.icon}</div>
+        <div class="cat-icon" style="background:${cc.bg}; color:${cc.text};">${c.icon}</div>
         <h3>${escapeHtml(c.title)}</h3>
         <p>${escapeHtml(c.desc)}</p>
       </div>
@@ -733,9 +1056,11 @@ window.openCategoryDetail = function(id) {
       <div class="proc-head">
         <h2>${cat.icon} ${escapeHtml(cat.title)}</h2>
         <div style="display:flex; gap:8px;">
-          ${isInfo
-            ? `<button class="btn-edit" onclick="editCategory('${cat.id}')">✏️ แก้ไขข้อมูล</button>`
-            : `<button class="btn-reset-check" onclick="resetChecklist('${key}', ${cat.steps.length})">🔄 รีเซ็ตเช็คลิสต์</button>`
+          ${isAdmin()
+            ? (isInfo
+                ? `<button class="btn-edit" onclick="editCategory('${cat.id}')">✏️ แก้ไขข้อมูล</button>`
+                : `<button class="btn-reset-check" onclick="resetChecklist('${key}', ${cat.steps.length})">🔄 รีเซ็ตเช็คลิสต์</button>`)
+            : ''
           }
           <button class="back-btn" id="backToCats">← กลับหน้าหลัก</button>
         </div>
@@ -867,20 +1192,24 @@ function renderRecipes(filter = '') {
   const g = el('recipeGrid');
   g.innerHTML = '';
   const f = filter.toLowerCase();
-  const list = DATA.recipes.filter(r => 
-    r.name.toLowerCase().includes(f) || r.category.toLowerCase().includes(f) || r.desc.toLowerCase().includes(f)
-  );
+  const list = DATA.recipes.filter(r => {
+    if (activeCategoryFilter && r.category !== activeCategoryFilter) return false;
+    return r.name.toLowerCase().includes(f) || r.category.toLowerCase().includes(f) || r.desc.toLowerCase().includes(f) ||
+      r.ingredients.some(i => i.toLowerCase().includes(f));
+  });
 
   if(list.length === 0) {
-    g.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="em-icon">🍔</div><p>ไม่พบสูตรอาหาร</p></div>`;
+    const msg = activeCategoryFilter ? `ไม่พบเมนูในหมวด "${escapeHtml(activeCategoryFilter)}"` : 'ไม่พบสูตรอาหาร';
+    g.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="em-icon">🍔</div><p>${msg}</p></div>`;
     return;
   }
 
   list.forEach(r => {
+    const c = getCategoryColor(r.category);
     g.innerHTML += `
-      <div class="recipe-card" onclick="openRecipeDetail('${r.id}')">
-        <button class="del-btn" onclick="event.stopPropagation(); deleteRecipe('${r.id}')">🗑️</button>
-        <div class="recipe-tag">${escapeHtml(r.category)}</div>
+      <div class="recipe-card" style="border-left-color:${c.text};" onclick="openRecipeDetail('${r.id}')">
+        ${isAdmin() ? `<button class="del-btn" onclick="event.stopPropagation(); deleteRecipe('${r.id}')">🗑️</button>` : ''}
+        <div class="recipe-tag" style="background:${c.bg}; color:${c.text};">${escapeHtml(r.category)}</div>
         <h3>${escapeHtml(r.name)}</h3>
         <p>${escapeHtml(r.desc)}</p>
         <div class="recipe-meta">
@@ -904,16 +1233,17 @@ window.openRecipeDetail = function(id) {
   const detail = el('view-recipe-detail');
   detail.style.display = 'block';
   
+  const rc = getCategoryColor(r.category);
   detail.innerHTML = `
     <div class="recipe-detail">
       <div class="rd-head">
         <div>
-          <div style="font-size:13px; font-weight:600; color:var(--ws-green); margin-bottom:4px;">${escapeHtml(r.category)}</div>
+          <div style="display:inline-block; font-size:13px; font-weight:600; color:${rc.text}; background:${rc.bg}; padding:4px 12px; border-radius:999px; margin-bottom:8px;">${escapeHtml(r.category)}</div>
           <h2>${escapeHtml(r.name)}</h2>
           <div style="color:var(--ws-gray); margin-top:6px; font-size:15px;">${escapeHtml(r.desc)}</div>
         </div>
         <div class="rd-actions">
-          <button class="btn-edit" onclick="editRecipe('${r.id}')">✏️ แก้ไขสูตร</button>
+          ${isAdmin() ? `<button class="btn-edit" onclick="editRecipe('${r.id}')">✏️ แก้ไขสูตร</button>` : ''}
           <button class="back-btn" id="backToRecipes">← ปิด</button>
         </div>
       </div>
@@ -944,24 +1274,29 @@ window.openRecipeDetail = function(id) {
 
 // Modal Recipes
 el('btnAddRecipe').onclick = () => {
+  renderDatalists();
   el('rId').value = '';
   el('rName').value = '';
-  el('rCategory').selectedIndex = 0;
+  el('rCategory').value = '';
   el('rDesc').value = '';
-  el('rIng').value = '';
+  resetIngredientRows([]);
   el('rSteps').value = '';
   el('modalTitle').innerText = 'เพิ่มเมนูใหม่';
   el('recipeModal').classList.add('open');
+  el('rName').focus();
 };
+
+el('btnAddIng').onclick = () => addIngredientRow();
 
 window.editRecipe = function(id) {
   const r = DATA.recipes.find(x => x.id === id);
   if(!r) return;
+  renderDatalists();
   el('rId').value = r.id;
   el('rName').value = r.name;
   el('rCategory').value = r.category;
   el('rDesc').value = r.desc;
-  el('rIng').value = r.ingredients.join(', ');
+  resetIngredientRows(r.ingredients);
   el('rSteps').value = r.steps.join('\n');
   el('modalTitle').innerText = 'แก้ไขเมนู';
   el('recipeModal').classList.add('open');
@@ -973,14 +1308,16 @@ el('saveRecipe').onclick = () => {
   const id = el('rId').value;
   const name = el('rName').value.trim();
   if(!name) return alert('กรุณากรอกชื่อเมนู');
+  const category = el('rCategory').value.trim();
+  if(!category) return alert('กรุณาเลือกหมวดหมู่');
   
-  const ings = el('rIng').value.split(',').map(s=>s.trim()).filter(s=>s);
+  const ings = collectIngredientsFromForm();
   const steps = el('rSteps').value.split('\n').map(s=>s.trim()).filter(s=>s);
   
   const recipeData = {
     id: id || 'r_' + Date.now(),
     name,
-    category: el('rCategory').value,
+    category,
     desc: el('rDesc').value,
     ingredients: ings,
     steps: steps
@@ -1003,6 +1340,8 @@ el('saveRecipe').onclick = () => {
   }
   
   saveData();
+  renderDatalists();
+  renderCategoryLegend();
   el('recipeModal').classList.remove('open');
 };
 
@@ -1017,19 +1356,40 @@ window.deleteRecipe = function(id) {
   }
   
   renderRecipes();
+  renderDatalists();
+  renderCategoryLegend();
   showToast('✅ ลบเมนูเรียบร้อยแล้ว');
 };
 
-// Search
-el('searchInput').addEventListener('input', (e) => {
-  const val = e.target.value;
+// Search (Real-time filtering)
+function runSearch(val) {
   const activeTab = document.querySelector('.tab.active').dataset.tab;
-  if(activeTab === 'dashboard') renderDashboard(val);
-  else renderRecipes(val);
+  el('searchClear').classList.toggle('show', val.length > 0);
+
+  let count;
+  if (activeTab === 'dashboard') {
+    renderDashboard(val);
+    count = DATA.categories.filter(c => c.title.toLowerCase().includes(val.toLowerCase()) || c.desc.toLowerCase().includes(val.toLowerCase())).length;
+    el('searchCount').innerText = val ? `พบ ${count} รายการ` : '';
+  } else {
+    renderRecipes(val);
+    const f = val.toLowerCase();
+    count = DATA.recipes.filter(r => {
+      if (activeCategoryFilter && r.category !== activeCategoryFilter) return false;
+      return r.name.toLowerCase().includes(f) || r.category.toLowerCase().includes(f) || r.desc.toLowerCase().includes(f) || r.ingredients.some(i => i.toLowerCase().includes(f));
+    }).length;
+    el('searchCount').innerText = (val || activeCategoryFilter) ? `พบ ${count} รายการ` : '';
+  }
+}
+
+el('searchInput').addEventListener('input', (e) => runSearch(e.target.value));
+
+el('searchClear').addEventListener('click', () => {
+  el('searchInput').value = '';
+  el('searchInput').focus();
+  runSearch('');
 });
 
-// Init
-loadData();
 
 </script>
 </body>
