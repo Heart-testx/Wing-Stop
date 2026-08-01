@@ -3,11 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wingstop TAN&HEART</title>
+<!-- SEO: description + theme-color สำหรับแถบสีบนมือถือ -->
+<meta name="description" content="สมุดสูตรหลังร้าน Wingstop: เช็คลิสต์ประจำกะและคลังสูตรอาหารสำหรับทีมครัว">
+<meta name="theme-color" content="#2B2015">
+<meta name="color-scheme" content="light">
+<title>Wingstop TAN&amp;HEART | สมุดสูตรหลังร้าน</title>
+<!-- Favicon แบบ inline (emoji) กัน 404 request ที่ไม่จำเป็น -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍗</text></svg>">
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chonburi&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Mali:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chonburi&amp;family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&amp;family=Mali:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -22,6 +28,18 @@
   }
   
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* A11y utilities */
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  .skip-link { position: absolute; left: 12px; top: -60px; background: var(--paprika); color: #fff; padding: 10px 18px; border-radius: 8px; z-index: 999; transition: top 0.2s; }
+  .skip-link:focus { top: 12px; }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible,
+  [role="button"]:focus-visible, [role="tab"]:focus-visible, .card:focus-visible, .check-item:focus-visible {
+    outline: 3px solid var(--sage); outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
   body { font-family: 'IBM Plex Sans Thai', sans-serif; background-color: var(--paper-bg); color: var(--ink); -webkit-font-smoothing: antialiased; background-image: radial-gradient(rgba(217, 201, 160, 0.25) 1px, transparent 0); background-size: 24px 24px; }
   h1, h2, h3, .brand-stamp { font-family: 'Chonburi', serif; font-weight: normal; }
   .note-handwriting { font-family: 'Mali', cursive; }
@@ -44,7 +62,7 @@
 
   /* Tabs */
   .tabs { display: flex; gap: 12px; margin-bottom: 24px; }
-  .tab { padding: 10px 22px; border-radius: 999px; background: var(--card-bg); border: 2px solid var(--border); font-size: 15px; font-weight: 600; color: #6E5D48; cursor: pointer; transition: 0.2s; }
+  .tab { padding: 10px 22px; border-radius: 999px; background: var(--card-bg); border: 2px solid var(--border); font-family: inherit; font-size: 15px; font-weight: 600; color: #6E5D48; cursor: pointer; transition: 0.2s; }
   .tab.active { background: var(--paprika); color: #fff; border-color: var(--paprika); }
 
   .section-title { font-size: 24px; color: var(--ink); margin-bottom: 4px; }
@@ -113,70 +131,96 @@
 
   .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--paper-bg); padding: 12px 26px; border-radius: 999px; font-size: 15px; font-weight: 500; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 200; border: 1px solid var(--mustard); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Responsive: มือถือ/จอแคบ */
+  @media (max-width: 560px) {
+    .topbar { padding: 12px 14px; }
+    .brand-text .t1 { font-size: 15px; }
+    .brand-text .t2 { font-size: 10.5px; }
+    .clock { font-size: 11px; }
+    .app { padding: 16px 12px 90px; }
+    .search-wrap { top: 66px; }
+    .tabs { flex-wrap: wrap; gap: 8px; }
+    .tab { padding: 9px 16px; font-size: 13.5px; flex: 1 1 auto; text-align: center; }
+    .grid { grid-template-columns: 1fr; gap: 14px; }
+    .toolbar { flex-direction: column; align-items: stretch; gap: 12px; }
+    .toolbar .btn-primary { width: 100%; }
+    .modal { padding: 20px; border-radius: 14px; }
+    .proc-head { flex-direction: column; align-items: stretch; gap: 12px; }
+    .proc-head > div { flex-wrap: wrap; }
+    .del-btn, .edit-btn-small { opacity: 1; } /* บนมือถือไม่มี hover ต้องโชว์ปุ่มตลอด */
+  }
+  @media (max-width: 380px) {
+    .dyn-row { flex-wrap: wrap; }
+    .dyn-row input.flex-2, .dyn-row input.flex-1 { flex: 1 1 100%; }
+  }
 </style>
 </head>
 <body>
 
-<div class="topbar">
+<a href="#main-content" class="skip-link">ข้ามไปยังเนื้อหาหลัก</a>
+
+<header class="topbar">
   <div class="brand">
-    <div class="brand-mark">W</div>
+    <div class="brand-mark" aria-hidden="true">W</div>
     <div class="brand-text">
-      <div class="t1">WINGSTOP</div>
-      <div class="t2">สมุดสูตรหลังร้าน (Kitchen Notebook)</div>
+      <h1 class="t1">WINGSTOP</h1>
+      <p class="t2">สมุดสูตรหลังร้าน (Kitchen Notebook)</p>
     </div>
   </div>
-  <div class="clock">
-    <div class="day" id="c-day">Loading...</div>
-    <div class="time" id="c-time">--:--</div>
+  <div class="clock" aria-live="off">
+    <p class="day" id="c-day">Loading...</p>
+    <time class="time" id="c-time">--:--</time>
   </div>
-</div>
+</header>
 
-<div class="app">
-  <div class="search-wrap">
+<main class="app" id="main-content">
+  <div class="search-wrap" role="search">
     <div class="search-box">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M19 11a8 8 0 11-16 0 8 8 0 0116 0z"></path></svg>
-      <input type="text" id="searchInput" placeholder="ค้นหาหมวดหมู่, เมนู, ทริคหลังร้าน..." autocomplete="off">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 21l-4.35-4.35M19 11a8 8 0 11-16 0 8 8 0 0116 0z"></path></svg>
+      <label for="searchInput" class="sr-only">ค้นหาหมวดหมู่, เมนู, ทริคหลังร้าน</label>
+      <input type="search" id="searchInput" placeholder="ค้นหาหมวดหมู่, เมนู, ทริคหลังร้าน..." autocomplete="off">
     </div>
   </div>
 
-  <div class="tabs" id="mainTabs">
-    <div class="tab active" data-tab="dashboard">📖 เช็คลิสต์ประจำกะ</div>
-    <div class="tab" data-tab="recipes">🍗 การ์ดสูตรอาหาร</div>
+  <div class="tabs" id="mainTabs" role="tablist" aria-label="เมนูหลัก">
+    <button type="button" class="tab active" role="tab" id="tab-dashboard" aria-selected="true" aria-controls="view-dashboard" data-tab="dashboard">📖 เช็คลิสต์ประจำกะ</button>
+    <button type="button" class="tab" role="tab" id="tab-recipes" aria-selected="false" aria-controls="view-recipes" data-tab="recipes">🍗 การ์ดสูตรอาหาร</button>
   </div>
 
   <!-- VIEW: DASHBOARD (Checklists) -->
-  <div id="view-dashboard">
+  <section id="view-dashboard" role="tabpanel" aria-labelledby="tab-dashboard" tabindex="-1">
     <div class="toolbar">
       <div>
-        <div class="section-title">มาตรฐานการทำงานหน้าเตา</div>
-        <div class="section-sub">เลือกหมวดหมู่เพื่อเปิดดูเช็คลิสต์และข้อควรระวังประจำวัน</div>
+        <h2 class="section-title">มาตรฐานการทำงานหน้าเตา</h2>
+        <p class="section-sub">เลือกหมวดหมู่เพื่อเปิดดูเช็คลิสต์และข้อควรระวังประจำวัน</p>
       </div>
-      <button class="btn-primary" onclick="openCatModal()">+ เพิ่มเช็คลิสต์ใหม่</button>
+      <button type="button" class="btn-primary" onclick="openCatModal()">+ เพิ่มเช็คลิสต์ใหม่</button>
     </div>
     <div class="grid" id="catGrid"></div>
-  </div>
+  </section>
 
   <!-- VIEW: RECIPES (Menu Cards) -->
-  <div id="view-recipes" style="display:none;">
+  <section id="view-recipes" role="tabpanel" aria-labelledby="tab-recipes" tabindex="-1" style="display:none;">
     <div class="toolbar">
       <div>
-        <div class="section-title">คลังสูตรอาหารประจำครัว</div>
-        <div class="section-sub">ส่วนผสม สัดส่วน และขั้นตอนการ Toss ซอสอย่างละเอียด</div>
+        <h2 class="section-title">คลังสูตรอาหารประจำครัว</h2>
+        <p class="section-sub">ส่วนผสม สัดส่วน และขั้นตอนการ Toss ซอสอย่างละเอียด</p>
       </div>
-      <button class="btn-primary" onclick="openRecipeModal()">+ เพิ่มสูตรเมนูใหม่</button>
+      <button type="button" class="btn-primary" onclick="openRecipeModal()">+ เพิ่มสูตรเมนูใหม่</button>
     </div>
     <div class="grid" id="recipeGrid"></div>
-  </div>
+  </section>
 
   <!-- VIEW: PROCEDURE DETAIL (Checklist View) -->
-  <div id="view-proc-detail" style="display:none;"></div>
+  <section id="view-proc-detail" aria-live="polite" style="display:none;"></section>
 
   <!-- VIEW: RECIPE DETAIL (Recipe Card View) -->
-  <div id="view-recipe-detail" style="display:none;"></div>
-</div>
+  <section id="view-recipe-detail" aria-live="polite" style="display:none;"></section>
+</main>
 
 <!-- Modal จัดการหมวดหมู่/เช็คลิสต์ (เพิ่มใหม่) -->
-<div class="modal-overlay" id="catModal">
+<div class="modal-overlay" id="catModal" role="dialog" aria-modal="true" aria-labelledby="catModalTitle">
   <div class="modal">
     <h2 style="font-family:'Chonburi', serif; font-size:22px; margin-bottom:20px; border-bottom:2px dashed var(--border); padding-bottom:10px;" id="catModalTitle">📝 สร้างเช็คลิสต์ใหม่</h2>
     <form id="catForm" onsubmit="saveCategory(event)">
@@ -184,29 +228,29 @@
       
       <div style="display:flex; gap:16px;">
         <div class="field" style="flex:2;">
-          <label>ชื่อหมวดหมู่เช็คลิสต์</label>
+          <label for="cTitle">ชื่อหมวดหมู่เช็คลิสต์</label>
           <input type="text" id="cTitle" required placeholder="เช่น เตรียมกะเช้า">
         </div>
         <div class="field" style="flex:1;">
-          <label>ไอคอน (Emoji)</label>
+          <label for="cIcon">ไอคอน (Emoji)</label>
           <input type="text" id="cIcon" required placeholder="เช่น 🍳" maxlength="8">
         </div>
       </div>
       
       <div class="field">
-        <label>คำอธิบาย</label>
+        <label for="cDesc">คำอธิบาย</label>
         <textarea id="cDesc" rows="2" placeholder="จุดประสงค์ของเช็คลิสต์นี้..."></textarea>
       </div>
 
       <!-- รายการเช็คลิสต์ (แยกบรรทัด) -->
       <div class="field">
-        <label>รายการที่ต้องทำ (เช็คลิสต์)</label>
-        <div id="cStepContainer"></div>
+        <label id="cStepContainerLabel">รายการที่ต้องทำ (เช็คลิสต์)</label>
+        <div id="cStepContainer" role="group" aria-labelledby="cStepContainerLabel"></div>
         <button type="button" class="btn-edit" onclick="addCatStepRow()" style="margin-top:6px; background:#fff;">+ เพิ่มรายการเช็คลิสต์</button>
       </div>
 
       <div class="field">
-        <label>💡 ทริคจากรุ่นพี่ (ข้อควรระวัง - ถ้ามี)</label>
+        <label for="cTip">💡 ทริคจากรุ่นพี่ (ข้อควรระวัง - ถ้ามี)</label>
         <textarea id="cTip" rows="2" placeholder="สิ่งที่ต้องระวังเป็นพิเศษ..."></textarea>
       </div>
       
@@ -219,7 +263,7 @@
 </div>
 
 <!-- Modal เพิ่ม/แก้ไขสูตร (อัปเกรดขั้นตอน) -->
-<div class="modal-overlay" id="recipeModal">
+<div class="modal-overlay" id="recipeModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal">
     <h2 style="font-family:'Chonburi', serif; font-size:22px; margin-bottom:20px; border-bottom:2px dashed var(--border); padding-bottom:10px;" id="modalTitle">จดสูตรใหม่</h2>
     <form id="recipeForm" onsubmit="saveRecipe(event)">
@@ -227,36 +271,36 @@
       
       <div style="display:flex; gap:16px;">
         <div class="field" style="flex:2;">
-          <label>ชื่อเมนู / สูตร</label>
+          <label for="rName">ชื่อเมนู / สูตร</label>
           <input type="text" id="rName" required placeholder="เช่น วิงส์รสเผ็ดออริจินัล">
         </div>
         <div class="field" style="flex:1;">
-          <label>หมวดหมู่</label>
+          <label for="rCat">หมวดหมู่</label>
           <select id="rCat" required onchange="handleCategoryChange(this)"></select>
         </div>
       </div>
       
       <div class="field">
-        <label>คำอธิบายสั้นๆ</label>
+        <label for="rDesc">คำอธิบายสั้นๆ</label>
         <textarea id="rDesc" rows="2" placeholder="จุดเด่นของเมนูนี้..."></textarea>
       </div>
 
       <!-- ส่วนผสม -->
       <div class="field">
-        <label>ส่วนผสม (ชื่อวัตถุดิบ และ ปริมาณ/หน่วย)</label>
-        <div id="ingContainer"></div>
+        <label id="ingContainerLabel">ส่วนผสม (ชื่อวัตถุดิบ และ ปริมาณ/หน่วย)</label>
+        <div id="ingContainer" role="group" aria-labelledby="ingContainerLabel"></div>
         <button type="button" class="btn-edit" onclick="addIngredientRow()" style="margin-top:6px; background:#fff;">+ เพิ่มส่วนผสม</button>
       </div>
 
       <!-- ขั้นตอนการทำ (อัปเกรดเป็น Dynamic Rows) -->
       <div class="field">
-        <label>ขั้นตอนการทำหน้าเตา</label>
-        <div id="rStepContainer"></div>
+        <label id="rStepContainerLabel">ขั้นตอนการทำหน้าเตา</label>
+        <div id="rStepContainer" role="group" aria-labelledby="rStepContainerLabel"></div>
         <button type="button" class="btn-edit" onclick="addRecipeStepRow()" style="margin-top:6px; background:#fff;">+ เพิ่มขั้นตอน</button>
       </div>
 
       <div class="field">
-        <label>💡 ทริคจากรุ่นพี่ (ข้อควรระวัง - ถ้ามี)</label>
+        <label for="rTip">💡 ทริคจากรุ่นพี่ (ข้อควรระวัง - ถ้ามี)</label>
         <textarea id="rTip" rows="2" placeholder="ระวังน้ำมันกระเด็นตอนหย่อนไก่..."></textarea>
       </div>
       
@@ -268,7 +312,7 @@
   </div>
 </div>
 
-<div class="toast" id="toast"><span id="toastMsg">✅ บันทึกสำเร็จ</span></div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastMsg">✅ บันทึกสำเร็จ</span></div>
 
 <script>
 // --- CONFIGURATION ---
@@ -318,8 +362,17 @@ const el = id => document.getElementById(id);
 function escapeHtml(str) { return str ? String(str).replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag])) : ''; }
 
 // --- CORE SYSTEM & FIRESTORE ---
+
+// localStorage อาจโยน error ได้ (โหมด Private Browsing / storage เต็ม / ปิดสิทธิ์) — ห่อไว้กันแอปพัง
+function safeLocalStorageGet(key) {
+  try { return localStorage.getItem(key); } catch (err) { console.error("localStorage read failed:", err); return null; }
+}
+function safeLocalStorageSet(key, value) {
+  try { localStorage.setItem(key, value); return true; } catch (err) { console.error("localStorage write failed:", err); return false; }
+}
+
 function loadData() {
-  const saved = localStorage.getItem('ws_ops_data_v4');
+  const saved = safeLocalStorageGet('ws_ops_data_v4');
   if(saved) { try { DATA = JSON.parse(saved); } catch(e) { DATA = { categories: defaultCategories(), recipes: [], checks: {} }; } }
   else DATA = { categories: defaultCategories(), recipes: [], checks: {} };
   if(!DATA.categories) DATA.categories = defaultCategories();
@@ -335,7 +388,7 @@ function loadData() {
         if(!DATA.categories) DATA.categories = defaultCategories();
         if(!DATA.recipes) DATA.recipes = [];
         if(!DATA.checks) DATA.checks = {};
-        localStorage.setItem('ws_ops_data_v4', JSON.stringify(DATA));
+        safeLocalStorageSet('ws_ops_data_v4', JSON.stringify(DATA));
         refreshCurrentView();
       }
     }, (err) => console.error("Firestore sync error:", err));
@@ -344,8 +397,8 @@ function loadData() {
   }
 }
 
-function saveData() { 
-  localStorage.setItem('ws_ops_data_v4', JSON.stringify(DATA)); 
+function saveData() {
+  safeLocalStorageSet('ws_ops_data_v4', JSON.stringify(DATA));
   if(!firebaseReady) return;
   try {
     db.collection('ops_manual').doc('app_data').set(DATA).catch(console.error);
@@ -354,8 +407,9 @@ function saveData() {
   }
 }
 
+// ใช้ textContent แทน innerHTML เสมอ (ข้อความเป็น plain text ล้วน ไม่มีเหตุผลต้องเสี่ยง XSS)
 function showToast(msg) {
-  const t = el('toast'); el('toastMsg').innerHTML = msg;
+  const t = el('toast'); el('toastMsg').textContent = msg;
   t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
 }
 
@@ -486,8 +540,10 @@ function sendActivityNotify(action, detail = '', color = 3447003) {
 function switchTab(tabId) {
   const wasActive = document.querySelector('.tab.active')?.dataset.tab;
   currentCategoryId = null; currentRecipeId = null;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+  const activeTabBtn = document.querySelector(`.tab[data-tab="${tabId}"]`);
+  activeTabBtn.classList.add('active');
+  activeTabBtn.setAttribute('aria-selected', 'true');
 
   if(wasActive !== tabId) {
     const tabLabel = tabId === 'dashboard' ? '📖 เช็คลิสต์ประจำกะ' : '🍗 การ์ดสูตรอาหาร';
@@ -539,10 +595,10 @@ function renderDashboard(filter = '') {
     const col = getCategoryColor(c.title);
 
     g.innerHTML += `
-      <div class="card cat-card" onclick="viewCategoryDetail('${c.id}')">
-        <button class="edit-btn-small" onclick="openCatModal('${c.id}', event)" title="แก้ไข">✏️</button>
-        <button class="del-btn" onclick="deleteCategory('${c.id}', event)" title="ลบ">🗑️</button>
-        <div class="cat-icon" style="background:${col.bg}; color:${col.text}">${escapeHtml(c.icon)}</div>
+      <div class="card cat-card" role="button" tabindex="0" aria-label="เปิดเช็คลิสต์ ${escapeHtml(c.title)}" onclick="viewCategoryDetail('${c.id}')">
+        <button class="edit-btn-small" onclick="openCatModal('${c.id}', event)" title="แก้ไข" aria-label="แก้ไขเช็คลิสต์ ${escapeHtml(c.title)}">✏️</button>
+        <button class="del-btn" onclick="deleteCategory('${c.id}', event)" title="ลบ" aria-label="ลบเช็คลิสต์ ${escapeHtml(c.title)}">🗑️</button>
+        <div class="cat-icon" style="background:${col.bg}; color:${col.text}" aria-hidden="true">${escapeHtml(c.icon)}</div>
         <h3>${escapeHtml(c.title)}</h3>
         <p>${escapeHtml(c.desc)}</p>
         <div class="cat-count" style="background:${isDone ? 'var(--sage)' : col.bg}; color:${isDone ? '#fff' : col.text}">
@@ -576,22 +632,22 @@ function openCategoryDetail(id) {
       <div class="proc-head">
         <h2>${escapeHtml(cat.icon)} ${escapeHtml(cat.title)}</h2>
         <div style="display:flex; gap:10px;">
-            <button class="btn-edit" onclick="openCatModal('${cat.id}')">✏️ แก้ไขเช็คลิสต์</button>
-            <button class="btn-edit" onclick="resetChecklist('${key}')">↺ รีเซ็ตเช็คลิสต์วันนี้</button>
-            <button class="back-btn" onclick="switchTab('dashboard')">← กลับ</button>
+            <button type="button" class="btn-edit" onclick="openCatModal('${cat.id}')">✏️ แก้ไขเช็คลิสต์</button>
+            <button type="button" class="btn-edit" onclick="resetChecklist('${key}')">↺ รีเซ็ตเช็คลิสต์วันนี้</button>
+            <button type="button" class="back-btn" onclick="switchTab('dashboard')">← กลับ</button>
         </div>
       </div>
       <div class="progress-card">
-        <div class="progress-info"><span>ความคืบหน้ากะวันนี้</span><span id="prog-txt">0%</span></div>
-        <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+        <div class="progress-info"><span id="prog-label">ความคืบหน้ากะวันนี้</span><span id="prog-txt">0%</span></div>
+        <div class="progress-bar" role="progressbar" aria-labelledby="prog-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="prog-bar"><div class="progress-fill" id="prog-fill"></div></div>
       </div>
       ${cat.tips ? `<div class="sticky-note"><b>📌 ทริคจากรุ่นพี่:</b> ${escapeHtml(cat.tips)}</div>` : ''}
       <div style="display:flex; flex-direction:column; margin-top:16px;">
         ${(cat.steps||[]).map((s,i) => {
           const done = DATA.checks[key].includes(i);
           return `
-            <div class="check-item ${done ? 'done' : ''}" onclick="toggleCheck('${key}', ${i})">
-              <div class="checkbox-custom">${done ? '✓' : ''}</div>
+            <div class="check-item ${done ? 'done' : ''}" role="checkbox" aria-checked="${done}" tabindex="0" onclick="toggleCheck('${key}', ${i})">
+              <div class="checkbox-custom" aria-hidden="true">${done ? '✓' : ''}</div>
               <div class="step-text">${i+1}. ${escapeHtml(s)}</div>
             </div>`;
         }).join('')}
@@ -632,7 +688,8 @@ function updateProgress(key, total) {
   const checked = DATA.checks[key] ? DATA.checks[key].length : 0;
   const pct = total === 0 ? 0 : Math.round((checked / total) * 100);
   if(el('prog-fill')) el('prog-fill').style.width = `${pct}%`;
-  if(el('prog-txt')) el('prog-txt').innerText = `${pct}% (${checked}/${total} ข้อ)`;
+  if(el('prog-txt')) el('prog-txt').textContent = `${pct}% (${checked}/${total} ข้อ)`;
+  if(el('prog-bar')) el('prog-bar').setAttribute('aria-valuenow', String(pct));
 }
 
 // Dynamic Rows สำหรับเช็คลิสต์
@@ -641,8 +698,8 @@ function addCatStepRow(val = '') {
   const div = document.createElement('div');
   div.className = 'dyn-row';
   div.innerHTML = `
-    <input type="text" class="c-step-input flex-2" placeholder="อธิบายสิ่งที่ต้องทำ..." value="${escapeHtml(val)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-    <button type="button" onclick="this.parentElement.remove()" class="del-row-btn" title="ลบรายการนี้">✕</button>
+    <input type="text" class="c-step-input flex-2" placeholder="อธิบายสิ่งที่ต้องทำ..." aria-label="รายการเช็คลิสต์" value="${escapeHtml(val)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+    <button type="button" onclick="this.parentElement.remove()" class="del-row-btn" title="ลบรายการนี้" aria-label="ลบรายการเช็คลิสต์นี้">✕</button>
   `;
   container.appendChild(div);
 }
@@ -668,9 +725,10 @@ function openCatModal(id = null, event = null) {
     }
   } else { addCatStepRow(); }
   el('catModal').classList.add('open');
+  openModalA11y(el('catModal'));
 }
 
-function closeCatModal() { el('catModal').classList.remove('open'); }
+function closeCatModal() { el('catModal').classList.remove('open'); closeModalA11y(); }
 
 function saveCategory(e) {
   e.preventDefault();
@@ -738,8 +796,8 @@ function renderRecipes(filter = '') {
   list.forEach(r => {
     const col = getCategoryColor(r.category);
     g.innerHTML += `
-      <div class="card recipe-card" onclick="viewRecipeDetail('${r.id}')">
-        <button class="del-btn" onclick="deleteRecipe('${r.id}', event)" title="ลบเมนูนี้">🗑️</button>
+      <div class="card recipe-card" role="button" tabindex="0" aria-label="เปิดสูตรเมนู ${escapeHtml(r.name)}" onclick="viewRecipeDetail('${r.id}')">
+        <button class="del-btn" onclick="deleteRecipe('${r.id}', event)" title="ลบเมนูนี้" aria-label="ลบสูตรเมนู ${escapeHtml(r.name)}">🗑️</button>
         <div class="recipe-tag" style="background:${col.bg}; color:${col.text}">${escapeHtml(r.category)}</div>
         <h3 style="padding-right:30px;">${escapeHtml(r.name)}</h3>
         <p>${escapeHtml(r.desc)}</p>
@@ -779,8 +837,8 @@ function openRecipeDetail(id) {
           <h2 style="font-size:28px; color:var(--paprika);">${escapeHtml(r.name)}</h2>
         </div>
         <div style="display:flex; gap:10px;">
-          <button class="btn-edit" onclick="openRecipeModal('${r.id}')">✏️ แก้ไขสูตร</button>
-          <button class="back-btn" onclick="switchTab('recipes')">ปิด X</button>
+          <button type="button" class="btn-edit" onclick="openRecipeModal('${r.id}')">✏️ แก้ไขสูตร</button>
+          <button type="button" class="back-btn" onclick="switchTab('recipes')" aria-label="ปิดหน้าสูตรอาหาร กลับไปหน้ารายการ">ปิด ✕</button>
         </div>
       </div>
       <p style="color:#6E5D48; margin-top:8px;">${escapeHtml(r.desc)}</p>
@@ -811,9 +869,9 @@ function addIngredientRow(name = '', amount = '') {
   const div = document.createElement('div');
   div.className = 'dyn-row';
   div.innerHTML = `
-    <input type="text" class="ing-name flex-2" placeholder="ชื่อวัตถุดิบ (เช่น ปีกไก่สด)" value="${escapeHtml(name)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-    <input type="text" class="ing-amount flex-1" placeholder="ปริมาณ/หน่วย (เช่น 100g, 2 ชิ้น)" value="${escapeHtml(amount)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-    <button type="button" onclick="this.parentElement.remove()" class="del-row-btn" title="ลบรายการนี้">✕</button>
+    <input type="text" class="ing-name flex-2" placeholder="ชื่อวัตถุดิบ (เช่น ปีกไก่สด)" aria-label="ชื่อวัตถุดิบ" value="${escapeHtml(name)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+    <input type="text" class="ing-amount flex-1" placeholder="ปริมาณ/หน่วย (เช่น 100g, 2 ชิ้น)" aria-label="ปริมาณ/หน่วย" value="${escapeHtml(amount)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+    <button type="button" onclick="this.parentElement.remove()" class="del-row-btn" title="ลบรายการนี้" aria-label="ลบส่วนผสมนี้">✕</button>
   `;
   container.appendChild(div);
 }
@@ -824,8 +882,8 @@ function addRecipeStepRow(val = '') {
   const div = document.createElement('div');
   div.className = 'dyn-row';
   div.innerHTML = `
-    <input type="text" class="r-step-input flex-2" placeholder="อธิบายขั้นตอน (เช่น ทอดไก่ที่ 350F)" value="${escapeHtml(val)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-    <button type="button" onclick="this.parentElement.remove()" class="del-row-btn" title="ลบรายการนี้">✕</button>
+    <input type="text" class="r-step-input flex-2" placeholder="อธิบายขั้นตอน (เช่น ทอดไก่ที่ 350F)" aria-label="ขั้นตอนการทำ" value="${escapeHtml(val)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+    <button type="button" onclick="this.parentElement.remove()" class="del-row-btn" title="ลบรายการนี้" aria-label="ลบขั้นตอนนี้">✕</button>
   `;
   container.appendChild(div);
 }
@@ -898,9 +956,10 @@ function openRecipeModal(id = null) {
     addRecipeStepRow();
   }
   el('recipeModal').classList.add('open');
+  openModalA11y(el('recipeModal'));
 }
 
-function closeRecipeModal() { el('recipeModal').classList.remove('open'); }
+function closeRecipeModal() { el('recipeModal').classList.remove('open'); closeModalA11y(); }
 
 function saveRecipe(e) {
   e.preventDefault();
@@ -960,6 +1019,51 @@ function deleteRecipe(id, event) {
   }
 }
 
+// --- MODAL ACCESSIBILITY: focus management, Esc-to-close, click-outside-to-close ---
+let lastFocusedBeforeModal = null;
+
+function openModalA11y(overlayEl) {
+  lastFocusedBeforeModal = document.activeElement;
+  const firstField = overlayEl.querySelector('.modal input, .modal select, .modal textarea');
+  if (firstField) firstField.focus();
+}
+
+function closeModalA11y() {
+  if (lastFocusedBeforeModal && typeof lastFocusedBeforeModal.focus === 'function') {
+    lastFocusedBeforeModal.focus();
+  }
+  lastFocusedBeforeModal = null;
+}
+
+function closeAnyOpenModal() {
+  const openOverlay = document.querySelector('.modal-overlay.open');
+  if (!openOverlay) return;
+  if (openOverlay.id === 'catModal') closeCatModal();
+  else if (openOverlay.id === 'recipeModal') closeRecipeModal();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeAnyOpenModal();
+});
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeAnyOpenModal(); // คลิกฉากหลัง (ไม่ใช่ตัวโมดัล) เพื่อปิด
+  });
+});
+
+// การ์ด/รายการเช็คลิสต์ถูก render เป็น div ที่คลิกได้ (role="button" กำหนดไว้ใน CSS class เดิม)
+// เพิ่ม keyboard support ให้กด Enter/Space แล้วทำงานเหมือนคลิก เพื่อรองรับผู้ใช้คีย์บอร์ด/สกรีนรีดเดอร์
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const target = e.target;
+  const role = target && target.getAttribute ? target.getAttribute('role') : null;
+  if (role === 'button' || role === 'checkbox') {
+    e.preventDefault();
+    target.click();
+  }
+});
+
 // --- INIT & UTILS ---
 let searchNotifyTimer = null;
 el('searchInput').addEventListener('input', (e) => {
@@ -977,11 +1081,15 @@ el('searchInput').addEventListener('input', (e) => {
   }
 });
 
-setInterval(() => {
+function updateClock() {
   const d = new Date();
-  el('c-day').innerText = d.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'short' });
-  el('c-time').innerText = d.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' });
-}, 1000);
+  el('c-day').textContent = d.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'short' });
+  const timeEl = el('c-time');
+  timeEl.textContent = d.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' });
+  timeEl.setAttribute('datetime', d.toISOString());
+}
+updateClock();
+setInterval(updateClock, 1000);
 
 loadData();
 </script>
