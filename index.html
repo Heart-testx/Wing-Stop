@@ -80,9 +80,19 @@
     .view-section { display: none; }
     .view-section.active { display: block; }
 
-    /* SEARCH AREA & BOX FIX */
-    .search-hero { margin-bottom: 24px; }
-    .search-input-wrapper { width: 100%; max-width: 800px; margin-bottom: 16px; }
+    /* STICKY SEARCH BAR */
+    .sticky-search-bar {
+      position: sticky;
+      top: 57px; /* อิงความสูงจาก header (ซ่อนรอยต่อด้วย z-index ที่น้อยกว่า) */
+      z-index: 40;
+      background-color: var(--bg-page); /* สีทึบเพื่อบังเนื้อหาที่ไถผ่านด้านล่าง */
+      padding: 16px 24px;
+      margin: 0 -24px 16px -24px; /* ขยายให้เต็มขอบจอเพื่อบังตัวหนังสือ */
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 10px 20px -10px rgba(0,0,0,0.8);
+    }
+    
+    .search-input-wrapper { width: 100%; max-width: 800px; margin: 0 auto; }
     
     .search-box {
       position: relative;
@@ -112,6 +122,7 @@
     }
     .search-input:focus { border-color: var(--primary-brand); }
 
+    .search-hero { margin-bottom: 24px; }
     .hero-title-area { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-top: 28px; }
     .hero-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 4px; color: white; }
     .hero-subtitle { font-size: 0.85rem; color: var(--text-muted); }
@@ -127,7 +138,7 @@
       border-left: 4px solid #F59E0B;
       border-radius: var(--radius-sm);
       padding: 16px 20px;
-      margin: 20px 0 24px 0;
+      margin: 0 0 24px 0;
     }
     .notice-header {
       display: flex;
@@ -194,26 +205,8 @@
     .btn-edit-modal i { color: var(--primary-brand); }
     .modal-close-btn:hover, .btn-edit-modal:hover { background: #333; border-color: #555; }
     
-    /* สไตล์ปุ่มลบเมนู */
-    .btn-delete-modal { 
-      background: var(--danger-light); 
-      border: 1px solid var(--danger); 
-      color: var(--danger); 
-      height: 36px; 
-      padding: 0 16px; 
-      border-radius: var(--radius-sm); 
-      cursor: pointer; 
-      display: flex; 
-      align-items: center; 
-      gap: 6px; 
-      font-size: 0.85rem; 
-      font-weight: 500; 
-      transition: var(--transition-smooth); 
-    }
-    .btn-delete-modal:hover { 
-      background: var(--danger); 
-      color: white; 
-    }
+    .btn-delete-modal { background: var(--danger-light); border: 1px solid var(--danger); color: var(--danger); height: 36px; padding: 0 16px; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 500; transition: var(--transition-smooth); }
+    .btn-delete-modal:hover { background: var(--danger); color: white; }
     
     .modal-category { color: var(--primary-brand); font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; display: block; }
     .modal-title { font-size: 2rem; color: var(--primary-brand); font-weight: 700; margin: 0 0 12px 0; }
@@ -265,15 +258,18 @@
   <main class="main-content">
     <!-- VIEW 1: READ / EXPLORE -->
     <section id="view-read" class="view-section active">
-      <div class="search-hero">
-        
+      
+      <!-- STICKY SEARCH BAR (กล่องค้นหาที่ตรึงด้านบน) -->
+      <div class="sticky-search-bar">
         <div class="search-input-wrapper">
           <div class="search-box">
             <i data-lucide="search" class="search-icon-left" size="18"></i>
             <input type="text" id="search-input" class="search-input" placeholder="ค้นหาหมวดหมู่, เมนู, ทริคหลังร้าน...">
           </div>
         </div>
+      </div>
 
+      <div class="search-hero">
         <div class="notice-board" id="notice-board">
           <div class="notice-header"><i data-lucide="pin" size="18"></i><span>📌 ข้อควรรู้ / ประกาศสำคัญ</span></div>
           <ul class="notice-list">
@@ -426,7 +422,6 @@
       }
     };
 
-    // REAL-TIME CLOCK FUNCTION
     const updateClock = () => {
       const now = new Date();
       const days = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
@@ -768,7 +763,6 @@
       lucide.createIcons();
       initEventListeners();
       
-      // เริ่มทำงานนาฬิกาเรียลไทม์
       updateClock();
       setInterval(updateClock, 1000);
       
