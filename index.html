@@ -1,1144 +1,729 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- SEO: description + theme-color สำหรับแถบสีบนมือถือ -->
-<meta name="description" content="สมุดสูตรหลังร้าน Wingstop: เช็คลิสต์ประจำกะและคลังสูตรอาหารสำหรับทีมครัว">
-<meta name="theme-color" content="#0B0D10">
-<meta name="color-scheme" content="dark">
-<title>Wingstop TAN&amp;HEART | สมุดสูตรหลังร้าน</title>
-<!-- Favicon แบบ inline (emoji) กัน 404 request ที่ไม่จำเป็น -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍗</text></svg>">
-<!-- Google Fonts: IBM Plex Sans Thai (UI/ข้อความ) + IBM Plex Mono (ตัวเลข/สถานะ สไตล์แผงควบคุมครัว) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TasteNote — สมุดบันทึกและแชร์สูตรอาหาร</title>
 
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-<style>
-  :root {
-    /* Surfaces */
-    --paper-bg: #0A0C0E;        /* app background — near-black, low glare */
-    --bg-elevated: #131619;     /* topbar / sticky bars */
-    --card-bg: #1B1F23;         /* card / panel surface */
-    --surface-2: #23282D;       /* hover / nested surface */
-    --surface-3: #2C3238;       /* input fields */
-    --ink: #F1F3F5;             /* primary text — near white */
-    --ink-dim: #8B929B;         /* secondary text */
-    --ink-faint: #5B6169;       /* tertiary / placeholder text */
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM & VARIABLES
+       ========================================================================== */
+    :root {
+      --bg-page: #F8FAF9;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #F1F5F3;
+      --text-main: #111827;
+      --text-muted: #6B7280;
+      --text-light: #9CA3AF;
+      --primary-green: #059669;
+      --primary-green-hover: #047857;
+      --primary-green-light: #ECFDF5;
+      --primary-green-border: #A7F3D0;
+      --danger: #EF4444;
+      --danger-light: #FEF2F2;
+      --border-color: #E5E7EB;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 20px 30px -10px rgba(5, 150, 105, 0.3);
+      --shadow-hover: 0 15px 35px -5px rgba(5, 150, 105, 0.25);
+      --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --transition-bounce: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
 
-    /* Semantic accents — red=ระวัง/ลบ, เหลือง/ส้ม=กำลังดำเนินการ, เขียว=เสร็จสิ้น */
-    --paprika: #FF5B3C;         --paprika-dark: #C23A20; --paprika-dim: #2B140F;
-    --mustard: #FFB238;         --mustard-light: #2A2011; --mustard-dim: #3A2B10;
-    --sage: #2FD97B;            --sage-light: #0F2419;   --sage-dim: #133020;
-    --info: #4FB3E8;            --info-dim: #10202B;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; -webkit-font-smoothing: antialiased; }
+    body { background-color: var(--bg-page); color: var(--text-main); line-height: 1.6; padding-bottom: 80px; overflow-x: hidden; }
 
-    --border: #2A2E33;
-    --border-strong: #3C424A;
-    --radius: 8px;
-    --radius-sm: 6px;
-    --radius-lg: 10px;
-    --shadow-paper: 0 1px 2px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.35);
-    --touch: 48px; /* minimum touch target */
-  }
+    /* ANIMATIONS */
+    @keyframes slideDownFade { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    @keyframes slideRightFade { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes pulseFab { 0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.6); } 70% { box-shadow: 0 0 0 15px rgba(5, 150, 105, 0); } 100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); } }
+    @keyframes heartBeat { 0% { transform: scale(1); } 25% { transform: scale(1.2); } 50% { transform: scale(1); } 75% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* HEADER */
+    .app-header {
+      position: sticky; top: 0; z-index: 50; background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); padding: 16px 24px;
+      transition: var(--transition-smooth);
+    }
+    .header-container { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .logo-group { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.25rem; color: var(--text-main); text-decoration: none; cursor: pointer; transition: var(--transition-bounce); }
+    .logo-group:hover { transform: scale(1.05); }
+    .logo-icon { width: 36px; height: 36px; background-color: var(--primary-green-light); color: var(--primary-green); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; transition: var(--transition-bounce); }
+    .logo-group:hover .logo-icon { transform: rotate(10deg); background-color: var(--primary-green); color: white; }
+    
+    .header-actions { display: flex; gap: 12px; }
+    .btn-toggle-fav { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-full); border: 1px solid var(--border-color); background: var(--bg-surface); cursor: pointer; font-weight: 500; font-size: 0.9rem; transition: var(--transition-bounce); }
+    .btn-toggle-fav.active { background: var(--danger-light); color: var(--danger); border-color: #FECACA; }
+    .btn-toggle-fav:hover { background: var(--bg-subtle); transform: translateY(-2px); }
+    .btn-toggle-fav.active:hover { background: #FEE2E2; transform: translateY(-2px) scale(1.03); }
 
-  /* A11y utilities */
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  .skip-link { position: absolute; left: 12px; top: -60px; background: var(--paprika); color: #1A0805; padding: 12px 18px; border-radius: var(--radius-sm); z-index: 999; transition: top 0.2s; font-weight: 700; }
-  .skip-link:focus { top: 12px; }
-  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible,
-  [role="button"]:focus-visible, [role="tab"]:focus-visible, .card:focus-visible, .check-item:focus-visible {
-    outline: 3px solid var(--info); outline-offset: 2px;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-  }
-  body {
-    font-family: 'IBM Plex Sans Thai', sans-serif; background-color: var(--paper-bg); color: var(--ink);
-    -webkit-font-smoothing: antialiased;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
-  h1, h2, h3 { font-family: 'IBM Plex Sans Thai', sans-serif; font-weight: 700; letter-spacing: 0.2px; }
-  .mono { font-family: 'IBM Plex Mono', monospace; }
+    /* MAIN CONTENT & VIEWS */
+    .main-content { max-width: 1100px; margin: 32px auto 0; padding: 0 24px; }
+    .view-section { display: none; }
+    .view-section.active { display: block; animation: slideUpFade 0.4s ease-out forwards; }
 
-  /* Topbar */
-  .topbar { position: sticky; top: 0; z-index: 40; background: var(--bg-elevated); color: var(--ink); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--paprika); min-height: var(--touch); }
-  .brand { display: flex; align-items: center; gap: 12px; }
-  .brand-mark { width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--paprika); color: #1A0805; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 20px; flex-shrink: 0; }
-  .brand-text .t1 { font-size: 17px; letter-spacing: 1.5px; color: #fff; font-weight: 700; }
-  .brand-text .t2 { font-size: 11.5px; color: var(--ink-dim); font-weight: 500; }
-  .clock { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-dim); text-align: right; line-height: 1.4; }
-  .clock .day { font-weight: 600; color: var(--mustard); display: block; }
-  .clock .time { font-size: 16px; color: var(--ink); font-weight: 700; }
+    /* SEARCH HERO */
+    .search-hero { background: var(--bg-surface); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); margin-bottom: 24px; animation: slideUpFade 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; }
+    .hero-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 8px; transition: var(--transition-smooth); }
+    .search-input-wrapper { position: relative; width: 100%; margin-top: 16px; transition: var(--transition-bounce); }
+    .search-icon-left { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-light); transition: var(--transition-smooth); }
+    .search-input { width: 100%; padding: 16px 20px 16px 48px; border-radius: var(--radius-full); border: 1px solid var(--border-color); background-color: var(--bg-subtle); outline: none; transition: var(--transition-bounce); font-size: 1rem; color: var(--text-main); }
+    .search-input:focus { background-color: var(--bg-surface); border-color: var(--primary-green); box-shadow: 0 0 0 4px var(--primary-green-light); transform: scale(1.01); }
+    .search-input:focus + .search-icon-left { color: var(--primary-green); }
 
-  /* App Container & Search */
-  .app { max-width: 1120px; margin: 0 auto; padding: 16px 16px 90px; }
-  .search-wrap { position: sticky; top: 68px; z-index: 30; background: var(--paper-bg); padding: 10px 0; border-bottom: 1px solid var(--border); }
-  .search-box { display: flex; align-items: center; gap: 12px; background: var(--card-bg); border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 0 16px; height: var(--touch); }
-  .search-box:focus-within { border-color: var(--info); }
-  .search-box svg { color: var(--ink-dim); flex-shrink: 0; }
-  .search-box input { border: none; outline: none; width: 100%; height: 100%; font-size: 15.5px; font-family: inherit; background: transparent; color: var(--ink); }
-  .search-box input::placeholder { color: var(--ink-faint); }
+    /* NOTICE BOARD */
+    .notice-board {
+      background-color: #FFFBEB; border: 1px solid #FEF3C7; border-left: 6px solid #F59E0B;
+      border-radius: var(--radius-md); padding: 20px 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm);
+      animation: slideDownFade 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      opacity: 0; animation-delay: 0.1s;
+    }
+    .notice-header { display: flex; align-items: center; gap: 10px; color: #92400E; font-size: 1.15rem; font-weight: 600; margin-bottom: 12px; }
+    .notice-list { padding-left: 24px; color: #B45309; font-size: 0.95rem; line-height: 1.6; }
 
-  /* Tabs */
-  .tabs { position: sticky; top: 137px; z-index: 29; display: flex; gap: 8px; padding: 10px 0 14px; background: var(--paper-bg); }
-  .tab { min-height: var(--touch); padding: 10px 20px; border-radius: var(--radius-sm); background: var(--card-bg); border: 2px solid var(--border); font-family: inherit; font-size: 14.5px; font-weight: 700; letter-spacing: 0.3px; color: var(--ink-dim); cursor: pointer; transition: 0.15s; }
-  .tab:hover { border-color: var(--border-strong); color: var(--ink); }
-  .tab.active { background: var(--paprika); color: #1A0805; border-color: var(--paprika); }
+    /* RECIPE GRID */
+    .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+    .recipe-card { position: relative; background: var(--bg-surface); border-radius: var(--radius-md); padding: 24px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition-bounce); display: flex; flex-direction: column; justify-content: space-between; opacity: 0; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    .recipe-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: var(--shadow-hover); border-color: var(--primary-green-border); z-index: 10; }
+    
+    .card-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .card-category { background: var(--primary-green-light); color: var(--primary-green); font-size: 0.8rem; font-weight: 600; padding: 4px 12px; border-radius: var(--radius-full); transition: var(--transition-smooth); }
+    .recipe-card:hover .card-category { background: var(--primary-green); color: white; }
+    
+    .btn-heart { background: transparent; border: none; cursor: pointer; color: var(--text-light); transition: var(--transition-bounce); display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; }
+    .btn-heart:hover { background: var(--danger-light); color: var(--danger); transform: scale(1.15); }
+    .btn-heart.active { color: var(--danger); animation: heartBeat 0.6s ease-in-out; }
+    
+    .card-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; transition: var(--transition-smooth); }
+    .recipe-card:hover .card-title { color: var(--primary-green); }
+    .card-description { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid var(--bg-subtle); padding-top: 14px; font-size: 0.825rem; color: var(--text-muted); transition: var(--transition-smooth); }
+    .card-meta div { display: flex; align-items: center; gap: 6px; }
+    .empty-state { text-align: center; padding: 64px 20px; color: var(--text-muted); grid-column: 1 / -1; animation: popIn 0.5s ease-out forwards; }
 
-  .section-title { font-size: 20px; color: var(--ink); margin-bottom: 3px; letter-spacing: 0.2px; }
-  .section-sub { color: var(--ink-dim); font-size: 13.5px; margin-bottom: 16px; font-weight: 400; }
+    /* FLOATING ACTION BUTTON (FAB) */
+    .fab-container { position: fixed; bottom: 24px; right: 24px; z-index: 90; }
+    .btn-fab { width: 64px; height: 64px; border-radius: var(--radius-full); background-color: var(--primary-green); color: white; border: none; box-shadow: var(--shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition-bounce); animation: pulseFab 2.5s infinite; }
+    .btn-fab i { transition: var(--transition-bounce); }
+    .btn-fab:hover { background-color: var(--primary-green-hover); transform: scale(1.15) translateY(-5px); animation: none; box-shadow: var(--shadow-hover); }
+    .btn-fab:hover i { transform: rotate(90deg) scale(1.1); }
+    .btn-fab.hidden { display: none; }
 
-  .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
-  .btn-primary { background: var(--paprika); color: #1A0805; border: none; min-height: var(--touch); padding: 0 22px; border-radius: var(--radius-sm); font-family: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; letter-spacing: 0.2px; }
-  .btn-primary:hover { background: #FF7357; }
-  .btn-primary:active { background: var(--paprika-dark); color: #fff; }
+    /* FORM VIEW */
+    .form-card { background: var(--bg-surface); border-radius: var(--radius-lg); padding: 36px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); max-width: 800px; margin: 0 auto; position: relative; }
+    .btn-close-form { position: absolute; top: 24px; right: 24px; background: var(--bg-subtle); border: none; width: 40px; height: 40px; border-radius: var(--radius-full); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: var(--transition-bounce); }
+    .btn-close-form:hover { background: var(--danger-light); color: var(--danger); transform: rotate(90deg) scale(1.1); }
 
-  /* Grid (Dashboard & Recipes) */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin-bottom: 20px; }
-  .card { background: var(--card-bg); border: 1px solid var(--border); border-left: 3px solid var(--border-strong); border-radius: var(--radius-sm); padding: 18px; cursor: pointer; transition: 0.15s ease; position: relative; }
-  .card:hover { border-color: var(--border-strong); background: var(--surface-2); }
-  .card:active { background: var(--surface-2); }
-  .card h3 { font-size: 16px; margin-bottom: 4px; line-height: 1.35; }
-  .card p { color: var(--ink-dim); font-size: 13.5px; line-height: 1.5; }
+    .form-header { margin-bottom: 28px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; padding-right: 40px; }
+    .form-group { margin-bottom: 24px; }
+    .form-row { display: flex; gap: 16px; margin-bottom: 24px; }
+    .form-row .form-group { margin-bottom: 0; flex: 1; }
+    .form-label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; transition: var(--transition-smooth); }
+    
+    .form-control { width: 100%; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background-color: #FAFAFA; outline: none; transition: var(--transition-bounce); font-size: 0.95rem; color: var(--text-main); }
+    .form-control:focus { background-color: var(--bg-surface); border-color: var(--primary-green); box-shadow: 0 0 0 3px var(--primary-green-light); transform: translateY(-2px); }
+    textarea.form-control { min-height: 100px; resize: vertical; }
+    
+    .dynamic-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+    .dynamic-row { display: flex; gap: 10px; align-items: center; animation: slideRightFade 0.4s ease-out forwards; }
+    .dynamic-row .form-control { margin-bottom: 0; }
+    .dynamic-row .eq-qty, .dynamic-row .ing-qty { width: 100px; flex-shrink: 0; }
+    
+    .btn-remove-row { border: none; background: transparent; color: var(--danger); padding: 10px; cursor: pointer; border-radius: var(--radius-sm); transition: var(--transition-bounce); }
+    .btn-remove-row:hover { background-color: var(--danger-light); transform: scale(1.15) rotate(10deg); }
+    .btn-add-row { background: var(--bg-subtle); color: var(--primary-green); border: 1px dashed var(--primary-green-border); padding: 10px 16px; border-radius: var(--radius-sm); font-size: 0.875rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: var(--transition-bounce); }
+    .btn-add-row:hover { background: var(--primary-green-light); border-color: var(--primary-green); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+    
+    .form-actions { display: flex; gap: 12px; margin-top: 32px; }
+    .btn-submit { flex: 1; background: var(--primary-green); color: white; border: none; padding: 14px 24px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: var(--transition-bounce); }
+    .btn-submit:hover:not(:disabled) { background: var(--primary-green-hover); transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .btn-submit:active:not(:disabled) { transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+    .btn-cancel { background: var(--bg-subtle); color: var(--text-main); border: none; padding: 14px 24px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: var(--transition-bounce); }
+    .btn-cancel:hover { background: #E5E7EB; transform: translateY(-2px); }
 
-  .del-btn, .edit-btn-small { position: absolute; top: 10px; width: var(--touch); height: var(--touch); border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 1; transition: 0.15s; }
-  .del-btn { right: 10px; background: var(--paprika-dim); color: var(--paprika); }
-  .del-btn:hover { background: var(--paprika); color: #1A0805; }
-  .edit-btn-small { right: calc(var(--touch) + 18px); background: var(--surface-2); color: var(--mustard); border-color: var(--border-strong); }
-  .edit-btn-small:hover { background: var(--mustard); color: #1A0805; }
+    /* MODAL */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(17, 24, 39, 0.4); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    .modal-card { background: var(--bg-surface); width: 100%; max-width: 720px; max-height: 90vh; border-radius: var(--radius-lg); overflow-y: auto; padding: 36px; position: relative; opacity: 0; transform: scale(0.8) translateY(20px); transition: var(--transition-bounce); }
+    .modal-overlay.active .modal-card { opacity: 1; transform: scale(1) translateY(0); }
+    
+    .modal-close-btn { position: absolute; top: 20px; right: 20px; background: var(--bg-subtle); border: none; width: 40px; height: 40px; border-radius: var(--radius-full); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); transition: var(--transition-bounce); }
+    .modal-close-btn:hover { background: var(--danger-light); color: var(--danger); transform: rotate(90deg) scale(1.1); }
+    
+    .modal-section-title { font-size: 1.05rem; font-weight: 600; margin: 24px 0 12px 0; display: flex; align-items: center; gap: 8px; }
+    .detail-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .detail-list li { background: var(--bg-subtle); padding: 10px 14px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; font-size: 0.95rem; transition: var(--transition-smooth); }
+    .detail-list li:hover { transform: translateX(5px); background: var(--bg-surface); border-left: 3px solid var(--primary-green); box-shadow: var(--shadow-sm); }
+    .step-list { padding-left: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .step-list li { transition: var(--transition-smooth); }
+    .step-list li:hover { transform: translateX(5px); color: var(--primary-green); }
 
-  /* Dashboard Specific */
-  .cat-icon { width: 48px; height: 48px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--ink); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 12px; border: 1px solid var(--border); }
-  .cat-count { display: inline-flex; align-items: center; margin-top: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: var(--radius-sm); letter-spacing: 0.2px; }
+    .modal-actions-bar { display: flex; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); justify-content: flex-end; }
+    .btn-edit-modal { background: var(--primary-green-light); color: var(--primary-green); border: none; padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; gap: 6px; align-items: center; transition: var(--transition-bounce); }
+    .btn-edit-modal:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); background: var(--primary-green); color: white; }
+    .btn-delete-modal { background: var(--danger-light); color: var(--danger); border: none; padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; gap: 6px; align-items: center; transition: var(--transition-bounce); }
+    .btn-delete-modal:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); background: var(--danger); color: white; }
 
-  /* Recipe Specific */
-  .recipe-tag { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: var(--radius-sm); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.4px; }
+    /* TOAST */
+    .toast { position: fixed; bottom: 24px; left: 24px; background: var(--text-main); color: var(--bg-surface); padding: 12px 20px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 10px; z-index: 200; transform: translateY(100px); opacity: 0; transition: var(--transition-bounce); pointer-events: none; box-shadow: var(--shadow-lg); }
+    .toast.show { transform: translateY(0); opacity: 1; }
 
-  /* Procedure & Checklist Details */
-  .proc-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-  .proc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 12px; flex-wrap: wrap; }
-  .proc-head h2 { font-size: 20px; }
-  .progress-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 20px; }
-  .progress-info { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--ink-dim); }
-  .progress-bar { height: 10px; background: var(--paper-bg); border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border); }
-  .progress-fill { height: 100%; background: var(--mustard); width: 0%; transition: width 0.3s, background-color 0.3s; }
-  .check-item { display: flex; gap: 14px; align-items: flex-start; min-height: var(--touch); padding: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); cursor: pointer; margin-bottom: 10px; transition: 0.15s; }
-  .check-item:hover { border-color: var(--border-strong); }
-  .check-item.done { background: var(--sage-light); border-color: var(--sage-dim); }
-  .checkbox-custom { width: 30px; height: 30px; border-radius: var(--radius-sm); border: 2px solid var(--border-strong); background: var(--card-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; font-weight: bold; color: transparent; }
-  .check-item.done .checkbox-custom { background: var(--sage); border-color: var(--sage); color: #06231A; }
-  .step-text { font-size: 15.5px; line-height: 1.55; color: var(--ink); padding-top: 4px; }
-  .check-item.done .step-text { text-decoration: line-through; color: var(--ink-dim); }
-
-  /* Buttons */
-  .btn-edit { background: var(--surface-2); color: var(--mustard); border: 2px solid var(--border-strong); min-height: var(--touch); padding: 0 16px; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-  .btn-edit:hover { background: var(--mustard-light); }
-  .back-btn { border: 2px solid var(--border-strong); background: transparent; color: var(--ink); min-height: var(--touch); padding: 0 18px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; cursor: pointer; }
-  .back-btn:hover { background: var(--surface-2); }
-
-  /* Tip callout (เดิม Sticky Note) */
-  .sticky-note { background: var(--mustard-light); border: 1px solid var(--mustard-dim); border-left: 4px solid var(--mustard); padding: 14px 16px; border-radius: var(--radius-sm); margin: 14px 0; color: var(--ink); line-height: 1.55; font-size: 14px; }
-  .sticky-note b { color: var(--mustard); }
-
-  /* Modals */
-  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--card-bg); width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; border-radius: var(--radius); border: 1px solid var(--border-strong); padding: 24px; box-shadow: var(--shadow-paper); }
-  .field { margin-bottom: 16px; }
-  .field label { display: block; font-size: 13.5px; font-weight: 700; margin-bottom: 6px; color: var(--ink-dim); letter-spacing: 0.2px; }
-  .field input, .field select, .field textarea { width: 100%; min-height: var(--touch); padding: 12px 14px; border: 2px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 15px; background: var(--surface-3); color: var(--ink); }
-  .field textarea { min-height: 64px; }
-  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--info); outline: none; background: var(--card-bg); }
-
-  /* Dynamic Rows */
-  .dyn-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-  .dyn-row input.flex-2 { flex: 2; }
-  .dyn-row input.flex-1 { flex: 1; }
-  .del-row-btn { background: var(--paprika-dim); color: var(--paprika); border: 1px solid var(--border); width: var(--touch); height: var(--touch); border-radius: var(--radius-sm); font-weight: bold; cursor: pointer; flex-shrink: 0; font-size: 16px; }
-  .del-row-btn:hover { background: var(--paprika); color: #1A0805; }
-
-  .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
-  .btn-cancel { background: transparent; border: 2px solid var(--border-strong); min-height: var(--touch); padding: 0 20px; border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; font-weight: 700; color: var(--ink); }
-  .btn-cancel:hover { background: var(--surface-2); }
-  .btn-save { background: var(--paprika); color: #1A0805; border: none; min-height: var(--touch); padding: 0 26px; border-radius: var(--radius-sm); cursor: pointer; font-family: inherit; font-weight: 700; }
-  .btn-save:hover { background: #FF7357; }
-
-  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--bg-elevated); color: var(--ink); padding: 14px 24px; border-radius: var(--radius-sm); font-size: 14.5px; font-weight: 600; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 200; border: 1px solid var(--border-strong); border-left: 4px solid var(--sage); box-shadow: var(--shadow-paper); }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* Responsive: มือถือ/จอแคบ */
-  @media (max-width: 560px) {
-    .topbar { padding: 10px 14px; }
-    .brand-text .t1 { font-size: 14.5px; letter-spacing: 1px; }
-    .brand-text .t2 { font-size: 10px; }
-    .clock { font-size: 11px; }
-    .clock .time { font-size: 14px; }
-    .app { padding: 12px 10px 90px; }
-    .search-wrap { top: 64px; }
-    .tabs { top: 133px; flex-wrap: wrap; gap: 8px; }
-    .tab { padding: 10px 14px; font-size: 13.5px; flex: 1 1 auto; text-align: center; }
-    .grid { grid-template-columns: 1fr; gap: 10px; }
-    .toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
-    .toolbar .btn-primary { width: 100%; }
-    .modal { padding: 18px; border-radius: var(--radius-sm); }
-    .proc-head { flex-direction: column; align-items: stretch; gap: 10px; }
-    .proc-head > div { flex-wrap: wrap; }
-  }
-  @media (max-width: 380px) {
-    .dyn-row { flex-wrap: wrap; }
-    .dyn-row input.flex-2, .dyn-row input.flex-1 { flex: 1 1 100%; }
-  }
-</style>
+    /* Responsive */
+    @media (max-width: 640px) {
+      .app-header { padding: 12px 16px; }
+      .main-content { padding: 0 16px; margin-top: 20px; }
+      .search-hero, .form-card { padding: 20px; }
+      .btn-close-form { top: 16px; right: 16px; }
+      .form-row { flex-direction: column; gap: 12px; }
+      .dynamic-row { flex-direction: column; gap: 6px; align-items: stretch; }
+      .dynamic-row .eq-qty, .dynamic-row .ing-qty { width: 100%; }
+      .btn-remove-row { align-self: flex-end; padding: 6px; margin-top: -4px;}
+      .modal-card { padding: 24px; }
+      .modal-actions-bar { flex-direction: column; }
+      .modal-actions-bar button { width: 100%; justify-content: center; }
+    }
+  </style>
 </head>
 <body>
 
-<a href="#main-content" class="skip-link">ข้ามไปยังเนื้อหาหลัก</a>
-
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-mark" aria-hidden="true">W</div>
-    <div class="brand-text">
-      <h1 class="t1">WINGSTOP</h1>
-      <p class="t2">สมุดสูตรหลังร้าน (Kitchen Notebook)</p>
-    </div>
-  </div>
-  <div class="clock" aria-live="off">
-    <p class="day" id="c-day">Loading...</p>
-    <time class="time" id="c-time">--:--</time>
-  </div>
-</header>
-
-<main class="app" id="main-content">
-  <div class="search-wrap" role="search">
-    <div class="search-box">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 21l-4.35-4.35M19 11a8 8 0 11-16 0 8 8 0 0116 0z"></path></svg>
-      <label for="searchInput" class="sr-only">ค้นหาหมวดหมู่, เมนู, ทริคหลังร้าน</label>
-      <input type="search" id="searchInput" placeholder="ค้นหาหมวดหมู่, เมนู, ทริคหลังร้าน..." autocomplete="off">
-    </div>
-  </div>
-
-  <div class="tabs" id="mainTabs" role="tablist" aria-label="เมนูหลัก">
-    <button type="button" class="tab active" role="tab" id="tab-dashboard" aria-selected="true" aria-controls="view-dashboard" data-tab="dashboard">📖 เช็คลิสต์ประจำกะ</button>
-    <button type="button" class="tab" role="tab" id="tab-recipes" aria-selected="false" aria-controls="view-recipes" data-tab="recipes">🍗 การ์ดสูตรอาหาร</button>
-  </div>
-
-  <!-- VIEW: DASHBOARD (Checklists) -->
-  <section id="view-dashboard" role="tabpanel" aria-labelledby="tab-dashboard" tabindex="-1">
-    <div class="toolbar">
-      <div>
-        <h2 class="section-title">มาตรฐานการทำงานหน้าเตา</h2>
-        <p class="section-sub">เลือกหมวดหมู่เพื่อเปิดดูเช็คลิสต์และข้อควรระวังประจำวัน</p>
-      </div>
-      <button type="button" class="btn-primary" onclick="openCatModal()">+ เพิ่มเช็คลิสต์ใหม่</button>
-    </div>
-    <div class="grid" id="catGrid"></div>
-  </section>
-
-  <!-- VIEW: RECIPES (Menu Cards) -->
-  <section id="view-recipes" role="tabpanel" aria-labelledby="tab-recipes" tabindex="-1" style="display:none;">
-    <div class="toolbar">
-      <div>
-        <h2 class="section-title">คลังสูตรอาหารประจำครัว</h2>
-        <p class="section-sub">ส่วนผสม สัดส่วน และขั้นตอนการ Toss ซอสอย่างละเอียด</p>
-      </div>
-      <button type="button" class="btn-primary" onclick="openRecipeModal()">+ เพิ่มสูตรเมนูใหม่</button>
-    </div>
-    <div class="grid" id="recipeGrid"></div>
-  </section>
-
-  <!-- VIEW: PROCEDURE DETAIL (Checklist View) -->
-  <section id="view-proc-detail" aria-live="polite" style="display:none;"></section>
-
-  <!-- VIEW: RECIPE DETAIL (Recipe Card View) -->
-  <section id="view-recipe-detail" aria-live="polite" style="display:none;"></section>
-</main>
-
-<!-- Modal จัดการหมวดหมู่/เช็คลิสต์ (เพิ่มใหม่) -->
-<div class="modal-overlay" id="catModal" role="dialog" aria-modal="true" aria-labelledby="catModalTitle">
-  <div class="modal">
-    <h2 style="font-size:19px; font-weight:700; margin-bottom:18px; border-bottom:1px solid var(--border); padding-bottom:12px; letter-spacing:0.2px;" id="catModalTitle">📝 สร้างเช็คลิสต์ใหม่</h2>
-    <form id="catForm" onsubmit="saveCategory(event)">
-      <input type="hidden" id="cEditId">
-      
-      <div style="display:flex; gap:16px;">
-        <div class="field" style="flex:2;">
-          <label for="cTitle">ชื่อหมวดหมู่เช็คลิสต์</label>
-          <input type="text" id="cTitle" required placeholder="เช่น เตรียมกะเช้า">
-        </div>
-        <div class="field" style="flex:1;">
-          <label for="cIcon">ไอคอน (Emoji)</label>
-          <input type="text" id="cIcon" required placeholder="เช่น 🍳" maxlength="8">
-        </div>
-      </div>
-      
-      <div class="field">
-        <label for="cDesc">คำอธิบาย</label>
-        <textarea id="cDesc" rows="2" placeholder="จุดประสงค์ของเช็คลิสต์นี้..."></textarea>
-      </div>
-
-      <!-- รายการเช็คลิสต์ (แยกบรรทัด) -->
-      <div class="field">
-        <label id="cStepContainerLabel">รายการที่ต้องทำ (เช็คลิสต์)</label>
-        <div id="cStepContainer" role="group" aria-labelledby="cStepContainerLabel"></div>
-        <button type="button" class="btn-edit" onclick="addCatStepRow()" style="margin-top:6px;">+ เพิ่มรายการเช็คลิสต์</button>
-      </div>
-
-      <div class="field">
-        <label for="cTip">💡 ทริคจากรุ่นพี่ (ข้อควรระวัง - ถ้ามี)</label>
-        <textarea id="cTip" rows="2" placeholder="สิ่งที่ต้องระวังเป็นพิเศษ..."></textarea>
-      </div>
-      
-      <div class="modal-actions">
-        <button type="button" class="btn-cancel" onclick="closeCatModal()">ยกเลิก</button>
-        <button type="submit" class="btn-save">บันทึกเช็คลิสต์</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Modal เพิ่ม/แก้ไขสูตร (อัปเกรดขั้นตอน) -->
-<div class="modal-overlay" id="recipeModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-  <div class="modal">
-    <h2 style="font-size:19px; font-weight:700; margin-bottom:18px; border-bottom:1px solid var(--border); padding-bottom:12px; letter-spacing:0.2px;" id="modalTitle">จดสูตรใหม่</h2>
-    <form id="recipeForm" onsubmit="saveRecipe(event)">
-      <input type="hidden" id="editId">
-      
-      <div style="display:flex; gap:16px;">
-        <div class="field" style="flex:2;">
-          <label for="rName">ชื่อเมนู / สูตร</label>
-          <input type="text" id="rName" required placeholder="เช่น วิงส์รสเผ็ดออริจินัล">
-        </div>
-        <div class="field" style="flex:1;">
-          <label for="rCat">หมวดหมู่</label>
-          <select id="rCat" required onchange="handleCategoryChange(this)"></select>
-        </div>
-      </div>
-      
-      <div class="field">
-        <label for="rDesc">คำอธิบายสั้นๆ</label>
-        <textarea id="rDesc" rows="2" placeholder="จุดเด่นของเมนูนี้..."></textarea>
-      </div>
-
-      <!-- ส่วนผสม -->
-      <div class="field">
-        <label id="ingContainerLabel">ส่วนผสม (ชื่อวัตถุดิบ และ ปริมาณ/หน่วย)</label>
-        <div id="ingContainer" role="group" aria-labelledby="ingContainerLabel"></div>
-        <button type="button" class="btn-edit" onclick="addIngredientRow()" style="margin-top:6px;">+ เพิ่มส่วนผสม</button>
-      </div>
-
-      <!-- ขั้นตอนการทำ (อัปเกรดเป็น Dynamic Rows) -->
-      <div class="field">
-        <label id="rStepContainerLabel">ขั้นตอนการทำหน้าเตา</label>
-        <div id="rStepContainer" role="group" aria-labelledby="rStepContainerLabel"></div>
-        <button type="button" class="btn-edit" onclick="addRecipeStepRow()" style="margin-top:6px;">+ เพิ่มขั้นตอน</button>
-      </div>
-
-      <div class="field">
-        <label for="rTip">💡 ทริคจากรุ่นพี่ (ข้อควรระวัง - ถ้ามี)</label>
-        <textarea id="rTip" rows="2" placeholder="ระวังน้ำมันกระเด็นตอนหย่อนไก่..."></textarea>
-      </div>
-      
-      <div class="modal-actions">
-        <button type="button" class="btn-cancel" onclick="closeRecipeModal()">ยกเลิก</button>
-        <button type="submit" class="btn-save">บันทึกสูตรลงสมุด</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastMsg">✅ บันทึกสำเร็จ</span></div>
-
-<script>
-// --- CONFIGURATION ---
-const firebaseConfig = {
-  apiKey: "AIzaSyBDYHAUJg1zrLsCycmasqlPSJ25XzQY354",
-  authDomain: "wingstop-c1dfd.firebaseapp.com",
-  projectId: "wingstop-c1dfd",
-  storageBucket: "wingstop-c1dfd.firebasestorage.app",
-  messagingSenderId: "68193512037",
-  appId: "1:68193512037:web:d938753a1544a6e664748c"
-};
-
-// 🌟 Webhook Discord ที่คุณให้มา
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1529841700644720671/EYFZJO0zt0f1gx1Uye6wYCjSN_pFoMH29gesDRCHH1E3Pe7hmAgTwwScgcaS8brwO7ps'; 
-
-let db = null;
-let firebaseReady = false;
-try {
-  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-  firebaseReady = true;
-} catch (err) {
-  console.error("Firebase init failed, running in local-only mode:", err);
-}
-
-// --- DATA STRUCTURE ---
-const COLOR_SCHEME = [
-  { bg: '#2A2011', text: '#FFB238' }, { bg: '#2E1512', text: '#FF6B4A' },
-  { bg: '#102318', text: '#3DDC84' }, { bg: '#0F1F2B', text: '#4FB3E8' }
-];
-
-function getCategoryColor(category) {
-  const str = (category || 'อื่นๆ').trim();
-  let hash = 0; for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
-  return COLOR_SCHEME[hash % COLOR_SCHEME.length];
-}
-
-const defaultCategories = () => [
-  { id: "prep_morning", icon: "🍳", title: "เตรียมวัตถุดิบกะเช้า", desc: "ตระเตรียมวัตถุดิบและตั้งอุณหภูมิหม้อทอดก่อนเปิดร้าน", steps: ["ตรวจสอบอุณหภูมิหม้อทอดให้อยู่ที่ 350°F (177°C)", "เตรียมแป้งทอดและซอสใส่สายเตรียมตามตำแหน่ง", "ละลายน้ำแข็งไก่สดตามโควต้ากะเช้า"], tips: "ห้ามหย่อนไก่ที่ยังมีเกล็ดน้ำแข็งลงหม้อทอดเด็ดขาด!" },
-  { id: "clean_night", icon: "🧽", title: "ปิดกะ & ทำความสะอาด", desc: "การกรองน้ำมัน และล้างทำความสะอาดสถานีงาน", steps: ["ปิดฮีตเตอร์หม้อทอด และกรองเศษแป้งออกจากน้ำมัน", "ล้างชาม Toss ซอสด้วยน้ำอุ่น", "เช็ดโต๊ะสแตนเลสด้วยน้ำยาฆ่าเชื้อ"] }
-];
-
-let DATA = { categories: [], recipes: [], checks: {} };
-let currentCategoryId = null; let currentRecipeId = null;
-
-const el = id => document.getElementById(id);
-function escapeHtml(str) { return str ? String(str).replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag])) : ''; }
-
-// --- CORE SYSTEM & FIRESTORE ---
-
-// localStorage อาจโยน error ได้ (โหมด Private Browsing / storage เต็ม / ปิดสิทธิ์) — ห่อไว้กันแอปพัง
-function safeLocalStorageGet(key) {
-  try { return localStorage.getItem(key); } catch (err) { console.error("localStorage read failed:", err); return null; }
-}
-function safeLocalStorageSet(key, value) {
-  try { localStorage.setItem(key, value); return true; } catch (err) { console.error("localStorage write failed:", err); return false; }
-}
-
-function loadData() {
-  const saved = safeLocalStorageGet('ws_ops_data_v4');
-  if(saved) { try { DATA = JSON.parse(saved); } catch(e) { DATA = { categories: defaultCategories(), recipes: [], checks: {} }; } }
-  else DATA = { categories: defaultCategories(), recipes: [], checks: {} };
-  if(!DATA.categories) DATA.categories = defaultCategories();
-  if(!DATA.recipes) DATA.recipes = [];
-  if(!DATA.checks) DATA.checks = {};
-  renderDashboard(); renderRecipes();
-
-  if(!firebaseReady) return;
-  try {
-    db.collection('ops_manual').doc('app_data').onSnapshot((doc) => {
-      if (doc.exists) {
-        DATA = doc.data();
-        if(!DATA.categories) DATA.categories = defaultCategories();
-        if(!DATA.recipes) DATA.recipes = [];
-        if(!DATA.checks) DATA.checks = {};
-        safeLocalStorageSet('ws_ops_data_v4', JSON.stringify(DATA));
-        refreshCurrentView();
-      }
-    }, (err) => console.error("Firestore sync error:", err));
-  } catch (err) {
-    console.error("Firestore listen failed, staying in local-only mode:", err);
-  }
-}
-
-function saveData() {
-  safeLocalStorageSet('ws_ops_data_v4', JSON.stringify(DATA));
-  if(!firebaseReady) return;
-  try {
-    db.collection('ops_manual').doc('app_data').set(DATA).catch(console.error);
-  } catch (err) {
-    console.error("Firestore save failed, data kept locally only:", err);
-  }
-}
-
-// ใช้ textContent แทน innerHTML เสมอ (ข้อความเป็น plain text ล้วน ไม่มีเหตุผลต้องเสี่ยง XSS)
-function showToast(msg) {
-  const t = el('toast'); el('toastMsg').textContent = msg;
-  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-// --- DISCORD WEBHOOK (DETAILED AUDIT LOG) ---
-
-// Discord embed field "value" has a 1024-char hard limit; trim long lists so the webhook never gets rejected.
-function truncateForField(str, max = 1000) {
-  if(!str) return '-';
-  return str.length > max ? str.slice(0, max - 20) + '\n... (ตัดข้อความ)' : str;
-}
-
-// ingredients can be legacy strings OR {name, amount} objects — normalize both into "• name (amount)" lines.
-function formatIngredientsField(ingredients) {
-  if(!ingredients || ingredients.length === 0) return '-';
-  const lines = ingredients.map(ing => {
-    if(typeof ing === 'string') return `• ${ing}`;
-    const amt = ing.amount ? ` (${ing.amount})` : '';
-    return `• ${ing.name}${amt}`;
-  });
-  return truncateForField(lines.join('\n'));
-}
-
-// steps for a recipe: plain bullet list, one step per line.
-function formatStepsField(steps) {
-  if(!steps || steps.length === 0) return '-';
-  return truncateForField(steps.map(s => `• ${s}`).join('\n'));
-}
-
-// checklist steps for a category: numbered list (1. 2. 3. ...) so order/sequence reads clearly.
-function formatChecklistField(steps) {
-  if(!steps || steps.length === 0) return '-';
-  return truncateForField(steps.map((s, i) => `${i + 1}. ${s}`).join('\n'));
-}
-
-/**
- * sendDiscordLog
- * @param {string} action     "เพิ่ม" | "แก้ไข" | "ลบ"
- * @param {string} itemName   ชื่อรายการ (ใช้เป็น fallback / หัวข้อ)
- * @param {string} type       "เมนูอาหาร" | "หมวดหมู่เช็คลิสต์"
- * @param {object} dataObject ก้อนข้อมูลเต็มของ recipe หรือ category ที่เกี่ยวข้องกับ action นี้
- */
-function sendDiscordLog(action, itemName, type = "ข้อมูล", dataObject = null) {
-  if(!DISCORD_WEBHOOK_URL) return;
-
-  // สีตาม action: เพิ่ม=เขียว, แก้ไข=เหลือง, ลบ=แดง
-  const colors = { "เพิ่ม": 5814783, "แก้ไข": 16763904, "ลบ": 16711680 };
-  const actionIcon = { "เพิ่ม": "🆕", "แก้ไข": "✏️", "ลบ": "🗑️" }[action] || "📌";
-
-  const fields = [
-    { name: "🧾 การกระทำ (Action)", value: `${actionIcon} **${action}**`, inline: true },
-    { name: "📂 ประเภท (Type)", value: type, inline: true },
-    { name: "🏷️ ชื่อรายการ (Item)", value: itemName || '-', inline: false }
-  ];
-
-  if(dataObject) {
-    if(type === "เมนูอาหาร") {
-      // --- Recipe: แยก field ส่วนผสม / ขั้นตอนการทำ ---
-      if(dataObject.category) {
-        fields.push({ name: "📁 หมวดหมู่เมนู", value: dataObject.category, inline: true });
-      }
-      if(dataObject.desc) {
-        fields.push({ name: "📄 รายละเอียด", value: truncateForField(dataObject.desc), inline: false });
-      }
-      fields.push({ name: "🥕 ส่วนผสม (Ingredients)", value: formatIngredientsField(dataObject.ingredients), inline: false });
-      fields.push({ name: "👨‍🍳 ขั้นตอนการทำ (Steps)", value: formatStepsField(dataObject.steps), inline: false });
-      if(dataObject.tip) {
-        fields.push({ name: "💡 ทริคหลังร้าน", value: truncateForField(dataObject.tip), inline: false });
-      }
-    } else if(type === "หมวดหมู่เช็คลิสต์") {
-      // --- Category: field รายการเช็คลิสต์ แบบเรียงลำดับตัวเลข ---
-      if(dataObject.desc) {
-        fields.push({ name: "📄 รายละเอียด", value: truncateForField(dataObject.desc), inline: false });
-      }
-      fields.push({ name: "✅ รายการเช็คลิสต์ (Checklist)", value: formatChecklistField(dataObject.steps), inline: false });
-      if(dataObject.tips) {
-        fields.push({ name: "💡 ทริคหลังร้าน", value: truncateForField(dataObject.tips), inline: false });
-      }
-    }
-    if(dataObject.id) {
-      fields.push({ name: "🆔 ID", value: `\`${dataObject.id}\``, inline: true });
-    }
-  }
-
-  const payload = {
-    username: "Wingstop Kitchen Notebook",
-    avatar_url: "https://cdn-icons-png.flaticon.com/512/3448/3448003.png",
-    embeds: [{
-      title: `📝 มีการอัปเดตสมุดสูตรหลังร้าน`,
-      description: `**ผู้ใช้งาน** ได้ทำการ **${action}** ${type}: \`${itemName}\``,
-      color: colors[action] || 16777215,
-      fields: fields,
-      footer: { text: "Wingstop Kitchen Notebook • Audit Log" },
-      timestamp: new Date().toISOString()
-    }]
-  };
-
-  fetch(DISCORD_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-    .catch(err => console.error("Discord Webhook Error:", err));
-}
-
-// --- DISCORD WEBHOOK (ACTIVITY LOG - ทุกการใช้งานเว็บไซต์) ---
-/**
- * sendActivityNotify
- * แจ้งเตือนการใช้งานทั่วไป (เปิดดู, ติ๊กเช็คลิสต์, ค้นหา, สลับแท็บ ฯลฯ)
- * แยกจาก sendDiscordLog ซึ่งใช้เฉพาะ เพิ่ม/แก้ไข/ลบ ข้อมูล
- * @param {string} action  ชื่อกิจกรรม เช่น "ติ๊กเช็คลิสต์"
- * @param {string} detail  รายละเอียดเพิ่มเติม (รองรับหลายบรรทัด)
- * @param {number} color   สีแถบ embed (ค่าเริ่มต้น = ฟ้า)
- */
-function sendActivityNotify(action, detail = '', color = 3447003) {
-  if(!DISCORD_WEBHOOK_URL) return;
-  const payload = {
-    username: "Wingstop Kitchen Notebook",
-    avatar_url: "https://cdn-icons-png.flaticon.com/512/3448/3448003.png",
-    embeds: [{
-      title: `👀 กิจกรรมการใช้งานเว็บไซต์`,
-      description: `**${action}**${detail ? `\n${detail}` : ''}`,
-      color: color,
-      footer: { text: "Wingstop Kitchen Notebook • Activity Log" },
-      timestamp: new Date().toISOString()
-    }]
-  };
-  fetch(DISCORD_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-    .catch(err => console.error("Discord Webhook Error:", err));
-}
-
-// --- TAB SWITCHER ---
-function switchTab(tabId) {
-  const wasActive = document.querySelector('.tab.active')?.dataset.tab;
-  currentCategoryId = null; currentRecipeId = null;
-  document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
-  const activeTabBtn = document.querySelector(`.tab[data-tab="${tabId}"]`);
-  activeTabBtn.classList.add('active');
-  activeTabBtn.setAttribute('aria-selected', 'true');
-
-  if(wasActive !== tabId) {
-    const tabLabel = tabId === 'dashboard' ? '📖 เช็คลิสต์ประจำกะ' : '🍗 การ์ดสูตรอาหาร';
-    sendActivityNotify('🔄 สลับแท็บ', `ไปที่: **${tabLabel}**`, 10181046);
-  }
-  
-  el('view-dashboard').style.display = tabId === 'dashboard' ? 'block' : 'none';
-  el('view-recipes').style.display = tabId === 'recipes' ? 'block' : 'none';
-  el('view-proc-detail').style.display = 'none';
-  el('view-recipe-detail').style.display = 'none';
-  
-  if(tabId === 'dashboard') renderDashboard(el('searchInput').value);
-  if(tabId === 'recipes') renderRecipes(el('searchInput').value);
-}
-document.querySelectorAll('.tab').forEach(t => t.onclick = () => switchTab(t.dataset.tab));
-
-function refreshCurrentView() {
-  const activeTab = document.querySelector('.tab.active').dataset.tab;
-  if(currentCategoryId) openCategoryDetail(currentCategoryId);
-  else if(currentRecipeId) openRecipeDetail(currentRecipeId);
-  else {
-    if (activeTab === 'dashboard') renderDashboard(el('searchInput').value);
-    if (activeTab === 'recipes') renderRecipes(el('searchInput').value);
-  }
-}
-
-// ==========================================
-// 1. DASHBOARD & CHECKLIST SYSTEM (มี CRUD)
-// ==========================================
-function renderDashboard(filter = '') {
-  const g = el('catGrid'); g.innerHTML = '';
-  const f = filter.trim().toLowerCase();
-  const cats = (DATA.categories || []).filter(c => {
-    const haystack = `${c.title||''} ${c.desc||''} ${c.tips||''}`.toLowerCase();
-    return haystack.includes(f);
-  });
-
-  if(cats.length === 0) {
-    g.innerHTML = `<p style="color:var(--ink-dim); grid-column:1/-1; padding:20px 0;">ไม่พบเช็คลิสต์ที่ตรงกับคำค้นหา</p>`;
-    return;
-  }
-
-  cats.forEach(c => {
-    const today = new Date().toISOString().split('T')[0];
-    const key = `${c.id}_${today}`;
-    const checked = (DATA.checks[key] || []).length;
-    const total = (c.steps || []).length;
-    const isDone = checked === total && total > 0;
-    const col = getCategoryColor(c.title);
-
-    g.innerHTML += `
-      <div class="card cat-card" role="button" tabindex="0" aria-label="เปิดเช็คลิสต์ ${escapeHtml(c.title)}" onclick="viewCategoryDetail('${c.id}')">
-        <button class="edit-btn-small" onclick="openCatModal('${c.id}', event)" title="แก้ไข" aria-label="แก้ไขเช็คลิสต์ ${escapeHtml(c.title)}">✏️</button>
-        <button class="del-btn" onclick="deleteCategory('${c.id}', event)" title="ลบ" aria-label="ลบเช็คลิสต์ ${escapeHtml(c.title)}">🗑️</button>
-        <div class="cat-icon" style="background:${col.bg}; color:${col.text}" aria-hidden="true">${escapeHtml(c.icon)}</div>
-        <h3>${escapeHtml(c.title)}</h3>
-        <p>${escapeHtml(c.desc)}</p>
-        <div class="cat-count" style="background:${isDone ? 'var(--sage)' : (checked > 0 ? 'var(--mustard-light)' : 'var(--surface-2)')}; color:${isDone ? '#06231A' : (checked > 0 ? 'var(--mustard)' : 'var(--ink-dim)')}">
-          ${isDone ? '✓ ทำครบแล้ว' : `ความคืบหน้า ${checked}/${total}`}
-        </div>
-      </div>
-    `;
-  });
-}
-
-function viewCategoryDetail(id) {
-  const cat = DATA.categories.find(c => c.id === id);
-  if(cat) sendActivityNotify('📂 เปิดดูเช็คลิสต์', `หมวดหมู่: **${cat.title}**`, 3447003);
-  openCategoryDetail(id);
-}
-
-function openCategoryDetail(id) {
-  currentCategoryId = id;
-  const cat = DATA.categories.find(c => c.id === id); if(!cat) return;
-  
-  const today = new Date().toISOString().split('T')[0];
-  const key = `${id}_${today}`;
-  if(!DATA.checks[key]) DATA.checks[key] = [];
-  
-  el('view-dashboard').style.display = 'none';
-  el('view-recipes').style.display = 'none';
-  const detail = el('view-proc-detail'); detail.style.display = 'block';
-  
-  detail.innerHTML = `
-    <div class="proc-card">
-      <div class="proc-head">
-        <h2>${escapeHtml(cat.icon)} ${escapeHtml(cat.title)}</h2>
-        <div style="display:flex; gap:10px;">
-            <button type="button" class="btn-edit" onclick="openCatModal('${cat.id}')">✏️ แก้ไขเช็คลิสต์</button>
-            <button type="button" class="btn-edit" onclick="resetChecklist('${key}')">↺ รีเซ็ตเช็คลิสต์วันนี้</button>
-            <button type="button" class="back-btn" onclick="switchTab('dashboard')">← กลับ</button>
-        </div>
-      </div>
-      <div class="progress-card">
-        <div class="progress-info"><span id="prog-label">ความคืบหน้ากะวันนี้</span><span id="prog-txt">0%</span></div>
-        <div class="progress-bar" role="progressbar" aria-labelledby="prog-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="prog-bar"><div class="progress-fill" id="prog-fill"></div></div>
-      </div>
-      ${cat.tips ? `<div class="sticky-note"><b>📌 ทริคจากรุ่นพี่:</b> ${escapeHtml(cat.tips)}</div>` : ''}
-      <div style="display:flex; flex-direction:column; margin-top:16px;">
-        ${(cat.steps||[]).map((s,i) => {
-          const done = DATA.checks[key].includes(i);
-          return `
-            <div class="check-item ${done ? 'done' : ''}" role="checkbox" aria-checked="${done}" tabindex="0" onclick="toggleCheck('${key}', ${i})">
-              <div class="checkbox-custom" aria-hidden="true">${done ? '✓' : ''}</div>
-              <div class="step-text">${i+1}. ${escapeHtml(s)}</div>
-            </div>`;
-        }).join('')}
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-container">
+      <a id="logo-link" href="#" class="logo-group">
+        <div class="logo-icon"><i data-lucide="utensils"></i></div>
+        <span>TasteNote</span>
+      </a>
+      <div class="header-actions">
+        <button id="btn-toggle-favorites" class="btn-toggle-fav">
+          <i data-lucide="heart" size="18"></i> <span id="fav-btn-text">สูตรโปรด</span>
+        </button>
       </div>
     </div>
-  `;
-  updateProgress(key, (cat.steps||[]).length);
-}
+  </header>
 
-function resetChecklist(key) {
-  if(!DATA.checks[key] || DATA.checks[key].length === 0) return;
-  if(confirm('⚠️ ต้องการล้างเครื่องหมายที่ติ๊กไว้ทั้งหมดของวันนี้ใช่ไหม?')) {
-    const cat = DATA.categories.find(c => c.id === currentCategoryId);
-    DATA.checks[key] = [];
-    saveData();
-    sendActivityNotify('↺ รีเซ็ตเช็คลิสต์วันนี้', `หมวดหมู่: **${cat ? cat.title : '-'}**`, 16711680);
-    showToast('↺ รีเซ็ตเช็คลิสต์เรียบร้อยแล้ว');
-    openCategoryDetail(currentCategoryId);
-  }
-}
-
-function toggleCheck(key, idx) {
-  const checks = DATA.checks[key];
-  const pos = checks.indexOf(idx);
-  const cat = DATA.categories.find(c => c.id === currentCategoryId);
-  const stepText = cat && cat.steps ? cat.steps[idx] : '';
-  if(pos === -1) {
-    checks.push(idx);
-    sendActivityNotify('✅ ติ๊กเช็คลิสต์', `หมวดหมู่: **${cat ? cat.title : '-'}**\nรายการ: ${stepText}`, 5814783);
-  } else {
-    checks.splice(pos, 1);
-    sendActivityNotify('◻️ ยกเลิกติ๊กเช็คลิสต์', `หมวดหมู่: **${cat ? cat.title : '-'}**\nรายการ: ${stepText}`, 16763904);
-  }
-  saveData(); openCategoryDetail(currentCategoryId);
-}
-
-function updateProgress(key, total) {
-  const checked = DATA.checks[key] ? DATA.checks[key].length : 0;
-  const pct = total === 0 ? 0 : Math.round((checked / total) * 100);
-  if(el('prog-fill')) {
-    el('prog-fill').style.width = `${pct}%`;
-    // สื่อความหมายด้วยสี: เหลือง/ส้ม = กำลังดำเนินการ, เขียว = เสร็จสิ้น (UI เท่านั้น ไม่กระทบข้อมูล)
-    el('prog-fill').style.background = pct >= 100 ? 'var(--sage)' : 'var(--mustard)';
-  }
-  if(el('prog-txt')) el('prog-txt').textContent = `${pct}% (${checked}/${total} ข้อ)`;
-  if(el('prog-bar')) el('prog-bar').setAttribute('aria-valuenow', String(pct));
-}
-
-// Dynamic Rows สำหรับเช็คลิสต์
-function addCatStepRow(val = '') {
-  const container = el('cStepContainer');
-  const div = document.createElement('div');
-  div.className = 'dyn-row';
-  div.innerHTML = `
-    <input type="text" class="c-step-input flex-2" placeholder="อธิบายสิ่งที่ต้องทำ..." aria-label="รายการเช็คลิสต์" value="${escapeHtml(val)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-    <button type="button" onclick="this.parentElement.remove()" class="del-row-btn" title="ลบรายการนี้" aria-label="ลบรายการเช็คลิสต์นี้">✕</button>
-  `;
-  container.appendChild(div);
-}
-
-function openCatModal(id = null, event = null) {
-  if(event) event.stopPropagation();
-  el('catForm').reset();
-  el('cEditId').value = '';
-  el('catModalTitle').innerText = '📝 สร้างเช็คลิสต์ใหม่';
-  el('cStepContainer').innerHTML = '';
-
-  if(id) {
-    const c = DATA.categories.find(x => x.id === id);
-    if(c) {
-      el('catModalTitle').innerText = '✏️ แก้ไขเช็คลิสต์';
-      el('cEditId').value = c.id;
-      el('cTitle').value = c.title || '';
-      el('cIcon').value = c.icon || '🍳';
-      el('cDesc').value = c.desc || '';
-      el('cTip').value = c.tips || '';
-      if(c.steps && c.steps.length > 0) c.steps.forEach(s => addCatStepRow(s));
-      else addCatStepRow();
-    }
-  } else { addCatStepRow(); }
-  el('catModal').classList.add('open');
-  openModalA11y(el('catModal'));
-}
-
-function closeCatModal() { el('catModal').classList.remove('open'); closeModalA11y(); }
-
-function saveCategory(e) {
-  e.preventDefault();
-  const id = el('cEditId').value;
-  const stepRows = document.querySelectorAll('.c-step-input');
-  const steps = [];
-  stepRows.forEach(input => { if(input.value.trim()) steps.push(input.value.trim()); });
-
-  if(steps.length === 0) return alert("กรุณาใส่รายการเช็คลิสต์อย่างน้อย 1 รายการครับ!");
-
-  const newCat = {
-    id: id || 'c_' + Date.now(),
-    title: el('cTitle').value.trim(),
-    icon: el('cIcon').value.trim() || '🍳',
-    desc: el('cDesc').value.trim(),
-    tips: el('cTip').value.trim(),
-    steps: steps
-  };
-
-  if(id) {
-    const idx = DATA.categories.findIndex(x => x.id === id);
-    if(idx > -1) DATA.categories[idx] = newCat;
-    sendDiscordLog("แก้ไข", newCat.title, "หมวดหมู่เช็คลิสต์", newCat);
-    showToast("✏️ แก้ไขเช็คลิสต์สำเร็จ");
-  } else {
-    DATA.categories.push(newCat);
-    sendDiscordLog("เพิ่ม", newCat.title, "หมวดหมู่เช็คลิสต์", newCat);
-    showToast("✅ สร้างเช็คลิสต์ใหม่สำเร็จ");
-  }
-  saveData(); closeCatModal();
-  if(currentCategoryId === id) openCategoryDetail(id);
-  else refreshCurrentView();
-}
-
-function deleteCategory(id, event) {
-  event.stopPropagation();
-  const c = DATA.categories.find(x => x.id === id);
-  if(!c) return;
-  if(confirm(`⚠️ แน่ใจหรือไม่ว่าจะลบหมวดหมู่ "${c.title}"?\n(รายการเช็คลิสต์จะหายไปทั้งหมด)`)) {
-    DATA.categories = DATA.categories.filter(x => x.id !== id);
-    sendDiscordLog("ลบ", c.title, "หมวดหมู่เช็คลิสต์", c);
-    saveData(); showToast("🗑️ ลบหมวดหมู่เรียบร้อยแล้ว");
-    if(currentCategoryId === id) switchTab('dashboard');
-    else renderDashboard(el('searchInput').value);
-  }
-}
-
-// ==========================================
-// 2. RECIPE SYSTEM (อัปเกรดขั้นตอน)
-// ==========================================
-function renderRecipes(filter = '') {
-  const g = el('recipeGrid'); g.innerHTML = '';
-  const f = filter.trim().toLowerCase();
-  const list = (DATA.recipes || []).filter(r => {
-    const ingText = (r.ingredients||[]).map(i => typeof i === 'string' ? i : `${i.name||''} ${i.amount||''}`).join(' ');
-    const haystack = `${r.name||''} ${r.category||''} ${r.desc||''} ${r.tip||''} ${ingText}`.toLowerCase();
-    return haystack.includes(f);
-  });
-
-  if(list.length === 0) {
-    g.innerHTML = `<p style="color:var(--ink-dim); grid-column:1/-1; padding:20px 0;">ไม่พบสูตรอาหารที่ตรงกับคำค้นหา</p>`;
-    return;
-  }
-
-  list.forEach(r => {
-    const col = getCategoryColor(r.category);
-    g.innerHTML += `
-      <div class="card recipe-card" role="button" tabindex="0" aria-label="เปิดสูตรเมนู ${escapeHtml(r.name)}" onclick="viewRecipeDetail('${r.id}')">
-        <button class="del-btn" onclick="deleteRecipe('${r.id}', event)" title="ลบเมนูนี้" aria-label="ลบสูตรเมนู ${escapeHtml(r.name)}">🗑️</button>
-        <div class="recipe-tag" style="background:${col.bg}; color:${col.text}">${escapeHtml(r.category)}</div>
-        <h3 style="padding-right:30px;">${escapeHtml(r.name)}</h3>
-        <p>${escapeHtml(r.desc)}</p>
-      </div>
-    `;
-  });
-}
-
-function viewRecipeDetail(id) {
-  const r = DATA.recipes.find(x => x.id === id);
-  if(r) sendActivityNotify('🍗 เปิดดูสูตรอาหาร', `เมนู: **${r.name}**${r.category ? ` (${r.category})` : ''}`, 3447003);
-  openRecipeDetail(id);
-}
-
-function openRecipeDetail(id) {
-  currentRecipeId = id;
-  const r = DATA.recipes.find(x => x.id === id); if(!r) { switchTab('recipes'); return; }
-  
-  el('view-dashboard').style.display = 'none';
-  el('view-recipes').style.display = 'none';
-  const detail = el('view-recipe-detail'); detail.style.display = 'block';
-  const col = getCategoryColor(r.category);
-  
-  const renderIng = (ing) => {
-    if(typeof ing === 'string') return `<li>${escapeHtml(ing)}</li>`;
-    return `<li style="display:flex; justify-content:space-between; border-bottom:1px dashed var(--border-strong); padding:6px 0;">
-              <span>${escapeHtml(ing.name)}</span>
-              <strong style="color:var(--paprika);">${escapeHtml(ing.amount)}</strong>
-            </li>`;
-  };
-
-  detail.innerHTML = `
-    <div style="background:var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; position:relative;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
-        <div>
-          <div class="recipe-tag" style="background:${col.bg}; color:${col.text}">${escapeHtml(r.category)}</div>
-          <h2 style="font-size:28px; color:var(--paprika);">${escapeHtml(r.name)}</h2>
-        </div>
-        <div style="display:flex; gap:10px;">
-          <button type="button" class="btn-edit" onclick="openRecipeModal('${r.id}')">✏️ แก้ไขสูตร</button>
-          <button type="button" class="back-btn" onclick="switchTab('recipes')" aria-label="ปิดหน้าสูตรอาหาร กลับไปหน้ารายการ">ปิด ✕</button>
-        </div>
-      </div>
-      <p style="color:var(--ink-dim); margin-top:8px; font-size:14.5px;">${escapeHtml(r.desc)}</p>
-      ${r.tip ? `<div class="sticky-note"><b>📌 ทริคจากรุ่นพี่:</b> ${escapeHtml(r.tip)}</div>` : ''}
-
-      <div style="display:grid; grid-template-columns: 1fr; gap:20px; margin-top:24px;">
-        <div style="background:var(--surface-2); border: 1px solid var(--border); border-radius:var(--radius-sm); padding:18px;">
-          <h4 style="margin-bottom:14px; font-size:16px; display:flex; align-items:center; gap:8px;">🛒 ส่วนผสม & อัตราส่วน</h4>
-          <ul style="list-style:none; padding:0; color:var(--ink); line-height:1.6; margin:0;">
-            ${(r.ingredients||[]).map(i => renderIng(i)).join('')}
-          </ul>
-        </div>
+  <main class="main-content">
+    <!-- VIEW 1: READ / EXPLORE -->
+    <section id="view-read" class="view-section active">
+      <div class="search-hero">
+        <h1 class="hero-title" id="explore-title">คลังสูตรอาหาร</h1>
         
-        <div style="background:var(--surface-2); border: 1px solid var(--border); border-radius:var(--radius-sm); padding:18px;">
-          <h4 style="margin-bottom:14px; font-size:16px; display:flex; align-items:center; gap:8px;">📋 ขั้นตอนการทำหน้าเตา</h4>
-          <ol style="padding-left:24px; color:var(--ink); line-height:1.7; margin:0;">
-            ${(r.steps||[]).map(s => `<li>${escapeHtml(s)}</li>`).join('')}
-          </ol>
+        <!-- Search -->
+        <div class="search-input-wrapper">
+          <i data-lucide="search" class="search-icon-left" size="20"></i>
+          <input type="text" id="search-input" class="search-input" placeholder="ค้นหาชื่อสูตรอาหาร หรือหมวดหมู่...">
         </div>
       </div>
+
+      <!-- NOTICE BOARD (Moved below search hero) -->
+      <div class="notice-board" id="notice-board">
+        <div class="notice-header"><i data-lucide="pin" size="24"></i><span>📌 ข้อควรรู้ / ประกาศสำคัญ</span></div>
+        <ul class="notice-list">
+          <li>แชร์สูตรอาหารของคุณเข้าสู่ระบบ เพื่อเก็บเป็นฐานข้อมูลส่วนกลาง</li>
+          <li>คุณสามารถแก้ไขหรือลบสูตรอาหารของตนเองได้ โดยคลิกที่สูตรแล้วเลื่อนลงมาด้านล่าง</li>
+          <li>กดรูปหัวใจเพื่อบันทึกสูตรโปรดไว้ดูส่วนตัว (ข้อมูลบันทึกในเบราว์เซอร์ของคุณ)</li>
+        </ul>
+      </div>
+
+      <div class="recipe-grid" id="recipe-grid"></div>
+
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <i data-lucide="book-x" size="48" style="color: var(--text-light); margin-bottom: 16px; transition: all 0.5s;"></i>
+        <h3 id="empty-title">ยังไม่พบสูตรอาหาร</h3>
+        <p id="empty-subtitle">เริ่มต้นเพิ่มสูตรอาหารแรกของคุณโดยกดปุ่ม + ด้านล่างขวา</p>
+      </div>
+    </section>
+
+    <!-- VIEW 2: RECIPE FORM -->
+    <section id="view-form" class="view-section">
+      <div class="form-card">
+        
+        <!-- Close Form Button (Top Right) -->
+        <button type="button" class="btn-close-form" id="btn-close-form-top" title="ยกเลิก / ปิด">
+          <i data-lucide="x" size="20"></i>
+        </button>
+
+        <div class="form-header">
+          <h2 id="form-main-title">เพิ่มสูตรอาหารใหม่</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">กรอกข้อมูลสูตรอาหาร วัตถุดิบ และขั้นตอนให้ครบถ้วน</p>
+        </div>
+
+        <form id="recipe-form">
+          <div class="form-group">
+            <label class="form-label">ชื่อสูตรอาหาร *</label>
+            <input type="text" id="recipe-title" class="form-control" required>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">หมวดหมู่ *</label>
+              <select id="recipe-category" class="form-control" required>
+                <option value="">-- เลือกหมวดหมู่ --</option>
+                <option value="ของทอด">ของทอด</option>
+                <option value="ซอส">ซอส</option>
+                <option value="เครื่องดื่ม">เครื่องดื่ม</option>
+                <option value="สลัด">สลัด</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">เวลาที่ใช้ทำ (นาที)</label>
+              <input type="number" id="recipe-time" class="form-control" placeholder="เช่น 30" min="1">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">อุปกรณ์ที่ต้องใช้</label>
+            <div id="equipment-container" class="dynamic-list"></div>
+            <button type="button" class="btn-add-row" data-type="equipment"><i data-lucide="plus" size="16"></i> เพิ่มอุปกรณ์</button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">วัตถุดิบ</label>
+            <div id="ingredients-container" class="dynamic-list"></div>
+            <button type="button" class="btn-add-row" data-type="ingredient"><i data-lucide="plus" size="16"></i> เพิ่มวัตถุดิบ</button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">วิธีทำ (ตามลำดับ)</label>
+            <div id="steps-container" class="dynamic-list"></div>
+            <button type="button" class="btn-add-row" data-type="step"><i data-lucide="plus" size="16"></i> เพิ่มขั้นตอน</button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">หมายเหตุ</label>
+            <textarea id="recipe-notes" class="form-control"></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" id="btn-cancel-form">ยกเลิก</button>
+            <button type="submit" class="btn-submit" id="submit-btn"><i data-lucide="save" size="18"></i> บันทึกข้อมูล</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- FLOATING ACTION BUTTON -->
+  <div class="fab-container" id="fab-add-btn">
+    <button class="btn-fab" id="btn-open-add-form" title="เพิ่มสูตรใหม่">
+      <i data-lucide="plus" size="32"></i>
+    </button>
+  </div>
+
+  <!-- MODAL: RECIPE DETAILS -->
+  <div class="modal-overlay" id="recipe-modal">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="btn-close-modal"><i data-lucide="x" size="20"></i></button>
+      <div id="modal-content"></div>
     </div>
-  `;
-}
+  </div>
 
-// Dynamic Rows - Ingredients
-function addIngredientRow(name = '', amount = '') {
-  const container = el('ingContainer');
-  const div = document.createElement('div');
-  div.className = 'dyn-row';
-  div.innerHTML = `
-    <input type="text" class="ing-name flex-2" placeholder="ชื่อวัตถุดิบ (เช่น ปีกไก่สด)" aria-label="ชื่อวัตถุดิบ" value="${escapeHtml(name)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-    <input type="text" class="ing-amount flex-1" placeholder="ปริมาณ/หน่วย (เช่น 100g, 2 ชิ้น)" aria-label="ปริมาณ/หน่วย" value="${escapeHtml(amount)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-    <button type="button" onclick="this.parentElement.remove()" class="del-row-btn" title="ลบรายการนี้" aria-label="ลบส่วนผสมนี้">✕</button>
-  `;
-  container.appendChild(div);
-}
+  <!-- TOAST -->
+  <div id="toast" class="toast">
+    <i data-lucide="check-circle-2" size="20" style="color: #10B981;"></i>
+    <span id="toast-message">แจ้งเตือน</span>
+  </div>
 
-// Dynamic Rows - Recipe Steps
-function addRecipeStepRow(val = '') {
-  const container = el('rStepContainer');
-  const div = document.createElement('div');
-  div.className = 'dyn-row';
-  div.innerHTML = `
-    <input type="text" class="r-step-input flex-2" placeholder="อธิบายขั้นตอน (เช่น ทอดไก่ที่ 350F)" aria-label="ขั้นตอนการทำ" value="${escapeHtml(val)}" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-    <button type="button" onclick="this.parentElement.remove()" class="del-row-btn" title="ลบรายการนี้" aria-label="ลบขั้นตอนนี้">✕</button>
-  `;
-  container.appendChild(div);
-}
+  <!-- FIREBASE & APP LOGIC -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { 
+      getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp,
+      doc, updateDoc, deleteDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-function getExistingCategories() {
-  const set = new Set();
-  (DATA.recipes || []).forEach(r => { if(r.category && r.category.trim()) set.add(r.category.trim()); });
-  return Array.from(set).sort((a, b) => a.localeCompare(b, 'th'));
-}
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDYHAUJg1zrLsCycmasqlPSJ25XzQY354",
+      authDomain: "wingstop-c1dfd.firebaseapp.com",
+      projectId: "wingstop-c1dfd",
+      storageBucket: "wingstop-c1dfd.firebasestorage.app",
+      messagingSenderId: "68193512037",
+      appId: "1:68193512037:web:d938753a1544a6e664748c"
+    };
 
-function populateCategorySelect(selected = '') {
-  const sel = el('rCat');
-  const cats = getExistingCategories();
-  if(selected && !cats.includes(selected)) cats.push(selected);
-  cats.sort((a, b) => a.localeCompare(b, 'th'));
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const recipesCollection = collection(db, "recipes");
 
-  sel.innerHTML =
-    `<option value="" disabled ${selected ? '' : 'selected'}>-- เลือกหมวดหมู่ --</option>` +
-    cats.map(c => `<option value="${escapeHtml(c)}" ${c === selected ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('') +
-    `<option value="__new__">＋ เพิ่มหมวดหมู่ใหม่...</option>`;
-  sel.dataset.last = selected || '';
-}
+    let allRecipes = [];
+    let currentEditingId = null;
+    let showingFavorites = false;
+    let myFavorites = JSON.parse(localStorage.getItem('tasteNoteFavorites')) || [];
 
-function handleCategoryChange(selectEl) {
-  if(selectEl.value === '__new__') {
-    const name = prompt('ตั้งชื่อหมวดหมู่ใหม่:');
-    const trimmed = (name || '').trim();
-    if(trimmed) {
-      populateCategorySelect(trimmed);
-    } else {
-      selectEl.value = selectEl.dataset.last || '';
-    }
-  } else {
-    selectEl.dataset.last = selectEl.value;
-  }
-}
+    const DOM = {
+      viewRead: document.getElementById('view-read'),
+      viewForm: document.getElementById('view-form'),
+      fabBtn: document.getElementById('fab-add-btn'),
+      recipeGrid: document.getElementById('recipe-grid'),
+      emptyState: document.getElementById('empty-state'),
+      modal: document.getElementById('recipe-modal'),
+      modalContent: document.getElementById('modal-content'),
+      recipeForm: document.getElementById('recipe-form'),
+      searchInput: document.getElementById('search-input'),
+      containers: {
+        equipment: document.getElementById('equipment-container'),
+        ingredient: document.getElementById('ingredients-container'),
+        step: document.getElementById('steps-container')
+      }
+    };
 
-function openRecipeModal(id = null) {
-  el('recipeForm').reset(); el('editId').value = '';
-  el('modalTitle').innerText = '📝 จดสูตรเมนูใหม่';
-  el('ingContainer').innerHTML = '';
-  el('rStepContainer').innerHTML = '';
-  populateCategorySelect('');
+    const escapeHTML = (str) => {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    };
 
-  if(id) {
-    const r = DATA.recipes.find(x => x.id === id);
-    if(r) {
-      el('modalTitle').innerText = '✏️ แก้ไขสูตรอาหาร';
-      el('editId').value = r.id;
-      el('rName').value = r.name || '';
-      populateCategorySelect(r.category || '');
-      el('rDesc').value = r.desc || '';
-      el('rTip').value = r.tip || '';
+    const showToast = (msg) => {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    };
+
+    const debounce = (func, delay) => {
+      let timeoutId;
+      return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func(...args), delay);
+      };
+    };
+
+    const switchView = (viewName) => {
+      DOM.viewRead.classList.toggle('active', viewName === 'read');
+      DOM.viewForm.classList.toggle('active', viewName === 'form');
+      DOM.fabBtn.classList.toggle('hidden', viewName === 'form');
+      if(viewName === 'read') applyFilters();
+    };
+
+    const toggleFavorite = (id, e) => {
+      e.stopPropagation(); 
+      if (myFavorites.includes(id)) {
+        myFavorites = myFavorites.filter(favId => favId !== id);
+        showToast('ลบออกจากสูตรโปรดแล้ว');
+      } else {
+        myFavorites.push(id);
+        showToast('บันทึกสูตรโปรดแล้ว!');
+      }
+      localStorage.setItem('tasteNoteFavorites', JSON.stringify(myFavorites));
+      applyFilters(); 
+    };
+
+    const applyFilters = () => {
+      const q = DOM.searchInput.value.toLowerCase().trim();
+      let filtered = allRecipes;
+
+      if (showingFavorites) {
+        filtered = filtered.filter(r => myFavorites.includes(r.id));
+      }
+
+      if (q) {
+        filtered = filtered.filter(r => 
+          (r.title || '').toLowerCase().includes(q) || 
+          (r.category || '').toLowerCase().includes(q)
+        );
+      }
+
+      renderRecipes(filtered);
+    };
+
+    const renderRecipes = (list) => {
+      if (list.length === 0) {
+        DOM.recipeGrid.innerHTML = '';
+        DOM.emptyState.style.display = 'block';
+        
+        if(showingFavorites) {
+          document.getElementById('empty-title').innerText = "ยังไม่มีสูตรโปรด";
+          document.getElementById('empty-subtitle').innerText = "กดหัวใจที่สูตรอาหารเพื่อบันทึกไว้ดูภายหลัง";
+        } else {
+          document.getElementById('empty-title').innerText = "ไม่พบสูตรอาหารที่ค้นหา";
+          document.getElementById('empty-subtitle').innerText = "ลองเปลี่ยนคำค้นหา หรือเพิ่มสูตรใหม่ด้วยตัวเอง";
+        }
+        return;
+      }
       
-      // Load Ingredients
-      if(r.ingredients && r.ingredients.length > 0) {
-        r.ingredients.forEach(ing => {
-          if(typeof ing === 'string') addIngredientRow(ing, '');
-          else addIngredientRow(ing.name, ing.amount);
-        });
-      } else addIngredientRow();
+      DOM.emptyState.style.display = 'none';
+      
+      DOM.recipeGrid.innerHTML = list.map((r, index) => {
+        const isFav = myFavorites.includes(r.id);
+        const heartFill = isFav ? '#EF4444' : 'none';
+        const heartClass = isFav ? 'active' : '';
+        const delay = (index * 0.05) + 's';
 
-      // Load Steps
-      if(r.steps && r.steps.length > 0) {
-        r.steps.forEach(s => addRecipeStepRow(s));
-      } else addRecipeStepRow();
-    }
-  } else {
-    addIngredientRow();
-    addRecipeStepRow();
-  }
-  el('recipeModal').classList.add('open');
-  openModalA11y(el('recipeModal'));
-}
+        return `
+        <div class="recipe-card" data-id="${r.id}" style="animation-delay: ${delay}">
+          <div>
+            <div class="card-header-top">
+              <span class="card-category">${escapeHTML(r.category) || 'ทั่วไป'}</span>
+              <button class="btn-heart ${heartClass}" data-action="favorite" data-id="${r.id}" title="บันทึกสูตรโปรด">
+                <i data-lucide="heart" size="20" fill="${heartFill}"></i>
+              </button>
+            </div>
+            <h3 class="card-title">${escapeHTML(r.title)}</h3>
+            <p class="card-description">${r.notes ? escapeHTML(r.notes) : 'ไม่มีคำอธิบายเพิ่มเติม'}</p>
+          </div>
+          <div class="card-meta">
+            <div><i data-lucide="clock" size="14"></i> ${r.time ? r.time + ' นาที' : '-'}</div>
+            <div><i data-lucide="shopping-bag" size="14"></i> ${r.ingredients?.length || 0} วัตถุดิบ</div>
+            <div><i data-lucide="list-checks" size="14"></i> ${r.steps?.length || 0} ขั้นตอน</div>
+          </div>
+        </div>
+      `}).join('');
+      
+      lucide.createIcons({ root: DOM.recipeGrid });
+    };
 
-function closeRecipeModal() { el('recipeModal').classList.remove('open'); closeModalA11y(); }
+    const createDynamicRowHTML = (type, val1 = '', val2 = '') => {
+      if (type === 'step') {
+        return `<input type="text" class="form-control step-text" placeholder="ขั้นตอนการทำ" value="${escapeHTML(val1)}">
+                <button type="button" class="btn-remove-row"><i data-lucide="trash-2" size="18"></i></button>`;
+      }
+      const placeholder1 = type === 'equipment' ? 'ชื่ออุปกรณ์' : 'ชื่อวัตถุดิบ';
+      const placeholder2 = type === 'equipment' ? 'จำนวน' : 'ปริมาณ';
+      const class1 = type === 'equipment' ? 'eq-name' : 'ing-name';
+      const class2 = type === 'equipment' ? 'eq-qty' : 'ing-qty';
+      
+      return `<input type="text" class="form-control ${class1}" placeholder="${placeholder1}" value="${escapeHTML(val1)}">
+              <input type="text" class="form-control ${class2}" placeholder="${placeholder2}" value="${escapeHTML(val2)}">
+              <button type="button" class="btn-remove-row"><i data-lucide="trash-2" size="18"></i></button>`;
+    };
 
-function saveRecipe(e) {
-  e.preventDefault();
-  const id = el('editId').value;
-  
-  const ingRows = document.querySelectorAll('.ing-name');
-  const amtRows = document.querySelectorAll('.ing-amount');
-  const ingredients = [];
-  ingRows.forEach((input, i) => {
-    if(input.value.trim()) ingredients.push({ name: input.value.trim(), amount: amtRows[i].value.trim() });
-  });
+    const addRow = (type, val1 = '', val2 = '') => {
+      const container = DOM.containers[type];
+      const row = document.createElement('div');
+      row.className = 'dynamic-row';
+      row.innerHTML = createDynamicRowHTML(type, val1, val2);
+      container.appendChild(row);
+      lucide.createIcons({ root: row }); 
+    };
 
-  const stepRows = document.querySelectorAll('.r-step-input');
-  const steps = [];
-  stepRows.forEach(input => { if(input.value.trim()) steps.push(input.value.trim()); });
+    const initDefaultFormRows = () => {
+      Object.values(DOM.containers).forEach(container => container.innerHTML = '');
+      addRow('equipment');
+      addRow('ingredient');
+      addRow('step');
+    };
 
-  if(ingredients.length === 0) return alert("กรุณาระบุส่วนผสมอย่างน้อย 1 รายการ!");
-  if(steps.length === 0) return alert("กรุณาระบุขั้นตอนอย่างน้อย 1 ขั้นตอน!");
+    const openFormForAdd = () => {
+      currentEditingId = null;
+      document.getElementById('form-main-title').innerText = "เพิ่มสูตรอาหารใหม่";
+      DOM.recipeForm.reset();
+      initDefaultFormRows();
+      switchView('form');
+    };
 
-  const newRecipe = {
-    id: id || 'r_' + Date.now(),
-    name: el('rName').value.trim(),
-    category: el('rCat').value.trim(),
-    desc: el('rDesc').value.trim(),
-    ingredients: ingredients,
-    steps: steps,
-    tip: el('rTip').value.trim()
-  };
+    const openFormForEdit = (id) => {
+      DOM.modal.classList.remove('active');
+      const recipe = allRecipes.find(r => r.id === id);
+      if (!recipe) return;
 
-  if(!DATA.recipes) DATA.recipes = [];
-  if(id) {
-    const idx = DATA.recipes.findIndex(x => x.id === id);
-    if(idx > -1) DATA.recipes[idx] = newRecipe;
-    sendDiscordLog("แก้ไข", newRecipe.name, "เมนูอาหาร", newRecipe);
-    showToast("✏️ แก้ไขสูตรสำเร็จ");
-  } else {
-    DATA.recipes.push(newRecipe);
-    sendDiscordLog("เพิ่ม", newRecipe.name, "เมนูอาหาร", newRecipe);
-    showToast("✅ เพิ่มสูตรใหม่สำเร็จ");
-  }
+      currentEditingId = id;
+      document.getElementById('form-main-title').innerText = "แก้ไขสูตรอาหาร";
+      document.getElementById('recipe-title').value = recipe.title || '';
+      document.getElementById('recipe-category').value = recipe.category || '';
+      document.getElementById('recipe-time').value = recipe.time || '';
+      document.getElementById('recipe-notes').value = recipe.notes || '';
 
-  saveData(); closeRecipeModal();
-  if(currentRecipeId === id) openRecipeDetail(id);
-  else refreshCurrentView();
-}
+      Object.values(DOM.containers).forEach(container => container.innerHTML = '');
 
-function deleteRecipe(id, event) {
-  event.stopPropagation();
-  const r = DATA.recipes.find(x => x.id === id);
-  if(!r) return;
-  if(confirm(`⚠️ ต้องการลบสูตร "${r.name}" ออกจากสมุดใช่ไหม?\n(ลบแล้วกู้คืนไม่ได้)`)) {
-    DATA.recipes = DATA.recipes.filter(x => x.id !== id);
-    sendDiscordLog("ลบ", r.name, "เมนูอาหาร", r);
-    saveData(); showToast("🗑️ ลบสูตรเรียบร้อยแล้ว");
-    if(currentRecipeId === id) switchTab('recipes');
-    else renderRecipes(el('searchInput').value);
-  }
-}
+      (recipe.equipment?.length ? recipe.equipment : [{name:'', qty:''}]).forEach(eq => addRow('equipment', eq.name, eq.qty));
+      (recipe.ingredients?.length ? recipe.ingredients : [{name:'', qty:''}]).forEach(ing => addRow('ingredient', ing.name, ing.qty));
+      (recipe.steps?.length ? recipe.steps : ['']).forEach(st => addRow('step', st));
 
-// --- MODAL ACCESSIBILITY: focus management, Esc-to-close, click-outside-to-close ---
-let lastFocusedBeforeModal = null;
+      switchView('form');
+    };
 
-function openModalA11y(overlayEl) {
-  lastFocusedBeforeModal = document.activeElement;
-  const firstField = overlayEl.querySelector('.modal input, .modal select, .modal textarea');
-  if (firstField) firstField.focus();
-}
+    const handleFormSubmit = async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true; 
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i data-lucide="loader-2" class="lucide-spin" size="18"></i> กำลังบันทึก...';
+      lucide.createIcons({ root: btn });
 
-function closeModalA11y() {
-  if (lastFocusedBeforeModal && typeof lastFocusedBeforeModal.focus === 'function') {
-    lastFocusedBeforeModal.focus();
-  }
-  lastFocusedBeforeModal = null;
-}
+      try {
+        const extractArr = (containerId, class1, class2) => 
+          Array.from(document.querySelectorAll(`#${containerId} .dynamic-row`))
+               .map(r => ({ name: r.querySelector(class1).value.trim(), qty: r.querySelector(class2).value.trim() }))
+               .filter(i => i.name); 
+               
+        const extractSteps = () => 
+          Array.from(document.querySelectorAll('#steps-container .dynamic-row'))
+               .map(r => r.querySelector('.step-text').value.trim())
+               .filter(i => i); 
 
-function closeAnyOpenModal() {
-  const openOverlay = document.querySelector('.modal-overlay.open');
-  if (!openOverlay) return;
-  if (openOverlay.id === 'catModal') closeCatModal();
-  else if (openOverlay.id === 'recipeModal') closeRecipeModal();
-}
+        const data = {
+          title: document.getElementById('recipe-title').value.trim(),
+          category: document.getElementById('recipe-category').value,
+          time: document.getElementById('recipe-time').value.trim(),
+          equipment: extractArr('equipment-container', '.eq-name', '.eq-qty'),
+          ingredients: extractArr('ingredients-container', '.ing-name', '.ing-qty'),
+          steps: extractSteps(),
+          notes: document.getElementById('recipe-notes').value.trim()
+        };
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeAnyOpenModal();
-});
+        if (currentEditingId) {
+          data.updatedAt = serverTimestamp(); 
+          await updateDoc(doc(db, "recipes", currentEditingId), data);
+          showToast('อัปเดตสูตรอาหารเรียบร้อยแล้ว!');
+        } else {
+          data.createdAt = serverTimestamp();
+          await addDoc(recipesCollection, data);
+          showToast('บันทึกสูตรอาหารเรียบร้อยแล้ว!');
+        }
 
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) closeAnyOpenModal(); // คลิกฉากหลัง (ไม่ใช่ตัวโมดัล) เพื่อปิด
-  });
-});
+        switchView('read');
+      } catch (error) {
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        lucide.createIcons({ root: btn });
+      }
+    };
 
-// การ์ด/รายการเช็คลิสต์ถูก render เป็น div ที่คลิกได้ (role="button" กำหนดไว้ใน CSS class เดิม)
-// เพิ่ม keyboard support ให้กด Enter/Space แล้วทำงานเหมือนคลิก เพื่อรองรับผู้ใช้คีย์บอร์ด/สกรีนรีดเดอร์
-document.addEventListener('keydown', (e) => {
-  if (e.key !== 'Enter' && e.key !== ' ') return;
-  const target = e.target;
-  const role = target && target.getAttribute ? target.getAttribute('role') : null;
-  if (role === 'button' || role === 'checkbox') {
-    e.preventDefault();
-    target.click();
-  }
-});
+    const openRecipeModal = (id) => {
+      const r = allRecipes.find(x => x.id === id);
+      if (!r) return;
 
-// --- INIT & UTILS ---
-let searchNotifyTimer = null;
-el('searchInput').addEventListener('input', (e) => {
-  const activeTab = document.querySelector('.tab.active').dataset.tab;
-  if(activeTab === 'dashboard') renderDashboard(e.target.value);
-  else renderRecipes(e.target.value);
+      const generateListHTML = (arr, icon, title, isStep) => {
+        if (!arr || arr.length === 0) return '';
+        const listItems = arr.map(i => isStep 
+          ? `<li>${escapeHTML(i)}</li>` 
+          : `<li><span>${escapeHTML(i.name)}</span> <strong>${escapeHTML(i.qty||'-')}</strong></li>`).join('');
+        
+        return `<div class="modal-section-title"><i data-lucide="${icon}" size="18"></i> ${title}</div>
+                <${isStep ? 'ol class="step-list"' : 'ul class="detail-list"'}>${listItems}</${isStep ? 'ol' : 'ul'}>`;
+      };
 
-  // Debounce: แจ้งเตือนหลังผู้ใช้หยุดพิมพ์ 1.2 วิ กันสแปมทุกตัวอักษร
-  clearTimeout(searchNotifyTimer);
-  const q = e.target.value.trim();
-  if(q) {
-    searchNotifyTimer = setTimeout(() => {
-      sendActivityNotify('🔍 ค้นหา', `คำค้นหา: "${q}"\nแท็บ: ${activeTab === 'dashboard' ? 'เช็คลิสต์' : 'สูตรอาหาร'}`, 10181046);
-    }, 1200);
-  }
-});
+      const metaInfoHTML = `
+        <div style="display: flex; gap: 16px; margin: 12px 0; color: var(--text-muted); font-size: 0.9rem;">
+          ${r.time ? `<span><i data-lucide="clock" size="16"></i> ${escapeHTML(r.time)} นาที</span>` : ''}
+        </div>
+      `;
 
-function updateClock() {
-  const d = new Date();
-  el('c-day').textContent = d.toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'short' });
-  const timeEl = el('c-time');
-  timeEl.textContent = d.toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' });
-  timeEl.setAttribute('datetime', d.toISOString());
-}
-updateClock();
-setInterval(updateClock, 1000);
+      DOM.modalContent.innerHTML = `
+        <span class="card-category">${escapeHTML(r.category) || 'ทั่วไป'}</span>
+        <h2 style="font-size: 1.6rem; margin: 8px 0;">${escapeHTML(r.title)}</h2>
+        ${metaInfoHTML}
+        ${generateListHTML(r.equipment, 'wrench', 'อุปกรณ์ที่ใช้', false)}
+        ${generateListHTML(r.ingredients, 'shopping-bag', 'วัตถุดิบ', false)}
+        ${generateListHTML(r.steps, 'chef-hat', 'วิธีทำ', true)}
+        ${r.notes ? `<div class="modal-section-title"><i data-lucide="file-text" size="18"></i> หมายเหตุ</div>
+                     <p style="background:#FFFBEB; padding:12px; border-radius:8px;">${escapeHTML(r.notes)}</p>` : ''}
+        
+        <div class="modal-actions-bar">
+          <button class="btn-edit-modal" data-id="${r.id}"><i data-lucide="edit" size="18"></i> แก้ไขเมนูนี้</button>
+          <button class="btn-delete-modal" data-id="${r.id}"><i data-lucide="trash-2" size="18"></i> ลบเมนูนี้</button>
+        </div>
+      `;
+      DOM.modal.classList.add('active');
+      lucide.createIcons({ root: DOM.modalContent });
+    };
 
-loadData();
-</script>
+    const deleteRecipe = async (id) => {
+      if(confirm('คุณแน่ใจหรือไม่ว่าต้องการลบสูตรอาหารนี้? ข้อมูลจะไม่สามารถกู้คืนได้')) {
+        try {
+          if(myFavorites.includes(id)) {
+             myFavorites = myFavorites.filter(favId => favId !== id);
+             localStorage.setItem('tasteNoteFavorites', JSON.stringify(myFavorites));
+          }
+
+          await deleteDoc(doc(db, "recipes", id));
+          DOM.modal.classList.remove('active');
+          showToast('ลบสูตรอาหารเรียบร้อยแล้ว');
+        } catch (error) {
+          alert('เกิดข้อผิดพลาดในการลบ: ' + error.message);
+        }
+      }
+    };
+
+    const initEventListeners = () => {
+      document.getElementById('logo-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        showingFavorites = false;
+        document.getElementById('btn-toggle-favorites').classList.remove('active');
+        document.getElementById('explore-title').innerText = "คลังสูตรอาหาร";
+        document.getElementById('notice-board').style.display = 'block';
+        switchView('read');
+      });
+
+      document.getElementById('btn-toggle-favorites').addEventListener('click', (e) => {
+        showingFavorites = !showingFavorites;
+        e.currentTarget.classList.toggle('active', showingFavorites);
+        document.getElementById('explore-title').innerText = showingFavorites ? "สูตรโปรดของคุณ" : "คลังสูตรอาหาร";
+        document.getElementById('notice-board').style.display = showingFavorites ? 'none' : 'block';
+        switchView('read'); 
+      });
+
+      const debouncedFilter = debounce(applyFilters, 300);
+      DOM.searchInput.addEventListener('input', debouncedFilter);
+
+      document.getElementById('btn-open-add-form').addEventListener('click', openFormForAdd);
+      document.getElementById('btn-cancel-form').addEventListener('click', () => switchView('read'));
+      document.getElementById('btn-close-form-top').addEventListener('click', () => switchView('read'));
+      DOM.recipeForm.addEventListener('submit', handleFormSubmit);
+
+      DOM.viewForm.addEventListener('click', (e) => {
+        const addBtn = e.target.closest('.btn-add-row');
+        if (addBtn) addRow(addBtn.dataset.type);
+
+        const removeBtn = e.target.closest('.btn-remove-row');
+        if (removeBtn) removeBtn.closest('.dynamic-row').remove();
+      });
+
+      DOM.recipeGrid.addEventListener('click', (e) => {
+        const heartBtn = e.target.closest('.btn-heart');
+        if(heartBtn) {
+          toggleFavorite(heartBtn.dataset.id, e);
+          return;
+        }
+
+        const card = e.target.closest('.recipe-card');
+        if (card) openRecipeModal(card.dataset.id);
+      });
+
+      DOM.modalContent.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('.btn-edit-modal');
+        const deleteBtn = e.target.closest('.btn-delete-modal');
+        if (editBtn) openFormForEdit(editBtn.dataset.id);
+        if (deleteBtn) deleteRecipe(deleteBtn.dataset.id);
+      });
+
+      document.getElementById('btn-close-modal').addEventListener('click', () => DOM.modal.classList.remove('active'));
+      DOM.modal.addEventListener('click', (e) => {
+        if (e.target === DOM.modal) DOM.modal.classList.remove('active');
+      });
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initEventListeners();
+      
+      const q = query(recipesCollection, orderBy("createdAt", "desc"));
+      onSnapshot(q, (snapshot) => {
+        allRecipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        applyFilters(); 
+      });
+    });
+  </script>
 </body>
 </html>
