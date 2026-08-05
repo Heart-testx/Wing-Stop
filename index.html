@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TasteNote — สมุดบันทึกและแชร์สูตรอาหาร</title>
+  <title>WINGSTOP — สมุดสูตรหลังร้าน</title>
 
   <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,189 +15,211 @@
 
   <style>
     /* ==========================================================================
-       DESIGN SYSTEM & VARIABLES
+       DESIGN SYSTEM & VARIABLES (DARK THEME)
        ========================================================================== */
     :root {
-      --bg-page: #F8FAF9;
-      --bg-surface: #FFFFFF;
-      --bg-subtle: #F1F5F3;
-      --text-main: #111827;
-      --text-muted: #6B7280;
-      --text-light: #9CA3AF;
-      --primary-green: #059669;
-      --primary-green-hover: #047857;
-      --primary-green-light: #ECFDF5;
-      --primary-green-border: #A7F3D0;
+      --bg-page: #0C0C0C;
+      --bg-surface: #1E1F22;
+      --bg-subtle: #252629;
+      --text-main: #FFFFFF;
+      --text-muted: #888888;
+      --text-light: #A1A1AA;
+      --primary-brand: #FF5E1E; /* Wingstop Orange */
+      --primary-brand-hover: #E04D15;
+      --primary-brand-light: rgba(255, 94, 30, 0.1);
+      --primary-brand-border: #FF5E1E;
       --danger: #EF4444;
-      --danger-light: #FEF2F2;
-      --border-color: #E5E7EB;
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
+      --danger-light: rgba(239, 68, 68, 0.1);
+      --border-color: #333333;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
       --radius-full: 9999px;
-      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
-      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
-      --shadow-lg: 0 20px 30px -10px rgba(5, 150, 105, 0.3);
-      --shadow-hover: 0 15px 35px -5px rgba(5, 150, 105, 0.25);
-      --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      --transition-bounce: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.5);
+      --transition-smooth: all 0.2s ease-in-out;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; -webkit-font-smoothing: antialiased; }
-    body { background-color: var(--bg-page); color: var(--text-main); line-height: 1.6; padding-bottom: 80px; overflow-x: hidden; }
-
-    /* ANIMATIONS */
-    @keyframes slideDownFade { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-    @keyframes slideRightFade { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes pulseFab { 0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.6); } 70% { box-shadow: 0 0 0 15px rgba(5, 150, 105, 0); } 100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); } }
-    @keyframes heartBeat { 0% { transform: scale(1); } 25% { transform: scale(1.2); } 50% { transform: scale(1); } 75% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    
+    /* Background Pattern Grid */
+    body { 
+      background-color: var(--bg-page); 
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 30px 30px;
+      color: var(--text-main); 
+      line-height: 1.6; 
+      padding-bottom: 80px; 
+      overflow-x: hidden; 
+    }
 
     /* HEADER */
     .app-header {
-      position: sticky; top: 0; z-index: 50; background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); padding: 16px 24px;
+      position: sticky; top: 0; z-index: 50; background: #111111;
+      border-bottom: 2px solid var(--primary-brand); padding: 12px 24px;
+    }
+    .header-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .logo-group { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; }
+    .logo-icon { width: 32px; height: 32px; background-color: var(--primary-brand); color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .logo-text-wrapper { display: flex; flex-direction: column; line-height: 1.1; }
+    .logo-title { font-weight: 800; font-size: 1.1rem; color: white; letter-spacing: 0.5px; }
+    .logo-subtitle { font-size: 0.7rem; color: var(--text-muted); }
+    
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .btn-toggle-fav { background: transparent; border: 1px solid var(--border-color); color: var(--text-light); padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+    .btn-toggle-fav.active { background: var(--primary-brand-light); color: var(--primary-brand); border-color: var(--primary-brand); }
+    .datetime-display { text-align: right; line-height: 1.1; }
+    .datetime-date { color: var(--primary-brand); font-size: 0.75rem; font-weight: 600; }
+    .datetime-time { color: white; font-size: 1.1rem; font-weight: 700; letter-spacing: 1px; }
+
+    /* MAIN CONTENT */
+    .main-content { max-width: 1200px; margin: 40px auto 0; padding: 0 24px; }
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+
+    /* SEARCH AREA & BOX FIX */
+    .search-hero { margin-bottom: 24px; }
+    .search-input-wrapper { width: 100%; max-width: 800px; margin-bottom: 16px; }
+    
+    .search-box {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+    
+    .search-icon-left {
+      position: absolute;
+      left: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 20px 14px 48px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      outline: none;
+      font-size: 0.95rem;
+      color: white;
       transition: var(--transition-smooth);
     }
-    .header-container { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-    .logo-group { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.25rem; color: var(--text-main); text-decoration: none; cursor: pointer; transition: var(--transition-bounce); }
-    .logo-group:hover { transform: scale(1.05); }
-    .logo-icon { width: 36px; height: 36px; background-color: var(--primary-green-light); color: var(--primary-green); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; transition: var(--transition-bounce); }
-    .logo-group:hover .logo-icon { transform: rotate(10deg); background-color: var(--primary-green); color: white; }
+    .search-input:focus { border-color: var(--primary-brand); }
     
-    .header-actions { display: flex; gap: 12px; }
-    .btn-toggle-fav { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--radius-full); border: 1px solid var(--border-color); background: var(--bg-surface); cursor: pointer; font-weight: 500; font-size: 0.9rem; transition: var(--transition-bounce); }
-    .btn-toggle-fav.active { background: var(--danger-light); color: var(--danger); border-color: #FECACA; }
-    .btn-toggle-fav:hover { background: var(--bg-subtle); transform: translateY(-2px); }
-    .btn-toggle-fav.active:hover { background: #FEE2E2; transform: translateY(-2px) scale(1.03); }
+    .filter-tabs { display: flex; gap: 12px; margin-top: 12px; }
+    .tab-btn { padding: 8px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; cursor: pointer; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px; }
+    .tab-btn.active { background: var(--primary-brand); color: white; border-color: var(--primary-brand); }
 
-    /* MAIN CONTENT & VIEWS */
-    .main-content { max-width: 1100px; margin: 32px auto 0; padding: 0 24px; }
-    .view-section { display: none; }
-    .view-section.active { display: block; animation: slideUpFade 0.4s ease-out forwards; }
-
-    /* SEARCH HERO */
-    .search-hero { background: var(--bg-surface); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); margin-bottom: 24px; animation: slideUpFade 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; }
-    .hero-title { font-size: 1.75rem; font-weight: 700; margin-bottom: 8px; transition: var(--transition-smooth); }
-    .search-input-wrapper { position: relative; width: 100%; margin-top: 16px; transition: var(--transition-bounce); }
-    .search-icon-left { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-light); transition: var(--transition-smooth); }
-    .search-input { width: 100%; padding: 16px 20px 16px 48px; border-radius: var(--radius-full); border: 1px solid var(--border-color); background-color: var(--bg-subtle); outline: none; transition: var(--transition-bounce); font-size: 1rem; color: var(--text-main); }
-    .search-input:focus { background-color: var(--bg-surface); border-color: var(--primary-green); box-shadow: 0 0 0 4px var(--primary-green-light); transform: scale(1.01); }
-    .search-input:focus + .search-icon-left { color: var(--primary-green); }
+    .hero-title-area { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-top: 28px; }
+    .hero-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 4px; color: white; }
+    .hero-subtitle { font-size: 0.85rem; color: var(--text-muted); }
+    
+    .btn-primary-add { background: var(--primary-brand); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; transition: var(--transition-smooth); }
+    .btn-primary-add:hover { background: var(--primary-brand-hover); }
 
     /* NOTICE BOARD */
     .notice-board {
-      background-color: #FFFBEB; border: 1px solid #FEF3C7; border-left: 6px solid #F59E0B;
-      border-radius: var(--radius-md); padding: 20px 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm);
-      animation: slideDownFade 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-      opacity: 0; animation-delay: 0.1s;
+      display: block;
+      background-color: #1A1813;
+      border: 1px solid #3B2D13;
+      border-left: 4px solid #F59E0B;
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      margin: 20px 0 24px 0;
     }
-    .notice-header { display: flex; align-items: center; gap: 10px; color: #92400E; font-size: 1.15rem; font-weight: 600; margin-bottom: 12px; }
-    .notice-list { padding-left: 24px; color: #B45309; font-size: 0.95rem; line-height: 1.6; }
+    .notice-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #FBBF24;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .notice-list {
+      padding-left: 20px;
+      color: #D1D5DB;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
 
     /* RECIPE GRID */
-    .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
-    .recipe-card { position: relative; background: var(--bg-surface); border-radius: var(--radius-md); padding: 24px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition-bounce); display: flex; flex-direction: column; justify-content: space-between; opacity: 0; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-    .recipe-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: var(--shadow-hover); border-color: var(--primary-green-border); z-index: 10; }
+    .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 24px; }
+    .recipe-card { background: var(--bg-surface); border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--border-color); cursor: pointer; transition: var(--transition-smooth); display: flex; flex-direction: column; justify-content: space-between; }
+    .recipe-card:hover { border-color: #555; background: #232428; }
     
-    .card-header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .card-category { background: var(--primary-green-light); color: var(--primary-green); font-size: 0.8rem; font-weight: 600; padding: 4px 12px; border-radius: var(--radius-full); transition: var(--transition-smooth); }
-    .recipe-card:hover .card-category { background: var(--primary-green); color: white; }
+    .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .card-category { color: var(--primary-brand); font-size: 0.8rem; font-weight: 700; }
     
-    .btn-heart { background: transparent; border: none; cursor: pointer; color: var(--text-light); transition: var(--transition-bounce); display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; }
-    .btn-heart:hover { background: var(--danger-light); color: var(--danger); transform: scale(1.15); }
-    .btn-heart.active { color: var(--danger); animation: heartBeat 0.6s ease-in-out; }
+    .btn-heart { background: #1A1A1A; border: 1px solid var(--border-color); cursor: pointer; color: var(--text-muted); width: 32px; height: 32px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; transition: var(--transition-smooth); }
+    .btn-heart:hover { color: white; background: #333; }
+    .btn-heart.active { color: var(--primary-brand); border-color: var(--primary-brand); }
     
-    .card-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; transition: var(--transition-smooth); }
-    .recipe-card:hover .card-title { color: var(--primary-green); }
-    .card-description { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid var(--bg-subtle); padding-top: 14px; font-size: 0.825rem; color: var(--text-muted); transition: var(--transition-smooth); }
-    .card-meta div { display: flex; align-items: center; gap: 6px; }
-    .empty-state { text-align: center; padding: 64px 20px; color: var(--text-muted); grid-column: 1 / -1; animation: popIn 0.5s ease-out forwards; }
-
-    /* FLOATING ACTION BUTTON (FAB) */
-    .fab-container { position: fixed; bottom: 24px; right: 24px; z-index: 90; }
-    .btn-fab { width: 64px; height: 64px; border-radius: var(--radius-full); background-color: var(--primary-green); color: white; border: none; box-shadow: var(--shadow-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition-bounce); animation: pulseFab 2.5s infinite; }
-    .btn-fab i { transition: var(--transition-bounce); }
-    .btn-fab:hover { background-color: var(--primary-green-hover); transform: scale(1.15) translateY(-5px); animation: none; box-shadow: var(--shadow-hover); }
-    .btn-fab:hover i { transform: rotate(90deg) scale(1.1); }
-    .btn-fab.hidden { display: none; }
+    .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; color: white; }
+    .card-description { font-size: 0.8rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+    
+    .empty-state { text-align: center; padding: 64px 20px; color: var(--text-muted); grid-column: 1 / -1; }
 
     /* FORM VIEW */
-    .form-card { background: var(--bg-surface); border-radius: var(--radius-lg); padding: 36px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); max-width: 800px; margin: 0 auto; position: relative; }
-    .btn-close-form { position: absolute; top: 24px; right: 24px; background: var(--bg-subtle); border: none; width: 40px; height: 40px; border-radius: var(--radius-full); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: var(--transition-bounce); }
-    .btn-close-form:hover { background: var(--danger-light); color: var(--danger); transform: rotate(90deg) scale(1.1); }
-
-    .form-header { margin-bottom: 28px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; padding-right: 40px; }
-    .form-group { margin-bottom: 24px; }
-    .form-row { display: flex; gap: 16px; margin-bottom: 24px; }
-    .form-row .form-group { margin-bottom: 0; flex: 1; }
-    .form-label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 8px; transition: var(--transition-smooth); }
+    .form-card { background: var(--bg-surface); border-radius: var(--radius-md); padding: 32px; border: 1px solid var(--border-color); max-width: 800px; margin: 0 auto; position: relative; }
+    .btn-close-form { position: absolute; top: 24px; right: 24px; background: var(--bg-subtle); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; }
     
-    .form-control { width: 100%; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background-color: #FAFAFA; outline: none; transition: var(--transition-bounce); font-size: 0.95rem; color: var(--text-main); }
-    .form-control:focus { background-color: var(--bg-surface); border-color: var(--primary-green); box-shadow: 0 0 0 3px var(--primary-green-light); transform: translateY(-2px); }
-    textarea.form-control { min-height: 100px; resize: vertical; }
+    .form-header { margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; }
+    .form-label { display: block; font-weight: 500; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-light); }
+    .form-control { width: 100%; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background-color: var(--bg-subtle); outline: none; color: white; font-size: 0.95rem; }
+    .form-control:focus { border-color: var(--primary-brand); }
     
-    .dynamic-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-    .dynamic-row { display: flex; gap: 10px; align-items: center; animation: slideRightFade 0.4s ease-out forwards; }
-    .dynamic-row .form-control { margin-bottom: 0; }
-    .dynamic-row .eq-qty, .dynamic-row .ing-qty { width: 100px; flex-shrink: 0; }
+    .dynamic-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .dynamic-row { display: flex; gap: 8px; align-items: center; }
+    .dynamic-row .eq-qty, .dynamic-row .ing-qty { width: 120px; flex-shrink: 0; }
     
-    .btn-remove-row { border: none; background: transparent; color: var(--danger); padding: 10px; cursor: pointer; border-radius: var(--radius-sm); transition: var(--transition-bounce); }
-    .btn-remove-row:hover { background-color: var(--danger-light); transform: scale(1.15) rotate(10deg); }
-    .btn-add-row { background: var(--bg-subtle); color: var(--primary-green); border: 1px dashed var(--primary-green-border); padding: 10px 16px; border-radius: var(--radius-sm); font-size: 0.875rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: var(--transition-bounce); }
-    .btn-add-row:hover { background: var(--primary-green-light); border-color: var(--primary-green); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+    .btn-remove-row { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 10px; cursor: pointer; border-radius: var(--radius-sm); }
+    .btn-remove-row:hover { color: var(--danger); border-color: var(--danger); }
+    .btn-add-row { background: transparent; color: var(--text-main); border: 1px dashed var(--border-color); padding: 10px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-add-row:hover { border-color: var(--primary-brand); color: var(--primary-brand); }
     
     .form-actions { display: flex; gap: 12px; margin-top: 32px; }
-    .btn-submit { flex: 1; background: var(--primary-green); color: white; border: none; padding: 14px 24px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: var(--transition-bounce); }
-    .btn-submit:hover:not(:disabled) { background: var(--primary-green-hover); transform: translateY(-3px); box-shadow: var(--shadow-md); }
-    .btn-submit:active:not(:disabled) { transform: translateY(0); }
-    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
-    .btn-cancel { background: var(--bg-subtle); color: var(--text-main); border: none; padding: 14px 24px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: var(--transition-bounce); }
-    .btn-cancel:hover { background: #E5E7EB; transform: translateY(-2px); }
+    .btn-submit { flex: 1; background: var(--primary-brand); color: white; border: none; padding: 14px 24px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+    .btn-cancel { background: var(--bg-subtle); color: white; border: 1px solid var(--border-color); padding: 14px 24px; border-radius: var(--radius-sm); cursor: pointer; }
 
-    /* MODAL */
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(17, 24, 39, 0.4); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease; }
-    .modal-overlay.active { display: flex; opacity: 1; }
-    .modal-card { background: var(--bg-surface); width: 100%; max-width: 720px; max-height: 90vh; border-radius: var(--radius-lg); overflow-y: auto; padding: 36px; position: relative; opacity: 0; transform: scale(0.8) translateY(20px); transition: var(--transition-bounce); }
-    .modal-overlay.active .modal-card { opacity: 1; transform: scale(1) translateY(0); }
+    /* MODAL: RECIPE DETAILS */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: flex-start; justify-content: center; padding: 40px 20px; overflow-y: auto; }
+    .modal-overlay.active { display: flex; }
+    .modal-card { background: #1C1D21; width: 100%; max-width: 900px; border-radius: var(--radius-md); padding: 32px; position: relative; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); }
     
-    .modal-close-btn { position: absolute; top: 20px; right: 20px; background: var(--bg-subtle); border: none; width: 40px; height: 40px; border-radius: var(--radius-full); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-main); transition: var(--transition-bounce); }
-    .modal-close-btn:hover { background: var(--danger-light); color: var(--danger); transform: rotate(90deg) scale(1.1); }
+    .modal-actions-top { position: absolute; top: 24px; right: 24px; display: flex; gap: 12px; }
+    .modal-close-btn, .btn-edit-modal { background: #25262B; border: 1px solid #3A3B40; color: white; height: 36px; padding: 0 16px; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 500; transition: var(--transition-smooth); }
+    .btn-edit-modal i { color: var(--primary-brand); }
+    .modal-close-btn:hover, .btn-edit-modal:hover { background: #333; border-color: #555; }
     
-    .modal-section-title { font-size: 1.05rem; font-weight: 600; margin: 24px 0 12px 0; display: flex; align-items: center; gap: 8px; }
-    .detail-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .detail-list li { background: var(--bg-subtle); padding: 10px 14px; border-radius: var(--radius-sm); display: flex; justify-content: space-between; font-size: 0.95rem; transition: var(--transition-smooth); }
-    .detail-list li:hover { transform: translateX(5px); background: var(--bg-surface); border-left: 3px solid var(--primary-green); box-shadow: var(--shadow-sm); }
-    .step-list { padding-left: 20px; display: flex; flex-direction: column; gap: 10px; }
-    .step-list li { transition: var(--transition-smooth); }
-    .step-list li:hover { transform: translateX(5px); color: var(--primary-green); }
+    .modal-actions-bar { display: none !important; } 
+    
+    .modal-category { color: var(--primary-brand); font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; display: block; }
+    .modal-title { font-size: 2rem; color: var(--primary-brand); font-weight: 700; margin: 0 0 12px 0; }
+    .modal-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 32px; }
 
-    .modal-actions-bar { display: flex; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); justify-content: flex-end; }
-    .btn-edit-modal { background: var(--primary-green-light); color: var(--primary-green); border: none; padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; gap: 6px; align-items: center; transition: var(--transition-bounce); }
-    .btn-edit-modal:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); background: var(--primary-green); color: white; }
-    .btn-delete-modal { background: var(--danger-light); color: var(--danger); border: none; padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; gap: 6px; align-items: center; transition: var(--transition-bounce); }
-    .btn-delete-modal:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); background: var(--danger); color: white; }
+    .modal-section-box { background: #25262B; border: 1px solid #2F3035; border-radius: var(--radius-md); padding: 24px; margin-bottom: 16px; }
+    .modal-section-title { font-size: 1rem; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    
+    .detail-list { list-style: none; display: flex; flex-direction: column; }
+    .detail-list li { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px dashed #444; font-size: 0.95rem; }
+    .detail-list li:last-child { border-bottom: none; padding-bottom: 0; }
+    .detail-list li span { color: #E5E7EB; }
+    .detail-list li strong { color: var(--primary-brand); font-weight: 600; }
+    
+    .step-list { padding-left: 20px; display: flex; flex-direction: column; gap: 12px; color: #E5E7EB; }
+    .step-list li { padding-bottom: 12px; border-bottom: 1px dashed #444; }
+    .step-list li:last-child { border-bottom: none; }
 
     /* TOAST */
-    .toast { position: fixed; bottom: 24px; left: 24px; background: var(--text-main); color: var(--bg-surface); padding: 12px 20px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 10px; z-index: 200; transform: translateY(100px); opacity: 0; transition: var(--transition-bounce); pointer-events: none; box-shadow: var(--shadow-lg); }
-    .toast.show { transform: translateY(0); opacity: 1; }
-
-    /* Responsive */
-    @media (max-width: 640px) {
-      .app-header { padding: 12px 16px; }
-      .main-content { padding: 0 16px; margin-top: 20px; }
-      .search-hero, .form-card { padding: 20px; }
-      .btn-close-form { top: 16px; right: 16px; }
-      .form-row { flex-direction: column; gap: 12px; }
-      .dynamic-row { flex-direction: column; gap: 6px; align-items: stretch; }
-      .dynamic-row .eq-qty, .dynamic-row .ing-qty { width: 100%; }
-      .btn-remove-row { align-self: flex-end; padding: 6px; margin-top: -4px;}
-      .modal-card { padding: 24px; }
-      .modal-actions-bar { flex-direction: column; }
-      .modal-actions-bar button { width: 100%; justify-content: center; }
-    }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--primary-brand); color: white; padding: 12px 24px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 10px; z-index: 200; opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   </style>
 </head>
 <body>
@@ -206,13 +228,21 @@
   <header class="app-header">
     <div class="header-container">
       <a id="logo-link" href="#" class="logo-group">
-        <div class="logo-icon"><i data-lucide="utensils"></i></div>
-        <span>TasteNote</span>
+        <div class="logo-icon">W</div>
+        <div class="logo-text-wrapper">
+          <span class="logo-title">WINGSTOP</span>
+          <span class="logo-subtitle">สมุดสูตรหลังร้าน (Kitchen Notebook)</span>
+        </div>
       </a>
       <div class="header-actions">
         <button id="btn-toggle-favorites" class="btn-toggle-fav">
-          <i data-lucide="heart" size="18"></i> <span id="fav-btn-text">สูตรโปรด</span>
+          <i data-lucide="bookmark" size="16"></i> <span id="fav-btn-text">สูตรโปรด</span>
         </button>
+        <!-- Real-time Clock Container -->
+        <div class="datetime-display">
+          <div class="datetime-date" id="current-date">--</div>
+          <div class="datetime-time" id="current-time">--:--</div>
+        </div>
       </div>
     </div>
   </header>
@@ -221,121 +251,125 @@
     <!-- VIEW 1: READ / EXPLORE -->
     <section id="view-read" class="view-section active">
       <div class="search-hero">
-        <h1 class="hero-title" id="explore-title">คลังสูตรอาหาร</h1>
         
-        <!-- Search -->
         <div class="search-input-wrapper">
-          <i data-lucide="search" class="search-icon-left" size="20"></i>
-          <input type="text" id="search-input" class="search-input" placeholder="ค้นหาชื่อสูตรอาหาร หรือหมวดหมู่...">
+          <div class="search-box">
+            <i data-lucide="search" class="search-icon-left" size="18"></i>
+            <input type="text" id="search-input" class="search-input" placeholder="ค้นหาหมวดหมู่, เมนู, ทริคหลังร้าน...">
+          </div>
+          
+          <div class="filter-tabs">
+            <button class="tab-btn active"><i data-lucide="drumstick" size="14"></i> การ์ดสูตรอาหาร</button>
+          </div>
         </div>
-      </div>
 
-      <!-- NOTICE BOARD (Moved below search hero) -->
-      <div class="notice-board" id="notice-board">
-        <div class="notice-header"><i data-lucide="pin" size="24"></i><span>📌 ข้อควรรู้ / ประกาศสำคัญ</span></div>
-        <ul class="notice-list">
-          <li>แชร์สูตรอาหารของคุณเข้าสู่ระบบ เพื่อเก็บเป็นฐานข้อมูลส่วนกลาง</li>
-          <li>คุณสามารถแก้ไขหรือลบสูตรอาหารของตนเองได้ โดยคลิกที่สูตรแล้วเลื่อนลงมาด้านล่าง</li>
-          <li>กดรูปหัวใจเพื่อบันทึกสูตรโปรดไว้ดูส่วนตัว (ข้อมูลบันทึกในเบราว์เซอร์ของคุณ)</li>
-        </ul>
+        <div class="notice-board" id="notice-board">
+          <div class="notice-header"><i data-lucide="pin" size="18"></i><span>📌 ข้อควรรู้ / ประกาศสำคัญ</span></div>
+          <ul class="notice-list">
+            <li>แชร์สูตรอาหารของคุณเข้าสู่ระบบ เพื่อเก็บเป็นฐานข้อมูลส่วนกลาง</li>
+            <li>คุณสามารถแก้ไขหรือลบสูตรอาหารของตนเองได้ โดยคลิกที่สูตรแล้วเลื่อนลงมาด้านล่าง</li>
+            <li>กดรูปหัวใจ/บันทึกเพื่อบันทึกสูตรโปรดไว้ดูส่วนตัว (ข้อมูลบันทึกในเบราว์เซอร์ของคุณ)</li>
+          </ul>
+        </div>
+
+        <div class="hero-title-area">
+          <div>
+            <h1 class="hero-title" id="explore-title">คลังสูตรอาหารประจำครัว</h1>
+            <div class="hero-subtitle">ส่วนผสม สัดส่วน และขั้นตอนการ Toss ซอสอย่างละเอียด</div>
+          </div>
+          <button class="btn-primary-add" id="btn-open-add-form">
+            + เพิ่มสูตรเมนูใหม่
+          </button>
+        </div>
       </div>
 
       <div class="recipe-grid" id="recipe-grid"></div>
 
       <div id="empty-state" class="empty-state" style="display: none;">
-        <i data-lucide="book-x" size="48" style="color: var(--text-light); margin-bottom: 16px; transition: all 0.5s;"></i>
-        <h3 id="empty-title">ยังไม่พบสูตรอาหาร</h3>
-        <p id="empty-subtitle">เริ่มต้นเพิ่มสูตรอาหารแรกของคุณโดยกดปุ่ม + ด้านล่างขวา</p>
+        <i data-lucide="folder-open" size="48" style="color: var(--text-muted); margin-bottom: 16px;"></i>
+        <h3 id="empty-title">ยังไม่พบข้อมูล</h3>
+        <p id="empty-subtitle">คลิกที่ปุ่มเพิ่มสูตรเมนูใหม่ เพื่อเริ่มต้นใช้งาน</p>
       </div>
     </section>
 
     <!-- VIEW 2: RECIPE FORM -->
     <section id="view-form" class="view-section">
       <div class="form-card">
-        
-        <!-- Close Form Button (Top Right) -->
-        <button type="button" class="btn-close-form" id="btn-close-form-top" title="ยกเลิก / ปิด">
+        <button type="button" class="btn-close-form" id="btn-close-form-top" title="ปิด">
           <i data-lucide="x" size="20"></i>
         </button>
 
         <div class="form-header">
-          <h2 id="form-main-title">เพิ่มสูตรอาหารใหม่</h2>
-          <p style="color: var(--text-muted); font-size: 0.9rem;">กรอกข้อมูลสูตรอาหาร วัตถุดิบ และขั้นตอนให้ครบถ้วน</p>
+          <h2 id="form-main-title" style="color: white;">เพิ่มสูตรอาหารใหม่</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">กรอกข้อมูลสูตรอาหาร วัตถุดิบ และขั้นตอนให้ครบถ้วน</p>
         </div>
 
         <form id="recipe-form">
-          <div class="form-group">
+          <div class="form-group" style="margin-bottom: 20px;">
             <label class="form-label">ชื่อสูตรอาหาร *</label>
             <input type="text" id="recipe-title" class="form-control" required>
           </div>
           
-          <div class="form-row">
-            <div class="form-group">
+          <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+            <div class="form-group" style="flex: 1;">
               <label class="form-label">หมวดหมู่ *</label>
               <select id="recipe-category" class="form-control" required>
                 <option value="">-- เลือกหมวดหมู่ --</option>
-                <option value="ของทอด">ของทอด</option>
+                <option value="ไก่ทอด (WINGS)">ไก่ทอด (WINGS)</option>
                 <option value="ซอส">ซอส</option>
+                <option value="ของทานเล่น">ของทานเล่น</option>
                 <option value="เครื่องดื่ม">เครื่องดื่ม</option>
-                <option value="สลัด">สลัด</option>
               </select>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="flex: 1;">
               <label class="form-label">เวลาที่ใช้ทำ (นาที)</label>
               <input type="number" id="recipe-time" class="form-control" placeholder="เช่น 30" min="1">
             </div>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" style="margin-bottom: 20px;">
             <label class="form-label">อุปกรณ์ที่ต้องใช้</label>
             <div id="equipment-container" class="dynamic-list"></div>
-            <button type="button" class="btn-add-row" data-type="equipment"><i data-lucide="plus" size="16"></i> เพิ่มอุปกรณ์</button>
+            <button type="button" class="btn-add-row" data-type="equipment"><i data-lucide="plus" size="14"></i> เพิ่มอุปกรณ์</button>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" style="margin-bottom: 20px;">
             <label class="form-label">วัตถุดิบ</label>
             <div id="ingredients-container" class="dynamic-list"></div>
-            <button type="button" class="btn-add-row" data-type="ingredient"><i data-lucide="plus" size="16"></i> เพิ่มวัตถุดิบ</button>
+            <button type="button" class="btn-add-row" data-type="ingredient"><i data-lucide="plus" size="14"></i> เพิ่มวัตถุดิบ</button>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" style="margin-bottom: 20px;">
             <label class="form-label">วิธีทำ (ตามลำดับ)</label>
             <div id="steps-container" class="dynamic-list"></div>
-            <button type="button" class="btn-add-row" data-type="step"><i data-lucide="plus" size="16"></i> เพิ่มขั้นตอน</button>
+            <button type="button" class="btn-add-row" data-type="step"><i data-lucide="plus" size="14"></i> เพิ่มขั้นตอน</button>
           </div>
 
           <div class="form-group">
             <label class="form-label">หมายเหตุ</label>
-            <textarea id="recipe-notes" class="form-control"></textarea>
+            <textarea id="recipe-notes" class="form-control" style="min-height: 80px;"></textarea>
           </div>
 
           <div class="form-actions">
             <button type="button" class="btn-cancel" id="btn-cancel-form">ยกเลิก</button>
-            <button type="submit" class="btn-submit" id="submit-btn"><i data-lucide="save" size="18"></i> บันทึกข้อมูล</button>
+            <button type="submit" class="btn-submit" id="submit-btn"><i data-lucide="save" size="16"></i> บันทึกข้อมูล</button>
           </div>
         </form>
       </div>
     </section>
   </main>
 
-  <!-- FLOATING ACTION BUTTON -->
-  <div class="fab-container" id="fab-add-btn">
-    <button class="btn-fab" id="btn-open-add-form" title="เพิ่มสูตรใหม่">
-      <i data-lucide="plus" size="32"></i>
-    </button>
-  </div>
-
   <!-- MODAL: RECIPE DETAILS -->
   <div class="modal-overlay" id="recipe-modal">
     <div class="modal-card">
-      <button class="modal-close-btn" id="btn-close-modal"><i data-lucide="x" size="20"></i></button>
+      <button id="btn-close-modal" style="display: none;"></button>
       <div id="modal-content"></div>
     </div>
   </div>
 
   <!-- TOAST -->
   <div id="toast" class="toast">
-    <i data-lucide="check-circle-2" size="20" style="color: #10B981;"></i>
+    <i data-lucide="check-circle-2" size="18"></i>
     <span id="toast-message">แจ้งเตือน</span>
   </div>
 
@@ -368,7 +402,6 @@
     const DOM = {
       viewRead: document.getElementById('view-read'),
       viewForm: document.getElementById('view-form'),
-      fabBtn: document.getElementById('fab-add-btn'),
       recipeGrid: document.getElementById('recipe-grid'),
       emptyState: document.getElementById('empty-state'),
       modal: document.getElementById('recipe-modal'),
@@ -380,6 +413,26 @@
         ingredient: document.getElementById('ingredients-container'),
         step: document.getElementById('steps-container')
       }
+    };
+
+    // REAL-TIME CLOCK FUNCTION
+    const updateClock = () => {
+      const now = new Date();
+      const days = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+      const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+      
+      const dayName = days[now.getDay()];
+      const dateNum = now.getDate();
+      const monthName = months[now.getMonth()];
+      
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      
+      const dateElem = document.getElementById('current-date');
+      const timeElem = document.getElementById('current-time');
+      
+      if (dateElem) dateElem.textContent = `${dayName}ที่ ${dateNum} ${monthName}`;
+      if (timeElem) timeElem.textContent = `${hours}:${minutes}`;
     };
 
     const escapeHTML = (str) => {
@@ -410,7 +463,6 @@
     const switchView = (viewName) => {
       DOM.viewRead.classList.toggle('active', viewName === 'read');
       DOM.viewForm.classList.toggle('active', viewName === 'form');
-      DOM.fabBtn.classList.toggle('hidden', viewName === 'form');
       if(viewName === 'read') applyFilters();
     };
 
@@ -418,10 +470,10 @@
       e.stopPropagation(); 
       if (myFavorites.includes(id)) {
         myFavorites = myFavorites.filter(favId => favId !== id);
-        showToast('ลบออกจากสูตรโปรดแล้ว');
+        showToast('ลบรายการแล้ว');
       } else {
         myFavorites.push(id);
-        showToast('บันทึกสูตรโปรดแล้ว!');
+        showToast('บันทึกรายการแล้ว!');
       }
       localStorage.setItem('tasteNoteFavorites', JSON.stringify(myFavorites));
       applyFilters(); 
@@ -449,41 +501,25 @@
       if (list.length === 0) {
         DOM.recipeGrid.innerHTML = '';
         DOM.emptyState.style.display = 'block';
-        
-        if(showingFavorites) {
-          document.getElementById('empty-title').innerText = "ยังไม่มีสูตรโปรด";
-          document.getElementById('empty-subtitle').innerText = "กดหัวใจที่สูตรอาหารเพื่อบันทึกไว้ดูภายหลัง";
-        } else {
-          document.getElementById('empty-title').innerText = "ไม่พบสูตรอาหารที่ค้นหา";
-          document.getElementById('empty-subtitle').innerText = "ลองเปลี่ยนคำค้นหา หรือเพิ่มสูตรใหม่ด้วยตัวเอง";
-        }
         return;
       }
       
       DOM.emptyState.style.display = 'none';
       
-      DOM.recipeGrid.innerHTML = list.map((r, index) => {
+      DOM.recipeGrid.innerHTML = list.map((r) => {
         const isFav = myFavorites.includes(r.id);
-        const heartFill = isFav ? '#EF4444' : 'none';
         const heartClass = isFav ? 'active' : '';
-        const delay = (index * 0.05) + 's';
-
         return `
-        <div class="recipe-card" data-id="${r.id}" style="animation-delay: ${delay}">
+        <div class="recipe-card" data-id="${r.id}">
           <div>
             <div class="card-header-top">
               <span class="card-category">${escapeHTML(r.category) || 'ทั่วไป'}</span>
-              <button class="btn-heart ${heartClass}" data-action="favorite" data-id="${r.id}" title="บันทึกสูตรโปรด">
-                <i data-lucide="heart" size="20" fill="${heartFill}"></i>
+              <button class="btn-heart ${heartClass}" data-action="favorite" data-id="${r.id}">
+                <i data-lucide="heart" size="16"></i>
               </button>
             </div>
             <h3 class="card-title">${escapeHTML(r.title)}</h3>
             <p class="card-description">${r.notes ? escapeHTML(r.notes) : 'ไม่มีคำอธิบายเพิ่มเติม'}</p>
-          </div>
-          <div class="card-meta">
-            <div><i data-lucide="clock" size="14"></i> ${r.time ? r.time + ' นาที' : '-'}</div>
-            <div><i data-lucide="shopping-bag" size="14"></i> ${r.ingredients?.length || 0} วัตถุดิบ</div>
-            <div><i data-lucide="list-checks" size="14"></i> ${r.steps?.length || 0} ขั้นตอน</div>
           </div>
         </div>
       `}).join('');
@@ -556,7 +592,7 @@
       const btn = document.getElementById('submit-btn');
       btn.disabled = true; 
       const originalText = btn.innerHTML;
-      btn.innerHTML = '<i data-lucide="loader-2" class="lucide-spin" size="18"></i> กำลังบันทึก...';
+      btn.innerHTML = '<i data-lucide="loader-2" class="lucide-spin" size="16"></i> กำลังบันทึก...';
       lucide.createIcons({ root: btn });
 
       try {
@@ -583,11 +619,11 @@
         if (currentEditingId) {
           data.updatedAt = serverTimestamp(); 
           await updateDoc(doc(db, "recipes", currentEditingId), data);
-          showToast('อัปเดตสูตรอาหารเรียบร้อยแล้ว!');
+          showToast('อัปเดตข้อมูลเรียบร้อยแล้ว!');
         } else {
           data.createdAt = serverTimestamp();
           await addDoc(recipesCollection, data);
-          showToast('บันทึกสูตรอาหารเรียบร้อยแล้ว!');
+          showToast('บันทึกข้อมูลเรียบร้อยแล้ว!');
         }
 
         switchView('read');
@@ -610,33 +646,39 @@
           ? `<li>${escapeHTML(i)}</li>` 
           : `<li><span>${escapeHTML(i.name)}</span> <strong>${escapeHTML(i.qty||'-')}</strong></li>`).join('');
         
-        return `<div class="modal-section-title"><i data-lucide="${icon}" size="18"></i> ${title}</div>
-                <${isStep ? 'ol class="step-list"' : 'ul class="detail-list"'}>${listItems}</${isStep ? 'ol' : 'ul'}>`;
+        return `<div class="modal-section-box">
+                  <div class="modal-section-title"><i data-lucide="${icon}" size="18"></i> ${title}</div>
+                  <${isStep ? 'ol class="step-list"' : 'ul class="detail-list"'}>${listItems}</${isStep ? 'ol' : 'ul'}>
+                </div>`;
       };
 
-      const metaInfoHTML = `
-        <div style="display: flex; gap: 16px; margin: 12px 0; color: var(--text-muted); font-size: 0.9rem;">
-          ${r.time ? `<span><i data-lucide="clock" size="16"></i> ${escapeHTML(r.time)} นาที</span>` : ''}
-        </div>
-      `;
-
       DOM.modalContent.innerHTML = `
-        <span class="card-category">${escapeHTML(r.category) || 'ทั่วไป'}</span>
-        <h2 style="font-size: 1.6rem; margin: 8px 0;">${escapeHTML(r.title)}</h2>
-        ${metaInfoHTML}
-        ${generateListHTML(r.equipment, 'wrench', 'อุปกรณ์ที่ใช้', false)}
-        ${generateListHTML(r.ingredients, 'shopping-bag', 'วัตถุดิบ', false)}
-        ${generateListHTML(r.steps, 'chef-hat', 'วิธีทำ', true)}
-        ${r.notes ? `<div class="modal-section-title"><i data-lucide="file-text" size="18"></i> หมายเหตุ</div>
-                     <p style="background:#FFFBEB; padding:12px; border-radius:8px;">${escapeHTML(r.notes)}</p>` : ''}
+        <div class="modal-actions-top">
+          <button class="btn-edit-modal" data-id="${r.id}"><i data-lucide="pencil" size="14"></i> แก้ไขสูตร</button>
+          <button class="modal-close-btn" id="btn-close-modal-custom">ปิด <i data-lucide="x" size="16"></i></button>
+        </div>
         
+        <span class="modal-category">${escapeHTML(r.category) || 'ซอส'}</span>
+        <h2 class="modal-title">${escapeHTML(r.title)}</h2>
+        <p class="modal-subtitle">เผ็ดน้อยที่สุด ${r.time ? `(ใช้เวลา ${escapeHTML(r.time)} นาที)` : ''}</p>
+        
+        ${generateListHTML(r.equipment, 'shopping-cart', 'ส่วนผสม & อัตราส่วน', false)}
+        ${generateListHTML(r.ingredients, 'shopping-bag', 'วัตถุดิบเพิ่มเติม', false)}
+        ${generateListHTML(r.steps, 'clipboard-list', 'ขั้นตอนการทำหน้าเตา', true)}
+        
+        ${r.notes ? `<div class="modal-section-box"><div class="modal-section-title"><i data-lucide="file-text" size="18"></i> หมายเหตุ</div>
+                     <p style="color:#CCC;">${escapeHTML(r.notes)}</p></div>` : ''}
+                     
         <div class="modal-actions-bar">
-          <button class="btn-edit-modal" data-id="${r.id}"><i data-lucide="edit" size="18"></i> แก้ไขเมนูนี้</button>
-          <button class="btn-delete-modal" data-id="${r.id}"><i data-lucide="trash-2" size="18"></i> ลบเมนูนี้</button>
+          <button class="btn-delete-modal" data-id="${r.id}">Delete</button>
         </div>
       `;
       DOM.modal.classList.add('active');
       lucide.createIcons({ root: DOM.modalContent });
+
+      document.getElementById('btn-close-modal-custom').addEventListener('click', () => {
+        DOM.modal.classList.remove('active');
+      });
     };
 
     const deleteRecipe = async (id) => {
@@ -649,7 +691,7 @@
 
           await deleteDoc(doc(db, "recipes", id));
           DOM.modal.classList.remove('active');
-          showToast('ลบสูตรอาหารเรียบร้อยแล้ว');
+          showToast('ลบรายการเรียบร้อยแล้ว');
         } catch (error) {
           alert('เกิดข้อผิดพลาดในการลบ: ' + error.message);
         }
@@ -661,7 +703,7 @@
         e.preventDefault();
         showingFavorites = false;
         document.getElementById('btn-toggle-favorites').classList.remove('active');
-        document.getElementById('explore-title').innerText = "คลังสูตรอาหาร";
+        document.getElementById('explore-title').innerText = "คลังสูตรอาหารประจำครัว";
         document.getElementById('notice-board').style.display = 'block';
         switchView('read');
       });
@@ -669,7 +711,7 @@
       document.getElementById('btn-toggle-favorites').addEventListener('click', (e) => {
         showingFavorites = !showingFavorites;
         e.currentTarget.classList.toggle('active', showingFavorites);
-        document.getElementById('explore-title').innerText = showingFavorites ? "สูตรโปรดของคุณ" : "คลังสูตรอาหาร";
+        document.getElementById('explore-title').innerText = showingFavorites ? "รายการโปรด / ที่บันทึกไว้" : "คลังสูตรอาหารประจำครัว";
         document.getElementById('notice-board').style.display = showingFavorites ? 'none' : 'block';
         switchView('read'); 
       });
@@ -717,6 +759,10 @@
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       initEventListeners();
+      
+      // เริ่มทำงานนาฬิกาเรียลไทม์
+      updateClock();
+      setInterval(updateClock, 1000);
       
       const q = query(recipesCollection, orderBy("createdAt", "desc"));
       onSnapshot(q, (snapshot) => {
