@@ -3,775 +3,982 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WINGSTOP — สมุดสูตรหลังร้าน</title>
-
-  <!-- Typography -->
+  <title>SOP Web Manual - Wingstop Samyan</title>
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Prompt -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ws: {
+              green: '#005A36',
+              dark: '#003F25',
+              darker: '#002516',
+              gold: '#FFC72C',
+              goldhover: '#E5B120',
+              red: '#E31837',
+              bg: '#F4F7F5',
+              card: '#FFFFFF'
+            }
+          },
+          fontFamily: {
+            sans: ['Prompt', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
   <style>
-    /* ==========================================================================
-       DESIGN SYSTEM & VARIABLES (DARK THEME)
-       ========================================================================== */
-    :root {
-      --bg-page: #0C0C0C;
-      --bg-surface: #1E1F22;
-      --bg-subtle: #252629;
-      --text-main: #FFFFFF;
-      --text-muted: #888888;
-      --text-light: #A1A1AA;
-      --primary-brand: #FF5E1E; /* Wingstop Orange */
-      --primary-brand-hover: #E04D15;
-      --primary-brand-light: rgba(255, 94, 30, 0.1);
-      --primary-brand-border: #FF5E1E;
-      --danger: #EF4444;
-      --danger-light: rgba(239, 68, 68, 0.1);
-      --border-color: #333333;
-      --radius-sm: 4px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --radius-full: 9999px;
-      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
-      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-      --shadow-lg: 0 20px 30px -10px rgba(0, 0, 0, 0.5);
-      --transition-smooth: all 0.2s ease-in-out;
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #F4F7F5;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Prompt', sans-serif; -webkit-font-smoothing: antialiased; }
-    
-    /* Background Pattern Grid */
-    body { 
-      background-color: var(--bg-page); 
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: 30px 30px;
-      color: var(--text-main); 
-      line-height: 1.6; 
-      padding-bottom: 80px; 
-      overflow-x: hidden; 
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-
-    /* HEADER */
-    .app-header {
-      position: sticky; top: 0; z-index: 50; background: #111111;
-      border-bottom: 2px solid var(--primary-brand); padding: 12px 24px;
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f1f1;
     }
-    .header-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-    .logo-group { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; }
-    .logo-icon { width: 32px; height: 32px; background-color: var(--primary-brand); color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-    .logo-text-wrapper { display: flex; flex-direction: column; line-height: 1.1; }
-    .logo-title { font-weight: 800; font-size: 1.1rem; color: white; letter-spacing: 0.5px; }
-    .logo-subtitle { font-size: 0.7rem; color: var(--text-muted); }
-    
-    .header-actions { display: flex; align-items: center; gap: 16px; }
-    .btn-toggle-fav { background: transparent; border: 1px solid var(--border-color); color: var(--text-light); padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
-    .btn-toggle-fav.active { background: var(--primary-brand-light); color: var(--primary-brand); border-color: var(--primary-brand); }
-    .datetime-display { text-align: right; line-height: 1.1; }
-    .datetime-date { color: var(--primary-brand); font-size: 0.75rem; font-weight: 600; }
-    .datetime-time { color: white; font-size: 1.1rem; font-weight: 700; letter-spacing: 1px; }
-
-    /* MAIN CONTENT */
-    .main-content { max-width: 1200px; margin: 40px auto 0; padding: 0 24px; }
-    .view-section { display: none; }
-    .view-section.active { display: block; }
-
-    /* STICKY SEARCH BAR */
-    .sticky-search-bar {
-      position: sticky;
-      top: 57px; /* อิงความสูงจาก header (ซ่อนรอยต่อด้วย z-index ที่น้อยกว่า) */
-      z-index: 40;
-      background-color: var(--bg-page); /* สีทึบเพื่อบังเนื้อหาที่ไถผ่านด้านล่าง */
-      padding: 16px 24px;
-      margin: 0 -24px 16px -24px; /* ขยายให้เต็มขอบจอเพื่อบังตัวหนังสือ */
-      border-bottom: 1px solid var(--border-color);
-      box-shadow: 0 10px 20px -10px rgba(0,0,0,0.8);
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
     }
-    
-    .search-input-wrapper { width: 100%; max-width: 800px; margin: 0 auto; }
-    
-    .search-box {
-      position: relative;
-      width: 100%;
-      display: flex;
-      align-items: center;
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #005A36;
     }
-    
-    .search-icon-left {
-      position: absolute;
-      left: 16px;
-      color: var(--text-muted);
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 14px 20px 14px 48px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border-color);
-      background-color: var(--bg-surface);
-      outline: none;
-      font-size: 0.95rem;
-      color: white;
-      transition: var(--transition-smooth);
-    }
-    .search-input:focus { border-color: var(--primary-brand); }
-
-    .search-hero { margin-bottom: 24px; }
-    .hero-title-area { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-top: 28px; }
-    .hero-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 4px; color: white; }
-    .hero-subtitle { font-size: 0.85rem; color: var(--text-muted); }
-    
-    .btn-primary-add { background: var(--primary-brand); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; transition: var(--transition-smooth); }
-    .btn-primary-add:hover { background: var(--primary-brand-hover); }
-
-    /* NOTICE BOARD */
-    .notice-board {
-      display: block;
-      background-color: #1A1813;
-      border: 1px solid #3B2D13;
-      border-left: 4px solid #F59E0B;
-      border-radius: var(--radius-sm);
-      padding: 16px 20px;
-      margin: 0 0 24px 0;
-    }
-    .notice-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #FBBF24;
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .notice-list {
-      padding-left: 20px;
-      color: #D1D5DB;
-      font-size: 0.85rem;
-      line-height: 1.6;
-    }
-
-    /* RECIPE GRID */
-    .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 24px; }
-    .recipe-card { background: var(--bg-surface); border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--border-color); cursor: pointer; transition: var(--transition-smooth); display: flex; flex-direction: column; justify-content: space-between; }
-    .recipe-card:hover { border-color: #555; background: #232428; }
-    
-    .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-    .card-category { color: var(--primary-brand); font-size: 0.8rem; font-weight: 700; }
-    
-    .btn-heart { background: #1A1A1A; border: 1px solid var(--border-color); cursor: pointer; color: var(--text-muted); width: 32px; height: 32px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; transition: var(--transition-smooth); }
-    .btn-heart:hover { color: white; background: #333; }
-    .btn-heart.active { color: var(--primary-brand); border-color: var(--primary-brand); }
-    
-    .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; color: white; }
-    .card-description { font-size: 0.8rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-    
-    .empty-state { text-align: center; padding: 64px 20px; color: var(--text-muted); grid-column: 1 / -1; }
-
-    /* FORM VIEW */
-    .form-card { background: var(--bg-surface); border-radius: var(--radius-md); padding: 32px; border: 1px solid var(--border-color); max-width: 800px; margin: 0 auto; position: relative; }
-    .btn-close-form { position: absolute; top: 24px; right: 24px; background: var(--bg-subtle); border: 1px solid var(--border-color); width: 36px; height: 36px; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; }
-    
-    .form-header { margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; }
-    .form-label { display: block; font-weight: 500; font-size: 0.9rem; margin-bottom: 8px; color: var(--text-light); }
-    .form-control { width: 100%; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background-color: var(--bg-subtle); outline: none; color: white; font-size: 0.95rem; }
-    .form-control:focus { border-color: var(--primary-brand); }
-    
-    .dynamic-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-    .dynamic-row { display: flex; gap: 8px; align-items: center; }
-    .dynamic-row .eq-qty, .dynamic-row .ing-qty { width: 120px; flex-shrink: 0; }
-    
-    .btn-remove-row { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 10px; cursor: pointer; border-radius: var(--radius-sm); }
-    .btn-remove-row:hover { color: var(--danger); border-color: var(--danger); }
-    .btn-add-row { background: transparent; color: var(--text-main); border: 1px dashed var(--border-color); padding: 10px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-    .btn-add-row:hover { border-color: var(--primary-brand); color: var(--primary-brand); }
-    
-    .form-actions { display: flex; gap: 12px; margin-top: 32px; }
-    .btn-submit { flex: 1; background: var(--primary-brand); color: white; border: none; padding: 14px 24px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
-    .btn-cancel { background: var(--bg-subtle); color: white; border: 1px solid var(--border-color); padding: 14px 24px; border-radius: var(--radius-sm); cursor: pointer; }
-
-    /* MODAL: RECIPE DETAILS */
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: flex-start; justify-content: center; padding: 40px 20px; overflow-y: auto; }
-    .modal-overlay.active { display: flex; }
-    .modal-card { background: #1C1D21; width: 100%; max-width: 900px; border-radius: var(--radius-md); padding: 32px; position: relative; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); }
-    
-    .modal-actions-top { position: absolute; top: 24px; right: 24px; display: flex; gap: 8px; }
-    .modal-close-btn, .btn-edit-modal { background: #25262B; border: 1px solid #3A3B40; color: white; height: 36px; padding: 0 16px; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 500; transition: var(--transition-smooth); }
-    .btn-edit-modal i { color: var(--primary-brand); }
-    .modal-close-btn:hover, .btn-edit-modal:hover { background: #333; border-color: #555; }
-    
-    .btn-delete-modal { background: var(--danger-light); border: 1px solid var(--danger); color: var(--danger); height: 36px; padding: 0 16px; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 500; transition: var(--transition-smooth); }
-    .btn-delete-modal:hover { background: var(--danger); color: white; }
-    
-    .modal-category { color: var(--primary-brand); font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; display: block; }
-    .modal-title { font-size: 2rem; color: var(--primary-brand); font-weight: 700; margin: 0 0 12px 0; }
-    .modal-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 32px; }
-
-    .modal-section-box { background: #25262B; border: 1px solid #2F3035; border-radius: var(--radius-md); padding: 24px; margin-bottom: 16px; }
-    .modal-section-title { font-size: 1rem; font-weight: 600; color: white; display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
-    
-    .detail-list { list-style: none; display: flex; flex-direction: column; }
-    .detail-list li { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px dashed #444; font-size: 0.95rem; }
-    .detail-list li:last-child { border-bottom: none; padding-bottom: 0; }
-    .detail-list li span { color: #E5E7EB; }
-    .detail-list li strong { color: var(--primary-brand); font-weight: 600; }
-    
-    .step-list { padding-left: 20px; display: flex; flex-direction: column; gap: 12px; color: #E5E7EB; }
-    .step-list li { padding-bottom: 12px; border-bottom: 1px dashed #444; }
-    .step-list li:last-child { border-bottom: none; }
-
-    /* TOAST */
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--primary-brand); color: white; padding: 12px 24px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 10px; z-index: 200; opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   </style>
 </head>
-<body>
+<body class="text-slate-800 flex flex-col min-h-screen custom-scrollbar">
 
-  <!-- HEADER -->
-  <header class="app-header">
-    <div class="header-container">
-      <a id="logo-link" href="#" class="logo-group">
-        <div class="logo-icon">W</div>
-        <div class="logo-text-wrapper">
-          <span class="logo-title">WINGSTOP</span>
-          <span class="logo-subtitle">เอาหน่อยเว้ยๆ</span>
-        </div>
-      </a>
-      <div class="header-actions">
-        <button id="btn-toggle-favorites" class="btn-toggle-fav">
-          <i data-lucide="bookmark" size="16"></i> <span id="fav-btn-text">สูตรโปรด</span>
-        </button>
-        <!-- Real-time Clock Container -->
-        <div class="datetime-display">
-          <div class="datetime-date" id="current-date">--</div>
-          <div class="datetime-time" id="current-time">--:--</div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <main class="main-content">
-    <!-- VIEW 1: READ / EXPLORE -->
-    <section id="view-read" class="view-section active">
+  <!-- ==================== HEADER / TOP BAR ==================== -->
+  <header class="bg-ws-dark text-white sticky top-0 z-50 shadow-md border-b-2 border-ws-gold">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
       
-      <!-- STICKY SEARCH BAR (กล่องค้นหาที่ตรึงด้านบน) -->
-      <div class="sticky-search-bar">
-        <div class="search-input-wrapper">
-          <div class="search-box">
-            <i data-lucide="search" class="search-icon-left" size="18"></i>
-            <input type="text" id="search-input" class="search-input" placeholder="ค้นหาหมวดหมู่, เมนู, ทริคหลังร้าน...">
+      <!-- Brand & Mobile Toggle -->
+      <div class="flex items-center gap-3">
+        <button id="mobile-menu-btn" class="md:hidden text-slate-200 hover:text-white focus:outline-none">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <div class="flex items-center gap-2">
+          <div class="bg-ws-gold text-ws-dark p-1.5 rounded-lg font-black text-lg tracking-wider flex items-center justify-center shadow">
+            WS
+          </div>
+          <div>
+            <h1 class="font-bold text-base sm:text-lg leading-tight text-white flex items-center gap-2">
+              WINGSTOP <span class="text-ws-gold text-xs px-2 py-0.5 rounded bg-ws-darker border border-ws-gold/40">SAMYAN</span>
+            </h1>
+            <p class="text-[10px] text-slate-300 hidden sm:block">Standard Operating Procedure Manual (SOP)</p>
           </div>
         </div>
       </div>
 
-      <div class="search-hero">
-        <div class="notice-board" id="notice-board">
-          <div class="notice-header"><i data-lucide="pin" size="18"></i><span>📌 ข้อควรรู้ / ประกาศสำคัญ</span></div>
-          <ul class="notice-list">
-            <li>ซอส9รสชาติ ทำเอง4รสชาติ </li>
-            <li>Garlic Parmesan,LEMON PEPPER,HOT HONEY RUB,Texas buffulo,mango habanero,inferno,atomic blast</li>
-            <li>โดยจะเรียงความเผ็ดจากน้อยไปมาก</li>
-          </ul>
-        </div>
-
-        <div class="hero-title-area">
-          <div>
-            <h1 class="hero-title" id="explore-title">คลังสูตรอาหารประจำครัว</h1>
-            <div class="hero-subtitle">ส่วนผสม สัดส่วน และขั้นตอนการ Toss ซอสอย่างละเอียด</div>
-          </div>
-          <button class="btn-primary-add" id="btn-open-add-form">
-            + เพิ่มสูตรเมนูใหม่
+      <!-- Real-time Search Bar -->
+      <div class="flex-1 max-w-md relative">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input 
+            type="text" 
+            id="search-input" 
+            placeholder="ค้นหาขั้นตอน, อุณหภูมิ, วัตถุดิบ..." 
+            class="w-full bg-slate-800/80 text-white placeholder-slate-400 text-sm rounded-full pl-9 pr-8 py-1.5 focus:outline-none focus:ring-2 focus:ring-ws-gold border border-slate-700 transition"
+          >
+          <button id="clear-search" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
 
-      <div class="recipe-grid" id="recipe-grid"></div>
-
-      <div id="empty-state" class="empty-state" style="display: none;">
-        <i data-lucide="folder-open" size="48" style="color: var(--text-muted); margin-bottom: 16px;"></i>
-        <h3 id="empty-title">ยังไม่พบข้อมูล</h3>
-        <p id="empty-subtitle">คลิกที่ปุ่มเพิ่มสูตรเมนูใหม่ เพื่อเริ่มต้นใช้งาน</p>
+      <!-- Quick Status Badges -->
+      <div class="hidden lg:flex items-center gap-2 text-xs">
+        <div class="bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded-full flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Sanitizer: 200-220 PPM
+        </div>
+        <div class="bg-amber-900/60 border border-amber-500/40 text-amber-300 px-3 py-1 rounded-full flex items-center gap-1.5">
+          <i data-lucide="thermometer" class="w-3.5 h-3.5"></i>
+          เตาทอด: 177°C
+        </div>
       </div>
-    </section>
 
-    <!-- VIEW 2: RECIPE FORM -->
-    <section id="view-form" class="view-section">
-      <div class="form-card">
-        <button type="button" class="btn-close-form" id="btn-close-form-top" title="ปิด">
-          <i data-lucide="x" size="20"></i>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTAINER ==================== -->
+  <div class="flex-1 max-w-7xl w-full mx-auto flex flex-col md:flex-row">
+    
+    <!-- ==================== SIDEBAR / NAVIGATION ==================== -->
+    <aside id="sidebar" class="bg-white border-r border-slate-200 w-full md:w-64 flex-shrink-0 hidden md:block transition-all">
+      <div class="p-4 sticky top-16 space-y-1">
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">ตำแหน่งงาน & หมวดหมู่</p>
+        
+        <button onclick="switchTab('tab-overview')" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-700 hover:bg-slate-100 active-tab" data-tab="tab-overview">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 text-ws-green"></i>
+            <span>ภาพรวม & Quick Matrix</span>
+          </div>
         </button>
 
-        <div class="form-header">
-          <h2 id="form-main-title" style="color: white;">เพิ่มสูตรอาหารใหม่</h2>
-          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">กรอกข้อมูลสูตรอาหาร วัตถุดิบ และขั้นตอนให้ครบถ้วน</p>
+        <button onclick="switchTab('tab-paratrooper')" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-paratrooper">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="chef-hat" class="w-4 h-4 text-emerald-600"></i>
+            <span>1. Paratrooper</span>
+          </div>
+          <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">Prep</span>
+        </button>
+
+        <button onclick="switchTab('tab-bombardier')" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-bombardier">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="flame" class="w-4 h-4 text-red-600"></i>
+            <span>2. Bombardier</span>
+          </div>
+          <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">Classic</span>
+        </button>
+
+        <button onclick="switchTab('tab-gunner')" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-gunner">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="sparkles" class="w-4 h-4 text-amber-600"></i>
+            <span>3. Gunner</span>
+          </div>
+          <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">Sides</span>
+        </button>
+
+        <button onclick="switchTab('tab-wingman')" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-wingman">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="package-check" class="w-4 h-4 text-blue-600"></i>
+            <span>4. Wingman</span>
+          </div>
+          <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">Toss</span>
+        </button>
+
+        <div class="p-3 mt-6 bg-ws-light rounded-xl border border-ws-green/20">
+          <p class="text-xs font-semibold text-ws-green flex items-center gap-1">
+            <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> ข้อควรระวังสำคัญ
+          </p>
+          <p class="text-[11px] text-slate-600 mt-1 leading-relaxed">
+            วัดอุณหภูมิไก่สุ่ม 3 จุด (Top-Mid-Bottom) ต้องเกิน <strong class="text-red-600">93.3°C</strong> ทุกครั้งก่อนเสิร์ฟ!
+          </p>
         </div>
-
-        <form id="recipe-form">
-          <div class="form-group" style="margin-bottom: 20px;">
-            <label class="form-label">ชื่อสูตรอาหาร *</label>
-            <input type="text" id="recipe-title" class="form-control" required>
-          </div>
-          
-          <div style="display: flex; gap: 16px; margin-bottom: 20px;">
-            <div class="form-group" style="flex: 1;">
-              <label class="form-label">หมวดหมู่ *</label>
-              <select id="recipe-category" class="form-control" required>
-                <option value="">-- เลือกหมวดหมู่ --</option>
-                <option value="ไก่ทอด (WINGS)">ไก่ทอด (WINGS)</option>
-                <option value="ซอส">ซอส</option>
-                <option value="ของทานเล่น">ของทานเล่น</option>
-                <option value="เครื่องดื่ม">เครื่องดื่ม</option>
-              </select>
-            </div>
-            <div class="form-group" style="flex: 1;">
-              <label class="form-label">เวลาที่ใช้ทำ (นาที)</label>
-              <input type="number" id="recipe-time" class="form-control" placeholder="เช่น 30" min="1">
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-bottom: 20px;">
-            <label class="form-label">อุปกรณ์ที่ต้องใช้</label>
-            <div id="equipment-container" class="dynamic-list"></div>
-            <button type="button" class="btn-add-row" data-type="equipment"><i data-lucide="plus" size="14"></i> เพิ่มอุปกรณ์</button>
-          </div>
-
-          <div class="form-group" style="margin-bottom: 20px;">
-            <label class="form-label">วัตถุดิบ</label>
-            <div id="ingredients-container" class="dynamic-list"></div>
-            <button type="button" class="btn-add-row" data-type="ingredient"><i data-lucide="plus" size="14"></i> เพิ่มวัตถุดิบ</button>
-          </div>
-
-          <div class="form-group" style="margin-bottom: 20px;">
-            <label class="form-label">วิธีทำ (ตามลำดับ)</label>
-            <div id="steps-container" class="dynamic-list"></div>
-            <button type="button" class="btn-add-row" data-type="step"><i data-lucide="plus" size="14"></i> เพิ่มขั้นตอน</button>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">หมายเหตุ</label>
-            <textarea id="recipe-notes" class="form-control" style="min-height: 80px;"></textarea>
-          </div>
-
-          <div class="form-actions">
-            <button type="button" class="btn-cancel" id="btn-cancel-form">ยกเลิก</button>
-            <button type="submit" class="btn-submit" id="submit-btn"><i data-lucide="save" size="16"></i> บันทึกข้อมูล</button>
-          </div>
-        </form>
       </div>
-    </section>
-  </main>
+    </aside>
 
-  <!-- MODAL: RECIPE DETAILS -->
-  <div class="modal-overlay" id="recipe-modal">
-    <div class="modal-card">
-      <button id="btn-close-modal" style="display: none;"></button>
-      <div id="modal-content"></div>
+    <!-- MOBILE NAVIGATION (HORIZONTAL SCROLL) -->
+    <div class="md:hidden bg-white border-b border-slate-200 overflow-x-auto whitespace-nowrap px-2 py-2 flex gap-1 custom-scrollbar">
+      <button onclick="switchTab('tab-overview')" class="mob-tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-ws-green text-white" data-tab="tab-overview">ภาพรวม</button>
+      <button onclick="switchTab('tab-paratrooper')" class="mob-tab-btn px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100" data-tab="tab-paratrooper">1. Paratrooper</button>
+      <button onclick="switchTab('tab-bombardier')" class="mob-tab-btn px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100" data-tab="tab-bombardier">2. Bombardier</button>
+      <button onclick="switchTab('tab-gunner')" class="mob-tab-btn px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100" data-tab="tab-gunner">3. Gunner</button>
+      <button onclick="switchTab('tab-wingman')" class="mob-tab-btn px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100" data-tab="tab-wingman">4. Wingman</button>
     </div>
-  </div>
 
-  <!-- TOAST -->
-  <div id="toast" class="toast">
-    <i data-lucide="check-circle-2" size="18"></i>
-    <span id="toast-message">แจ้งเตือน</span>
-  </div>
+    <!-- ==================== CONTENT AREA ==================== -->
+    <main class="flex-1 p-4 sm:p-6 lg:p-8">
 
-  <!-- FIREBASE & APP LOGIC -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { 
-      getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp,
-      doc, updateDoc, deleteDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+      <!-- SEARCH NOTIFICATION -->
+      <div id="search-results-label" class="hidden mb-4 p-3 bg-ws-gold/10 border border-ws-gold/30 rounded-lg text-xs text-ws-dark font-medium flex justify-between items-center">
+        <span>กำลังแสดงผลการค้นหาสำหรับ: "<strong id="search-query-text"></strong>"</span>
+        <button onclick="clearSearch()" class="text-ws-green underline">ล้างคำค้นหา</button>
+      </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBDYHAUJg1zrLsCycmasqlPSJ25XzQY354",
-      authDomain: "wingstop-c1dfd.firebaseapp.com",
-      projectId: "wingstop-c1dfd",
-      storageBucket: "wingstop-c1dfd.firebasestorage.app",
-      messagingSenderId: "68193512037",
-      appId: "1:68193512037:web:d938753a1544a6e664748c"
-    };
+      <!-- ================= TAB 0: OVERVIEW & QUICK MATRIX ================= -->
+      <div id="tab-overview" class="tab-content space-y-6">
+        
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-ws-dark to-ws-green rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+          <div class="relative z-10">
+            <span class="bg-ws-gold text-ws-dark font-bold text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">Wingstop Samyan Branch</span>
+            <h2 class="text-2xl sm:text-3xl font-bold mt-2">คู่มือการปฏิบัติงานมาตรฐาน (SOP Manual)</h2>
+            <p class="text-slate-200 text-xs sm:text-sm mt-1 max-w-2xl">
+              ระบบศูนย์รวมขั้นตอนการปฏิบัติงานสำหรับพนักงานทุกตำแหน่ง เพื่อรักษามาตรฐานความอร่อย ความสะอาด และความปลอดภัยสูงสุด
+            </p>
+          </div>
+          <i data-lucide="utensils" class="absolute -right-6 -bottom-6 w-48 h-48 text-white/5 pointer-events-none"></i>
+        </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const recipesCollection = collection(db, "recipes");
-
-    let allRecipes = [];
-    let currentEditingId = null;
-    let showingFavorites = false;
-    let myFavorites = JSON.parse(localStorage.getItem('tasteNoteFavorites')) || [];
-
-    const DOM = {
-      viewRead: document.getElementById('view-read'),
-      viewForm: document.getElementById('view-form'),
-      recipeGrid: document.getElementById('recipe-grid'),
-      emptyState: document.getElementById('empty-state'),
-      modal: document.getElementById('recipe-modal'),
-      modalContent: document.getElementById('modal-content'),
-      recipeForm: document.getElementById('recipe-form'),
-      searchInput: document.getElementById('search-input'),
-      containers: {
-        equipment: document.getElementById('equipment-container'),
-        ingredient: document.getElementById('ingredients-container'),
-        step: document.getElementById('steps-container')
-      }
-    };
-
-    const updateClock = () => {
-      const now = new Date();
-      const days = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
-      const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-      
-      const dayName = days[now.getDay()];
-      const dateNum = now.getDate();
-      const monthName = months[now.getMonth()];
-      
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      
-      const dateElem = document.getElementById('current-date');
-      const timeElem = document.getElementById('current-time');
-      
-      if (dateElem) dateElem.textContent = `${dayName}ที่ ${dateNum} ${monthName}`;
-      if (timeElem) timeElem.textContent = `${hours}:${minutes}`;
-    };
-
-    const escapeHTML = (str) => {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    };
-
-    const showToast = (msg) => {
-      const toast = document.getElementById('toast');
-      document.getElementById('toast-message').innerText = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    };
-
-    const debounce = (func, delay) => {
-      let timeoutId;
-      return (...args) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func(...args), delay);
-      };
-    };
-
-    const switchView = (viewName) => {
-      DOM.viewRead.classList.toggle('active', viewName === 'read');
-      DOM.viewForm.classList.toggle('active', viewName === 'form');
-      if(viewName === 'read') applyFilters();
-    };
-
-    const toggleFavorite = (id, e) => {
-      e.stopPropagation(); 
-      if (myFavorites.includes(id)) {
-        myFavorites = myFavorites.filter(favId => favId !== id);
-        showToast('ลบรายการแล้ว');
-      } else {
-        myFavorites.push(id);
-        showToast('บันทึกรายการแล้ว!');
-      }
-      localStorage.setItem('tasteNoteFavorites', JSON.stringify(myFavorites));
-      applyFilters(); 
-    };
-
-    const applyFilters = () => {
-      const q = DOM.searchInput.value.toLowerCase().trim();
-      let filtered = allRecipes;
-
-      if (showingFavorites) {
-        filtered = filtered.filter(r => myFavorites.includes(r.id));
-      }
-
-      if (q) {
-        filtered = filtered.filter(r => 
-          (r.title || '').toLowerCase().includes(q) || 
-          (r.category || '').toLowerCase().includes(q)
-        );
-      }
-
-      renderRecipes(filtered);
-    };
-
-    const renderRecipes = (list) => {
-      if (list.length === 0) {
-        DOM.recipeGrid.innerHTML = '';
-        DOM.emptyState.style.display = 'block';
-        return;
-      }
-      
-      DOM.emptyState.style.display = 'none';
-      
-      DOM.recipeGrid.innerHTML = list.map((r) => {
-        const isFav = myFavorites.includes(r.id);
-        const heartClass = isFav ? 'active' : '';
-        return `
-        <div class="recipe-card" data-id="${r.id}">
-          <div>
-            <div class="card-header-top">
-              <span class="card-category">${escapeHTML(r.category) || 'ทั่วไป'}</span>
-              <button class="btn-heart ${heartClass}" data-action="favorite" data-id="${r.id}">
-                <i data-lucide="heart" size="16"></i>
-              </button>
+        <!-- Quick Specs Cards Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between text-slate-500 mb-2">
+              <span class="text-xs font-medium">ความสะอาด (Sanitizer)</span>
+              <i data-lucide="droplet" class="w-4 h-4 text-blue-500"></i>
             </div>
-            <h3 class="card-title">${escapeHTML(r.title)}</h3>
-            <p class="card-description">${r.notes ? escapeHTML(r.notes) : 'ไม่มีคำอธิบายเพิ่มเติม'}</p>
+            <p class="text-lg font-bold text-slate-800">200 - 220 PPM</p>
+            <p class="text-[11px] text-slate-500 mt-1">เปลี่ยนน้ำยาลงถังทุกๆ 4 ชม.</p>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between text-slate-500 mb-2">
+              <span class="text-xs font-medium">อุณหภูมิเตาทอดหลัก</span>
+              <i data-lucide="thermometer" class="w-4 h-4 text-red-500"></i>
+            </div>
+            <p class="text-lg font-bold text-slate-800">177°C <span class="text-xs font-normal text-slate-500">(±10°C)</span></p>
+            <p class="text-[11px] text-slate-500 mt-1">เตา 1 - 5 มาตรฐาน</p>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between text-slate-500 mb-2">
+              <span class="text-xs font-medium">ตู้ CVAP (Holding)</span>
+              <i data-lucide="box" class="w-4 h-4 text-amber-500"></i>
+            </div>
+            <p class="text-lg font-bold text-slate-800">140 - 144°F</p>
+            <p class="text-[11px] text-slate-500 mt-1">พัก 10 นาที / ใช้ได้ไม่เกิน 50 นาที</p>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between text-slate-500 mb-2">
+              <span class="text-xs font-medium">อุณหภูมิสุกขั้นต่ำ</span>
+              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+            </div>
+            <p class="text-lg font-bold text-red-600">> 93.3°C</p>
+            <p class="text-[11px] text-slate-500 mt-1">สุ่มวัด 3 จุด (Top-Mid-Bottom)</p>
           </div>
         </div>
-      `}).join('');
-      
-      lucide.createIcons({ root: DOM.recipeGrid });
-    };
 
-    const createDynamicRowHTML = (type, val1 = '', val2 = '') => {
-      if (type === 'step') {
-        return `<input type="text" class="form-control step-text" placeholder="ขั้นตอนการทำ" value="${escapeHTML(val1)}">
-                <button type="button" class="btn-remove-row"><i data-lucide="trash-2" size="18"></i></button>`;
-      }
-      const placeholder1 = type === 'equipment' ? 'ชื่ออุปกรณ์' : 'ชื่อวัตถุดิบ';
-      const placeholder2 = type === 'equipment' ? 'จำนวน' : 'ปริมาณ';
-      const class1 = type === 'equipment' ? 'eq-name' : 'ing-name';
-      const class2 = type === 'equipment' ? 'eq-qty' : 'ing-qty';
-      
-      return `<input type="text" class="form-control ${class1}" placeholder="${placeholder1}" value="${escapeHTML(val1)}">
-              <input type="text" class="form-control ${class2}" placeholder="${placeholder2}" value="${escapeHTML(val2)}">
-              <button type="button" class="btn-remove-row"><i data-lucide="trash-2" size="18"></i></button>`;
-    };
+        <!-- Role Jump Grid -->
+        <h3 class="text-base font-bold text-slate-800 pt-2">หมวดหมู่ขั้นตอนการทำงาน (SOP Roles)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <div onclick="switchTab('tab-paratrooper')" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="p-3 rounded-lg bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition">
+                  <i data-lucide="chef-hat" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-800 group-hover:text-ws-green transition">1. Paratrooper (การเตรียมวัตถุดิบ)</h4>
+                  <p class="text-xs text-slate-500">เตรียม Homemade Sauces, Ranch, Dip, Coleslaw และ Sanitizer</p>
+                </div>
+              </div>
+              <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition"></i>
+            </div>
+          </div>
 
-    const addRow = (type, val1 = '', val2 = '') => {
-      const container = DOM.containers[type];
-      const row = document.createElement('div');
-      row.className = 'dynamic-row';
-      row.innerHTML = createDynamicRowHTML(type, val1, val2);
-      container.appendChild(row);
-      lucide.createIcons({ root: row }); 
-    };
+          <div onclick="switchTab('tab-bombardier')" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="p-3 rounded-lg bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white transition">
+                  <i data-lucide="flame" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-800 group-hover:text-ws-green transition">2. Bombardier (ทอด Classic Wings)</h4>
+                  <p class="text-xs text-slate-500">ทอดปีก-น่อง เตา 1-2 (Full Cook, Half Cook, Final Cook)</p>
+                </div>
+              </div>
+              <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition"></i>
+            </div>
+          </div>
 
-    const initDefaultFormRows = () => {
-      Object.values(DOM.containers).forEach(container => container.innerHTML = '');
-      addRow('equipment');
-      addRow('ingredient');
-      addRow('step');
-    };
+          <div onclick="switchTab('tab-gunner')" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="p-3 rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition">
+                  <i data-lucide="sparkles" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-800 group-hover:text-ws-green transition">3. Gunner (Boneless, Tender, Fries)</h4>
+                  <p class="text-xs text-slate-500">ทอดเตา 3-5 และการจัดการอุณหภูมิตู้แช่</p>
+                </div>
+              </div>
+              <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition"></i>
+            </div>
+          </div>
 
-    const openFormForAdd = () => {
-      currentEditingId = null;
-      document.getElementById('form-main-title').innerText = "เพิ่มสูตรอาหารใหม่";
-      DOM.recipeForm.reset();
-      initDefaultFormRows();
-      switchView('form');
-    };
+          <div onclick="switchTab('tab-wingman')" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="p-3 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition">
+                  <i data-lucide="package-check" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-slate-800 group-hover:text-ws-green transition">4. Wingman (การคลุกซอส & จัดเสิร์ฟ)</h4>
+                  <p class="text-xs text-slate-500">Sauce & Toss, ตักกระบวยซอส, Shaker Caps, หลักการ Shake-Heat-Sweet</p>
+                </div>
+              </div>
+              <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition"></i>
+            </div>
+          </div>
 
-    const openFormForEdit = (id) => {
-      DOM.modal.classList.remove('active');
-      const recipe = allRecipes.find(r => r.id === id);
-      if (!recipe) return;
-
-      currentEditingId = id;
-      document.getElementById('form-main-title').innerText = "แก้ไขสูตรอาหาร";
-      document.getElementById('recipe-title').value = recipe.title || '';
-      document.getElementById('recipe-category').value = recipe.category || '';
-      document.getElementById('recipe-time').value = recipe.time || '';
-      document.getElementById('recipe-notes').value = recipe.notes || '';
-
-      Object.values(DOM.containers).forEach(container => container.innerHTML = '');
-
-      (recipe.equipment?.length ? recipe.equipment : [{name:'', qty:''}]).forEach(eq => addRow('equipment', eq.name, eq.qty));
-      (recipe.ingredients?.length ? recipe.ingredients : [{name:'', qty:''}]).forEach(ing => addRow('ingredient', ing.name, ing.qty));
-      (recipe.steps?.length ? recipe.steps : ['']).forEach(st => addRow('step', st));
-
-      switchView('form');
-    };
-
-    const handleFormSubmit = async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('submit-btn');
-      btn.disabled = true; 
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '<i data-lucide="loader-2" class="lucide-spin" size="16"></i> กำลังบันทึก...';
-      lucide.createIcons({ root: btn });
-
-      try {
-        const extractArr = (containerId, class1, class2) => 
-          Array.from(document.querySelectorAll(`#${containerId} .dynamic-row`))
-               .map(r => ({ name: r.querySelector(class1).value.trim(), qty: r.querySelector(class2).value.trim() }))
-               .filter(i => i.name); 
-               
-        const extractSteps = () => 
-          Array.from(document.querySelectorAll('#steps-container .dynamic-row'))
-               .map(r => r.querySelector('.step-text').value.trim())
-               .filter(i => i); 
-
-        const data = {
-          title: document.getElementById('recipe-title').value.trim(),
-          category: document.getElementById('recipe-category').value,
-          time: document.getElementById('recipe-time').value.trim(),
-          equipment: extractArr('equipment-container', '.eq-name', '.eq-qty'),
-          ingredients: extractArr('ingredients-container', '.ing-name', '.ing-qty'),
-          steps: extractSteps(),
-          notes: document.getElementById('recipe-notes').value.trim()
-        };
-
-        if (currentEditingId) {
-          data.updatedAt = serverTimestamp(); 
-          await updateDoc(doc(db, "recipes", currentEditingId), data);
-          showToast('อัปเดตข้อมูลเรียบร้อยแล้ว!');
-        } else {
-          data.createdAt = serverTimestamp();
-          await addDoc(recipesCollection, data);
-          showToast('บันทึกข้อมูลเรียบร้อยแล้ว!');
-        }
-
-        switchView('read');
-      } catch (error) {
-        alert("เกิดข้อผิดพลาดในการบันทึก: " + error.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-        lucide.createIcons({ root: btn });
-      }
-    };
-
-    const openRecipeModal = (id) => {
-      const r = allRecipes.find(x => x.id === id);
-      if (!r) return;
-
-      const generateListHTML = (arr, icon, title, isStep) => {
-        if (!arr || arr.length === 0) return '';
-        const listItems = arr.map(i => isStep 
-          ? `<li>${escapeHTML(i)}</li>` 
-          : `<li><span>${escapeHTML(i.name)}</span> <strong>${escapeHTML(i.qty||'-')}</strong></li>`).join('');
-        
-        return `<div class="modal-section-box">
-                  <div class="modal-section-title"><i data-lucide="${icon}" size="18"></i> ${title}</div>
-                  <${isStep ? 'ol class="step-list"' : 'ul class="detail-list"'}>${listItems}</${isStep ? 'ol' : 'ul'}>
-                </div>`;
-      };
-
-      DOM.modalContent.innerHTML = `
-        <div class="modal-actions-top">
-          <button class="btn-edit-modal" data-id="${r.id}"><i data-lucide="pencil" size="14"></i> แก้ไขสูตร</button>
-          <button class="btn-delete-modal" data-id="${r.id}"><i data-lucide="trash-2" size="14"></i> ลบสูตร</button>
-          <button class="modal-close-btn" id="btn-close-modal-custom">ปิด <i data-lucide="x" size="16"></i></button>
         </div>
-        
-        <span class="modal-category">${escapeHTML(r.category) || 'ซอส'}</span>
-        <h2 class="modal-title">${escapeHTML(r.title)}</h2>
-        <p class="modal-subtitle">เผ็ดน้อยที่สุด ${r.time ? `(ใช้เวลา ${escapeHTML(r.time)} นาที)` : ''}</p>
-        
-        ${generateListHTML(r.equipment, 'shopping-cart', 'ส่วนผสม & อัตราส่วน', false)}
-        ${generateListHTML(r.ingredients, 'shopping-bag', 'วัตถุดิบเพิ่มเติม', false)}
-        ${generateListHTML(r.steps, 'clipboard-list', 'ขั้นตอนการทำหน้าเตา', true)}
-        
-        ${r.notes ? `<div class="modal-section-box"><div class="modal-section-title"><i data-lucide="file-text" size="18"></i> หมายเหตุ</div>
-                     <p style="color:#CCC;">${escapeHTML(r.notes)}</p></div>` : ''}
-      `;
-      DOM.modal.classList.add('active');
-      lucide.createIcons({ root: DOM.modalContent });
+      </div>
 
-      document.getElementById('btn-close-modal-custom').addEventListener('click', () => {
-        DOM.modal.classList.remove('active');
+      <!-- ================= TAB 1: PARATROOPER ================= -->
+      <div id="tab-paratrooper" class="tab-content hidden space-y-6">
+        
+        <div class="border-b border-slate-200 pb-4">
+          <div class="flex items-center gap-2 text-emerald-700 font-bold text-sm">
+            <i data-lucide="chef-hat" class="w-5 h-5"></i> Position 1
+          </div>
+          <h2 class="text-2xl font-bold text-slate-800">Paratrooper (การเตรียมวัตถุดิบและอุปกรณ์)</h2>
+          <p class="text-xs text-slate-500 mt-1">รับผิดชอบงานความสะอาด น้ำยาฆ่าเชื้อ การผสม Homemade Sauces และการเตรียม Sides</p>
+        </div>
+
+        <!-- 1. Sanitation -->
+        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
+              <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i>
+              งานความสะอาด & น้ำยา Sanitizer (Q10)
+            </h3>
+            <span class="bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full border border-blue-200 font-semibold">สุขอนามัย</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs bg-slate-50 p-4 rounded-lg">
+            <div>
+              <p class="text-slate-500">ค่ามาตรฐานความเข้มข้น (PPM):</p>
+              <p class="text-base font-bold text-emerald-700">200 - 220 PPM</p>
+            </div>
+            <div>
+              <p class="text-slate-500">รอบการเปลี่ยนน้ำยา:</p>
+              <p class="text-base font-bold text-slate-800">เปลี่ยนน้ำลงถังทุกๆ <span class="text-red-600">4 ชั่วโมง</span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Homemade Sauces (4 Flavors) -->
+        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
+                <i data-lucide="flask-conical" class="w-5 h-5 text-amber-500"></i>
+                การเตรียม Homemade Sauces (4 รสชาติหลัก)
+              </h3>
+              <p class="text-xs text-slate-500">สูตรการผสมประจำวัน</p>
+            </div>
+            <!-- Stat Badge -->
+            <div class="flex flex-wrap gap-1.5 text-[11px]">
+              <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded border border-amber-200">หมัก 1 วัน</span>
+              <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">จัดเก็บ 7 วัน (แบ่งเปิดใช้ 6 วัน)</span>
+              <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">อุณหภูมิห้อง 25-30°C</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Garlic Parmesan -->
+            <div class="border border-slate-200 rounded-lg p-3.5 bg-amber-50/30">
+              <div class="flex justify-between items-center mb-1">
+                <h4 class="font-bold text-slate-800 text-sm">🧄 Garlic Parmesan</h4>
+              </div>
+              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-2">
+                <li>Butter oil: <strong>2 Gal (4 L)</strong></li>
+                <li>ผง Garlic: <strong>260 g</strong></li>
+              </ul>
+            </div>
+
+            <!-- Lemon Pepper -->
+            <div class="border border-slate-200 rounded-lg p-3.5 bg-yellow-50/30">
+              <div class="flex justify-between items-center mb-1">
+                <h4 class="font-bold text-slate-800 text-sm">🍋 Lemon Pepper</h4>
+              </div>
+              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-2">
+                <li>Butter oil: <strong>2 Gal (4 L)</strong></li>
+                <li>ผง Lemon: <strong>300 g</strong></li>
+              </ul>
+            </div>
+
+            <!-- Hot Honey Rub -->
+            <div class="border border-slate-200 rounded-lg p-3.5 bg-orange-50/30">
+              <div class="flex justify-between items-center mb-1">
+                <h4 class="font-bold text-slate-800 text-sm">🍯 Hot Honey Rub</h4>
+              </div>
+              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-2">
+                <li>Butter oil: <strong>1 Gal (2 L)</strong></li>
+                <li>ผง Honey: <strong>400 g</strong></li>
+              </ul>
+            </div>
+
+            <!-- Louisiana Rub -->
+            <div class="border border-slate-200 rounded-lg p-3.5 bg-red-50/30">
+              <div class="flex justify-between items-center mb-1">
+                <h4 class="font-bold text-slate-800 text-sm">🌶️ Louisiana Rub</h4>
+              </div>
+              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-2">
+                <li>Butter oil: <strong>2 Gal (4 L)</strong></li>
+                <li>ผง Garlic: <strong>110 g</strong> + ผง Cajun: <strong>250 g</strong></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Ranch & Cheese Dip -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Ranch -->
+          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex justify-between items-start">
+              <h3 class="font-bold text-slate-800 text-base">🥣 Ranch Sauce</h3>
+              <span class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded">อายุจัดเก็บ 4 วัน</span>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside bg-slate-50 p-3 rounded-lg">
+              <li>นมจืด: <strong>2 Gal (4 L)</strong></li>
+              <li>Mayonnaise: <strong>3 L</strong></li>
+              <li>ผง Ranch: <strong>454 g</strong></li>
+              <li class="text-emerald-700 font-semibold mt-2">⚠️ แช่เย็นอย่างน้อย 1 ชั่วโมงก่อนนำออกมาใช้</li>
+            </ul>
+          </div>
+
+          <!-- Cheese Dip -->
+          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex justify-between items-start">
+              <h3 class="font-bold text-slate-800 text-base">🧀 Cheese Dip</h3>
+              <span class="bg-amber-100 text-amber-800 text-[11px] px-2 py-0.5 rounded">อายุหลังเปิด 5 วัน</span>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside bg-slate-50 p-3 rounded-lg">
+              <li>บรรจุขวดบีบขนาด <strong>14 oz</strong></li>
+              <li>อุ่นร้อนเป็นเวลา <strong>30 นาที</strong></li>
+              <li>ตักเสิร์ฟลงถ้วยขนาด <strong>2 oz</strong></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 4. Inferno Crumb & Coleslaw -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Inferno Crumb -->
+          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex justify-between items-start">
+              <h3 class="font-bold text-slate-800 text-base">🔥 Inferno Crumb</h3>
+              <span class="bg-red-100 text-red-800 text-[11px] px-2 py-0.5 rounded">อายุจัดเก็บ 3 วัน</span>
+            </div>
+            <div class="text-xs text-slate-600 space-y-2 bg-slate-50 p-3 rounded-lg">
+              <p><strong>การผสม:</strong> น้ำเย็น 500ml + แป้ง Batter Mix 400g ใส่ขวดบีบ</p>
+              <p><strong>การทอด:</strong> ทอดเตาเบอร์ 5 อุณหภูมิ 177°C บีบเป็นตัว S นาน <strong class="text-red-600">20 วินาที</strong></p>
+              <p><strong>การคลุก:</strong> นำขึ้นมาคลุกผง Chilli Spice <strong>2 ช้อนโต๊ะ</strong></p>
+            </div>
+          </div>
+
+          <!-- Coleslaw -->
+          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex justify-between items-start">
+              <h3 class="font-bold text-slate-800 text-base">🥗 Coleslaw</h3>
+              <span class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded">อายุจัดเก็บ 4 วัน</span>
+            </div>
+            <div class="text-xs text-slate-600 space-y-2 bg-slate-50 p-3 rounded-lg">
+              <p><strong>อัตราส่วน:</strong> น้ำสลัด 600g + ผักกะหล่ำ 2 ถุง (620g)</p>
+              <p><strong>ขั้นตอน:</strong> คลุกเบามือ และพักตู้เย็นไว้ <strong>1 วัน</strong></p>
+              <p><strong>การบรรจุ:</strong> บรรจุถ้วยกระดาษ <strong>120g / ถ้วย</strong></p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= TAB 2: BOMBARDIER ================= -->
+      <div id="tab-bombardier" class="tab-content hidden space-y-6">
+        
+        <div class="border-b border-slate-200 pb-4">
+          <div class="flex items-center gap-2 text-red-600 font-bold text-sm">
+            <i data-lucide="flame" class="w-5 h-5"></i> Position 2
+          </div>
+          <h2 class="text-2xl font-bold text-slate-800">Bombardier (การทอด Classic Wings)</h2>
+          <p class="text-xs text-slate-500 mt-1">รับผิดชอบการทอดปีกและน่อง (Classic Wings) ควบคุมระบบการทอดและสุขอนามัยวัตถุดิบดิบ</p>
+        </div>
+
+        <!-- Station Specs -->
+        <div class="sop-card bg-gradient-to-r from-red-900 to-slate-900 text-white p-5 rounded-xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h3 class="font-bold text-lg text-ws-gold">ข้อกำหนดประจำสถานี (Station Specs)</h3>
+            <p class="text-xs text-slate-300 mt-0.5">ประจำเตาหมายเลข 1 และ 2</p>
+          </div>
+          <div class="flex flex-wrap gap-3 text-xs">
+            <div class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+              <span class="text-slate-300 block text-[10px]">อุณหภูมิเตา</span>
+              <strong class="text-sm font-mono text-ws-gold">177°C (±10°C)</strong>
+            </div>
+            <div class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+              <span class="text-slate-300 block text-[10px]">ความจุสูงสุด</span>
+              <strong class="text-sm font-mono text-white">ไม่เกิน 36 ชิ้น / ตะกร้า</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Cooking Systems -->
+        <h3 class="text-base font-bold text-slate-800 pt-2">รูปแบบการทอด 3 ระบบ (Cooking Systems)</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- 1. Full Cook -->
+          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="bg-red-100 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded">ระบบที่ 1</span>
+                <i data-lucide="timer" class="w-4 h-4 text-red-600"></i>
+              </div>
+              <h4 class="font-bold text-slate-800 text-base">1. Full Cook</h4>
+              <p class="text-xs text-slate-500 mt-1">ทอดสุกสมบูรณ์พร้อมเสิร์ฟทันที</p>
+              
+              <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-center">
+                <span class="text-xs text-slate-500 block">เวลาในการทอด</span>
+                <span class="text-2xl font-black text-red-600 font-mono">7:00 นาที</span>
+              </div>
+            </div>
+            <p class="text-xs text-slate-600 mt-3 bg-slate-50 p-2 rounded text-center">
+              🔔 เสียงดังให้ <strong>Stir 3.30 นาที</strong><br>เมื่อครบ 7 นาทีสามารถนำไปทำออเดอร์ได้ทันที
+            </p>
+          </div>
+
+          <!-- 2. Half Cook -->
+          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded">ระบบที่ 2</span>
+                <i data-lucide="archive" class="w-4 h-4 text-amber-600"></i>
+              </div>
+              <h4 class="font-bold text-slate-800 text-base">2. Half Cook</h4>
+              <p class="text-xs text-slate-500 mt-1">ทอดกึ่งสุกเพื่อเตรียมสต็อกในตู้ CVAP</p>
+              
+              <div class="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-100 text-center">
+                <span class="text-xs text-slate-500 block">เวลาในการทอด</span>
+                <span class="text-2xl font-black text-amber-600 font-mono">3:30 นาที</span>
+              </div>
+            </div>
+            <ul class="text-xs text-slate-600 mt-3 space-y-1 bg-slate-50 p-2 rounded">
+              <li>• นำเข้าตู้ CVAP (140-144°F) <strong>พัก 10 นาที</strong></li>
+              <li>• สามารถใช้ต่อได้ภายใน <strong>50 นาที</strong></li>
+            </ul>
+          </div>
+
+          <!-- 3. Final Cook -->
+          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">ระบบที่ 3</span>
+                <i data-lucide="zap" class="w-4 h-4 text-emerald-600"></i>
+              </div>
+              <h4 class="font-bold text-slate-800 text-base">3. Final Cook</h4>
+              <p class="text-xs text-slate-500 mt-1">ทอดซ้ำจาก Half Cook เพื่อปิดออเดอร์</p>
+              
+              <div class="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-100 text-center">
+                <span class="text-xs text-slate-500 block">เวลาในการทอด</span>
+                <span class="text-2xl font-black text-emerald-600 font-mono">1:30 นาที</span>
+              </div>
+            </div>
+            <div class="text-xs text-slate-600 mt-3 bg-slate-50 p-2 rounded">
+              <p class="font-semibold text-red-600">⚠️ Temp Check:</p>
+              <p>สุ่มวัดอุณหภูมิไก่ 3 จุด (Top-Mid-Bottom) ต้อง <strong class="text-red-600">&gt; 93.3°C</strong> หากไม่ได้ให้ทอดต่อ 15 วินาที</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hygiene Rules -->
+        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
+            <i data-lucide="hand" class="w-5 h-5 text-ws-gold"></i>
+            กฎสุขอนามัยและการแยกการสัมผัส (Hygiene Standard)
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-emerald-900 block font-semibold">มือสะอาด (Clean Hands)</strong>
+                <p class="text-emerald-800">ใช้สำหรับสัมผัสจับตู้, ภาชนะบรรจุสะอาด, หน้าจอ KDS เท่านั้น</p>
+              </div>
+            </div>
+            <div class="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-red-900 block font-semibold">มือสัมผัสวัตถุดิบดิบ (Raw Hands)</strong>
+                <p class="text-red-800">ใช้จับ Tong (ที่คีบ) เพื่อคีบไก่ดิบเท่านั้น ห้ามจับหน้าจอหรือภาชนะสุกเด็ดขาด!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= TAB 3: GUNNER ================= -->
+      <div id="tab-gunner" class="tab-content hidden space-y-6">
+        
+        <div class="border-b border-slate-200 pb-4">
+          <div class="flex items-center gap-2 text-amber-600 font-bold text-sm">
+            <i data-lucide="sparkles" class="w-5 h-5"></i> Position 3
+          </div>
+          <h2 class="text-2xl font-bold text-slate-800">Gunner (การทอด Boneless, Tender, Fries)</h2>
+          <p class="text-xs text-slate-500 mt-1">รับผิดชอบการทอดเมนูไก่ไม่มีกระดูก เทนเดอร์ และเฟรนช์ฟรายส์ เตา 3, 4 และ 5</p>
+        </div>
+
+        <!-- Fridge Temps -->
+        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
+            <i data-lucide="snowflake" class="w-5 h-5 text-blue-500"></i>
+            อุณหภูมิตู้แช่ (Refrigerator & Freezer)
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 class="font-bold text-slate-800 text-sm mb-2">❄️ ตู้แช่แข็ง (Freeze)</h4>
+              <p class="text-xl font-bold text-blue-600 font-mono">-15°C ถึง -18°C</p>
+            </div>
+            <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+              <h4 class="font-bold text-slate-800 text-sm mb-2">🌡️ ตู้แช่เย็น (Chill)</h4>
+              <ul class="text-slate-600 space-y-1">
+                <li>• ตู้แช่เย็นแบบเก่า: <strong class="text-emerald-700">0°C ถึง 4°C</strong></li>
+                <li>• ตู้แช่เย็นแบบใหม่: <strong class="text-emerald-700">1°C ถึง 4°C</strong></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fryers 3 & 4 (Oil Level) -->
+        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
+              <i data-lucide="flame" class="w-5 h-5 text-amber-500"></i>
+              เตา 3 และ 4 (ระดับน้ำมัน Oil Level)
+            </h3>
+            <span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-0.5 rounded-full font-semibold">Boneless & Tender</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Boneless -->
+            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <h4 class="font-bold text-slate-800 text-sm">🍗 Boneless Wings</h4>
+                </div>
+                <div class="space-y-1 text-xs text-slate-600">
+                  <p>• ปริมาณทอดสูงสุด: <strong class="text-slate-800">50 ชิ้น</strong> / ตะกร้า</p>
+                  <p>• เวลาในการทอด: <strong class="text-slate-800">4:30 นาที</strong></p>
+                  <p class="pt-2 text-amber-700 font-medium">🔔 เสียงดังให้ Stir: เก่า 2.30 นาที / ใหม่ 2.15 นาที</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tender -->
+            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <h4 class="font-bold text-slate-800 text-sm">🥩 Chicken Tenders</h4>
+                </div>
+                <div class="space-y-1 text-xs text-slate-600">
+                  <p>• ปริมาณทอดสูงสุด: <strong class="text-slate-800">16 ชิ้น</strong> / ตะกร้า</p>
+                  <p>• เวลาในการทอด: <strong class="text-slate-800">5:15 นาที</strong></p>
+                  <p class="pt-2 text-amber-700 font-medium">🔔 เสียงดังให้ Stir: เก่า 2.15 นาที / ใหม่ 1 นาที</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fryer 5 (Oil Max) -->
+        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
+              <i data-lucide="zap" class="w-5 h-5 text-ws-gold"></i>
+              เตา 5 (ระดับน้ำมัน Oil Max)
+            </h3>
+            <span class="bg-ws-gold/20 text-ws-dark text-xs px-2.5 py-0.5 rounded-full font-semibold">Fries</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Seasoning Fries -->
+            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+              <h4 class="font-bold text-slate-800 text-sm">🍟 Seasoning Fries</h4>
+              <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
+                <li>ขนาดบรรจุถุง: <strong>2.5 kg</strong></li>
+                <li>ปริมาณการทอด: <strong>ครั้งละครึ่งถุง</strong> (เสียงดังให้ Stir)</li>
+                <li>เมื่อทอดเสร็จ: ใส่ผง Seasoning เขย่า <strong class="text-ws-green">10 Shake</strong></li>
+              </ul>
+            </div>
+
+            <!-- Voodoo Fries -->
+            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+              <div class="flex justify-between items-center">
+                <h4 class="font-bold text-slate-800 text-sm">🧀 Voodoo Fries</h4>
+                <span class="text-[10px] bg-red-100 text-red-800 px-1.5 py-0.5 rounded">พักบนไลน์ได้ 5 นาที</span>
+              </div>
+              <p class="text-xs text-slate-500">ขั้นตอนการทำ:</p>
+              <ol class="text-xs text-slate-700 space-y-1 list-decimal list-inside font-medium bg-white p-2.5 rounded border border-slate-200">
+                <li>ทอดเฟรนช์ฟรายส์ครึ่งถุง</li>
+                <li>ใส่ผง Cajun <strong class="text-amber-600">10 Shake</strong></li>
+                <li>ซอส Voodoo <strong class="text-red-600">200 g</strong></li>
+                <li>ซอสชีส <strong class="text-yellow-600">8 เส้น</strong></li>
+                <li>Ranch Sauce <strong class="text-blue-600">13 เส้น</strong></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hygiene Rules -->
+        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
+            <i data-lucide="hand" class="w-5 h-5 text-ws-gold"></i>
+            กฎสุขอนามัยและการแยกการสัมผัส (Hygiene Standard)
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start gap-2">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-emerald-900 block font-semibold">มือสะอาด (Clean Hands)</strong>
+                <p class="text-emerald-800">ใช้สำหรับสัมผัสจับตู้, ภาชนะบรรจุสะอาด, หน้าจอ KDS เท่านั้น</p>
+              </div>
+            </div>
+            <div class="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-red-900 block font-semibold">มือสัมผัสวัตถุดิบดิบ (Raw Hands)</strong>
+                <p class="text-red-800">ใช้จับ Tong (ที่คีบ) เพื่อคีบไก่ดิบเท่านั้น ห้ามจับหน้าจอหรือภาชนะสุกเด็ดขาด!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= TAB 4: WINGMAN ================= -->
+      <div id="tab-wingman" class="tab-content hidden space-y-6">
+        
+        <div class="border-b border-slate-200 pb-4">
+          <div class="flex items-center gap-2 text-blue-600 font-bold text-sm">
+            <i data-lucide="package-check" class="w-5 h-5"></i> Position 4
+          </div>
+          <h2 class="text-2xl font-bold text-slate-800">Wingman (การคลุกซอส และจัดเสิร์ฟ)</h2>
+          <p class="text-xs text-slate-500 mt-1">รับผิดชอบ Sauce & Toss ตักซอส จัดวางไก่ลงภาชนะ และบรรจุห่อเสิร์ฟลูกค้า</p>
+        </div>
+
+        <!-- Ladle Standards -->
+        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
+            <i data-lucide="spoon" class="w-5 h-5 text-blue-600"></i>
+            มาตรฐานขนาดกระบวยตักซอส (Ladle Size Standards)
+          </h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <!-- 2 oz -->
+            <div class="p-3.5 bg-blue-50/60 rounded-lg border border-blue-200">
+              <div class="flex justify-between items-center mb-1.5">
+                <span class="font-bold text-blue-900 text-sm">2 oz. Ladle</span>
+                <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+              </div>
+              <p class="text-slate-600 leading-relaxed">
+                <strong class="text-slate-800">• Atomic, Mango, Hickory, Texas</strong>
+              </p>
+            </div>
+
+            <!-- 1 oz -->
+            <div class="p-3.5 bg-red-50/60 rounded-lg border border-red-200">
+              <div class="flex justify-between items-center mb-1.5">
+                <span class="font-bold text-red-900 text-sm">1 oz. Ladle</span>
+                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+              </div>
+              <p class="text-slate-600 leading-relaxed">
+                <strong class="text-slate-800">• Inferno</strong>
+              </p>
+            </div>
+
+            <!-- 1/2 oz -->
+            <div class="p-3.5 bg-amber-50/60 rounded-lg border border-amber-200">
+              <div class="flex justify-between items-center mb-1.5">
+                <span class="font-bold text-amber-900 text-sm">1/2 oz. Ladle</span>
+                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+              </div>
+              <p class="text-slate-600 leading-relaxed">
+                Homemade Sauces: <br>
+                <strong class="text-slate-800">• Garlic Parm, Lemon Pepper, Hot Honey, Louisiana</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shaker Cap Colors -->
+        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
+            <i data-lucide="palette" class="w-5 h-5 text-ws-gold"></i>
+            สีกระปุกผงปรุงรส (Shaker Cap Color Codes)
+          </h3>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+              <div class="w-6 h-6 rounded-full bg-orange-600 mx-auto mb-1 border border-black/10"></div>
+              <span class="font-bold text-slate-800 block">Lemon Pepper</span>
+              <span class="text-[10px] text-slate-500">ฝาส้มอิฐ</span>
+            </div>
+
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+              <div class="w-6 h-6 rounded-full bg-white border border-slate-300 mx-auto mb-1"></div>
+              <span class="font-bold text-slate-800 block">Parmesan</span>
+              <span class="text-[10px] text-slate-500">ฝาขาว</span>
+            </div>
+
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+              <div class="w-6 h-6 rounded-full bg-yellow-400 mx-auto mb-1 border border-black/10"></div>
+              <span class="font-bold text-slate-800 block">Hot Honey</span>
+              <span class="text-[10px] text-slate-500">ฝาเหลือง</span>
+            </div>
+
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+              <div class="w-6 h-6 rounded-full bg-yellow-500 mx-auto mb-1 border border-black/10"></div>
+              <span class="font-bold text-slate-800 block">Cajun</span>
+              <span class="text-[10px] text-slate-500">ฝาเหลือง</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Placement Rules & Special Warnings -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- 3 Placement Rules -->
+          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+              <i data-lucide="layers" class="w-5 h-5 text-ws-green"></i>
+              3 หลักการจัดวางไก่ลงภาชนะ
+            </h3>
+            <p class="text-xs text-slate-500">เรียงลงจาก <strong class="text-slate-800">มุมซ้ายล่าง</strong> เสมอ:</p>
+            
+            <div class="space-y-2 text-xs">
+              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center">1</span>
+                <div><strong>Shake:</strong> ไก่ใส่ผงปรุงรสวางก่อน</div>
+              </div>
+              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center">2</span>
+                <div><strong>Heat:</strong> รสชาติเผ็ดมากลงตาม</div>
+              </div>
+              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center">3</span>
+                <div><strong>Sweet:</strong> รสหวาน / BBQ อยู่ด้านบนเสมอ</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Special Warnings -->
+          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+              <i data-lucide="alert-circle" class="w-5 h-5 text-red-600"></i>
+              ข้อควรระวังพิเศษก่อนเสิร์ฟ
+            </h3>
+            <div class="space-y-2.5 text-xs">
+              <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <strong class="text-amber-900 block font-semibold">🧄 Garlic Parmesan:</strong>
+                <p class="text-amber-800 mt-0.5">ต้องโรยผง Parmesan <strong class="text-red-600">3 Shake</strong> ก่อนเสิร์ฟ</p>
+              </div>
+
+              <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <strong class="text-red-900 block font-semibold">🔥 Inferno:</strong>
+                <p class="text-red-800 mt-0.5">ต้องโรย Inferno Crumb <strong class="text-red-600">1 ช้อนโต๊ะ</strong> ก่อนเสิร์ฟ</p>
+              </div>
+
+              <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+                <strong class="text-emerald-900 block font-semibold">🥗 ทานที่ร้าน (Dine-in):</strong>
+                <p class="text-emerald-800 mt-0.5">ให้ใช้ <strong class="text-ws-green">Tong สีเขียว</strong></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-6 mt-auto border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+      <p class="font-medium text-slate-300">© 2026 Wingstop Samyan Branch - SOP Web Manual Application</p>
+      <p class="text-[11px] text-slate-500">สำหรับใช้งานภายในสาขาเพื่อการควบคุมมาตรฐานการปฏิบัติงานและสุขอนามัยอาหาร</p>
+    </div>
+  </footer>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    lucide.createIcons();
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.add('hidden');
       });
-    };
+      
+      document.getElementById(tabId).classList.remove('hidden');
+      
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-slate-100', 'text-ws-green', 'active-tab');
+        btn.classList.add('text-slate-700');
+        if (btn.dataset.tab === tabId) {
+          btn.classList.add('bg-slate-100', 'active-tab');
+          btn.classList.remove('text-slate-700');
+        }
+      });
+      
+      document.querySelectorAll('.mob-tab-btn').forEach(btn => {
+        btn.classList.remove('bg-ws-green', 'text-white');
+        btn.classList.add('bg-slate-100', 'text-slate-600');
+        if (btn.dataset.tab === tabId) {
+          btn.classList.remove('bg-slate-100', 'text-slate-600');
+          btn.classList.add('bg-ws-green', 'text-white');
+        }
+      });
 
-    const deleteRecipe = async (id) => {
-      if(confirm('คุณแน่ใจหรือไม่ว่าต้องการลบสูตรอาหารนี้? ข้อมูลจะไม่สามารถกู้คืนได้')) {
-        try {
-          if(myFavorites.includes(id)) {
-             myFavorites = myFavorites.filter(favId => favId !== id);
-             localStorage.setItem('tasteNoteFavorites', JSON.stringify(myFavorites));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    const searchInput = document.getElementById('search-input');
+    const clearSearchBtn = document.getElementById('clear-search');
+    const searchLabel = document.getElementById('search-results-label');
+    const searchQueryText = document.getElementById('search-query-text');
+
+    searchInput.addEventListener('input', function(e) {
+      const term = e.target.value.toLowerCase().trim();
+      
+      if (term.length > 0) {
+        clearSearchBtn.classList.remove('hidden');
+        searchLabel.classList.remove('hidden');
+        searchQueryText.textContent = term;
+        
+        let foundAny = false;
+        document.querySelectorAll('.sop-card').forEach(card => {
+          if (card.textContent.toLowerCase().includes(term)) {
+            card.style.display = 'block';
+            card.classList.add('ring-2', 'ring-ws-gold', 'ring-offset-2');
+            foundAny = true;
+          } else {
+            card.style.display = 'none';
+            card.classList.remove('ring-2', 'ring-ws-gold', 'ring-offset-2');
           }
-
-          await deleteDoc(doc(db, "recipes", id));
-          DOM.modal.classList.remove('active');
-          showToast('ลบรายการเรียบร้อยแล้ว');
-        } catch (error) {
-          alert('เกิดข้อผิดพลาดในการลบ: ' + error.message);
+        });
+        
+        if (foundAny) {
+          document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('hidden'));
+          document.getElementById('tab-overview').classList.add('hidden'); 
         }
+
+      } else {
+        clearSearch();
       }
-    };
-
-    const initEventListeners = () => {
-      document.getElementById('logo-link').addEventListener('click', (e) => {
-        e.preventDefault();
-        showingFavorites = false;
-        document.getElementById('btn-toggle-favorites').classList.remove('active');
-        document.getElementById('explore-title').innerText = "คลังสูตรอาหารประจำครัว";
-        document.getElementById('notice-board').style.display = 'block';
-        switchView('read');
-      });
-
-      document.getElementById('btn-toggle-favorites').addEventListener('click', (e) => {
-        showingFavorites = !showingFavorites;
-        e.currentTarget.classList.toggle('active', showingFavorites);
-        document.getElementById('explore-title').innerText = showingFavorites ? "รายการโปรด / ที่บันทึกไว้" : "คลังสูตรอาหารประจำครัว";
-        document.getElementById('notice-board').style.display = showingFavorites ? 'none' : 'block';
-        switchView('read'); 
-      });
-
-      const debouncedFilter = debounce(applyFilters, 300);
-      DOM.searchInput.addEventListener('input', debouncedFilter);
-
-      document.getElementById('btn-open-add-form').addEventListener('click', openFormForAdd);
-      document.getElementById('btn-cancel-form').addEventListener('click', () => switchView('read'));
-      document.getElementById('btn-close-form-top').addEventListener('click', () => switchView('read'));
-      DOM.recipeForm.addEventListener('submit', handleFormSubmit);
-
-      DOM.viewForm.addEventListener('click', (e) => {
-        const addBtn = e.target.closest('.btn-add-row');
-        if (addBtn) addRow(addBtn.dataset.type);
-
-        const removeBtn = e.target.closest('.btn-remove-row');
-        if (removeBtn) removeBtn.closest('.dynamic-row').remove();
-      });
-
-      DOM.recipeGrid.addEventListener('click', (e) => {
-        const heartBtn = e.target.closest('.btn-heart');
-        if(heartBtn) {
-          toggleFavorite(heartBtn.dataset.id, e);
-          return;
-        }
-
-        const card = e.target.closest('.recipe-card');
-        if (card) openRecipeModal(card.dataset.id);
-      });
-
-      DOM.modalContent.addEventListener('click', (e) => {
-        const editBtn = e.target.closest('.btn-edit-modal');
-        const deleteBtn = e.target.closest('.btn-delete-modal');
-        if (editBtn) openFormForEdit(editBtn.dataset.id);
-        if (deleteBtn) deleteRecipe(deleteBtn.dataset.id);
-      });
-
-      document.getElementById('btn-close-modal').addEventListener('click', () => DOM.modal.classList.remove('active'));
-      DOM.modal.addEventListener('click', (e) => {
-        if (e.target === DOM.modal) DOM.modal.classList.remove('active');
-      });
-    };
-
-    window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
-      initEventListeners();
-      
-      updateClock();
-      setInterval(updateClock, 1000);
-      
-      const q = query(recipesCollection, orderBy("createdAt", "desc"));
-      onSnapshot(q, (snapshot) => {
-        allRecipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        applyFilters(); 
-      });
     });
+
+    function clearSearch() {
+      searchInput.value = '';
+      clearSearchBtn.classList.add('hidden');
+      searchLabel.classList.add('hidden');
+      
+      document.querySelectorAll('.sop-card').forEach(card => {
+        card.style.display = 'block';
+        card.classList.remove('ring-2', 'ring-ws-gold', 'ring-offset-2');
+      });
+      
+      const activeTabBtn = document.querySelector('.nav-btn.active-tab');
+      if(activeTabBtn) {
+        switchTab(activeTabBtn.dataset.tab);
+      } else {
+        switchTab('tab-overview');
+      }
+    }
+
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const sidebar = document.getElementById('sidebar');
+    
+    mobileMenuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+      if(!sidebar.classList.contains('hidden')){
+        sidebar.classList.add('absolute', 'z-40', 'h-[calc(100vh-64px)]', 'shadow-2xl');
+      } else {
+        sidebar.classList.remove('absolute', 'z-40', 'h-[calc(100vh-64px)]', 'shadow-2xl');
+      }
+    });
+
   </script>
 </body>
 </html>
