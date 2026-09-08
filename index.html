@@ -2,9 +2,19 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>SOP Web Manual - Wingstop Samyan</title>
   
+  <!-- ==================== APP ICONS & PWA META TAGS ==================== -->
+  <meta name="theme-color" content="#005A36">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="WS SOP">
+  
+  <!-- App Icons -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23005A36'/><text x='50' y='68' font-family='sans-serif' font-size='45' font-weight='bold' fill='%23FFC72C' text-anchor='middle'>WS</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23005A36'/><text x='50' y='68' font-family='sans-serif' font-size='45' font-weight='bold' fill='%23FFC72C' text-anchor='middle'>WS</text></svg>">
+
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN -->
@@ -42,6 +52,8 @@
     body {
       font-family: 'Prompt', sans-serif;
       background-color: #F4F7F5;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
@@ -57,49 +69,51 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: #005A36;
     }
+    .fade-in {
+      animation: fadeIn 0.25s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
-<body class="text-slate-800 flex flex-col min-h-screen custom-scrollbar">
+<body class="text-slate-800 flex flex-col h-screen overflow-hidden">
 
   <!-- ==================== HEADER / TOP BAR ==================== -->
-  <header class="bg-ws-dark text-white sticky top-0 z-50 shadow-md border-b-2 border-ws-gold">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+  <header class="bg-ws-dark text-white z-50 shadow-md border-b-2 border-ws-gold flex-none pt-[env(safe-area-inset-top)]">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
       
-      <!-- Brand & Mobile Toggle -->
+      <!-- Brand -->
       <div class="flex items-center gap-3">
-        <button id="mobile-menu-btn" class="md:hidden text-slate-200 hover:text-white focus:outline-none">
-          <i data-lucide="menu" class="w-6 h-6"></i>
-        </button>
-        <div class="flex items-center gap-2">
-          <div class="bg-ws-gold text-ws-dark p-1.5 rounded-lg font-black text-lg tracking-wider flex items-center justify-center shadow">
-            WS
-          </div>
-          <div>
-            <h1 class="font-bold text-base sm:text-lg leading-tight text-white flex items-center gap-2">
-              WINGSTOP <span class="text-ws-gold text-xs px-2 py-0.5 rounded bg-ws-darker border border-ws-gold/40">SAMYAN</span>
-            </h1>
-            <p class="text-[10px] text-slate-300 hidden sm:block">Standard Operating Procedure Manual (SOP)</p>
-          </div>
+        <div class="bg-ws-gold text-ws-dark p-1.5 rounded-lg font-black text-lg tracking-wider flex items-center justify-center shadow">
+          WS
+        </div>
+        <div>
+          <h1 class="font-bold text-base sm:text-lg leading-tight text-white flex items-center gap-2">
+            WINGSTOP <span class="text-ws-gold text-xs px-2 py-0.5 rounded bg-ws-darker border border-ws-gold/40">SAMYAN</span>
+          </h1>
+          <p class="text-[10px] text-slate-300 hidden sm:block">Standard Operating Procedure Manual (SOP)</p>
         </div>
       </div>
 
       <!-- Real-time Search Bar -->
       <div class="flex-1 max-w-md relative">
-        <div class="relative">
-          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <div class="relative flex items-center">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 text-slate-400"></i>
           <input 
             type="text" 
             id="search-input" 
             placeholder="ค้นหาขั้นตอน, อุณหภูมิ, วัตถุดิบ..." 
-            class="w-full bg-slate-800/80 text-white placeholder-slate-400 text-sm rounded-full pl-9 pr-8 py-1.5 focus:outline-none focus:ring-2 focus:ring-ws-gold border border-slate-700 transition"
+            class="w-full bg-slate-800/90 text-white placeholder-slate-400 text-sm rounded-xl pl-9 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-ws-gold border border-slate-700 transition"
           >
-          <button id="clear-search" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
-            <i data-lucide="x" class="w-4 h-4"></i>
+          <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3 text-slate-400 hover:text-white">
+            <i data-lucide="x-circle" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
 
-      <!-- Quick Status Badges -->
+      <!-- Quick Status Badges (Desktop) -->
       <div class="hidden lg:flex items-center gap-2 text-xs">
         <div class="bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded-full flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -115,21 +129,21 @@
   </header>
 
   <!-- ==================== MAIN CONTAINER ==================== -->
-  <div class="flex-1 max-w-7xl w-full mx-auto flex flex-col md:flex-row">
+  <div class="flex-1 flex overflow-hidden relative">
     
-    <!-- ==================== SIDEBAR / NAVIGATION ==================== -->
-    <aside id="sidebar" class="bg-white border-r border-slate-200 w-full md:w-64 flex-shrink-0 hidden md:block transition-all">
-      <div class="p-4 sticky top-16 space-y-1">
+    <!-- SIDEBAR NAVIGATION (DESKTOP) -->
+    <aside class="bg-white border-r border-slate-200 w-64 flex-shrink-0 hidden md:flex flex-col h-full overflow-y-auto custom-scrollbar">
+      <div class="p-4 space-y-1">
         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">ตำแหน่งงาน & หมวดหมู่</p>
         
-        <button onclick="switchTab('tab-overview')" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-700 hover:bg-slate-100 active-tab" data-tab="tab-overview">
+        <button onclick="switchTab('tab-overview')" class="nav-btn-desktop w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-700 hover:bg-slate-100 active-tab bg-slate-100 font-bold" data-tab="tab-overview">
           <div class="flex items-center gap-2.5">
             <i data-lucide="layout-dashboard" class="w-4 h-4 text-ws-green"></i>
             <span>ภาพรวม & Quick Matrix</span>
           </div>
         </button>
 
-        <button onclick="switchTab('tab-paratrooper')" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-paratrooper">
+        <button onclick="switchTab('tab-paratrooper')" class="nav-btn-desktop w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-paratrooper">
           <div class="flex items-center gap-2.5">
             <i data-lucide="chef-hat" class="w-4 h-4 text-emerald-600"></i>
             <span>1. Paratrooper</span>
@@ -137,7 +151,7 @@
           <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">Prep</span>
         </button>
 
-        <button onclick="switchTab('tab-bombardier')" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-bombardier">
+        <button onclick="switchTab('tab-bombardier')" class="nav-btn-desktop w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-bombardier">
           <div class="flex items-center gap-2.5">
             <i data-lucide="flame" class="w-4 h-4 text-red-600"></i>
             <span>2. Bombardier</span>
@@ -145,7 +159,7 @@
           <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">Classic</span>
         </button>
 
-        <button onclick="switchTab('tab-gunner')" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-gunner">
+        <button onclick="switchTab('tab-gunner')" class="nav-btn-desktop w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-gunner">
           <div class="flex items-center gap-2.5">
             <i data-lucide="sparkles" class="w-4 h-4 text-amber-600"></i>
             <span>3. Gunner</span>
@@ -153,7 +167,7 @@
           <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">Sides</span>
         </button>
 
-        <button onclick="switchTab('tab-wingman')" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-wingman">
+        <button onclick="switchTab('tab-wingman')" class="nav-btn-desktop w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition text-slate-700 hover:bg-slate-100" data-tab="tab-wingman">
           <div class="flex items-center gap-2.5">
             <i data-lucide="package-check" class="w-4 h-4 text-blue-600"></i>
             <span>4. Wingman</span>
@@ -161,7 +175,7 @@
           <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">Toss</span>
         </button>
 
-        <div class="p-3 mt-6 bg-ws-light rounded-xl border border-ws-green/20">
+        <div class="p-3 mt-6 bg-emerald-50 rounded-xl border border-ws-green/20">
           <p class="text-xs font-semibold text-ws-green flex items-center gap-1">
             <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> ข้อควรระวังสำคัญ
           </p>
@@ -172,26 +186,23 @@
       </div>
     </aside>
 
-    <!-- MOBILE NAVIGATION (HORIZONTAL SCROLL) -->
-    <div class="md:hidden bg-white border-b border-slate-200 overflow-x-auto whitespace-nowrap px-2 py-2 flex gap-1 custom-scrollbar">
-      <button onclick="switchTab('tab-overview')" class="mob-tab-btn px-3 py-1.5 rounded-full text-xs font-medium bg-ws-green text-white" data-tab="tab-overview">ภาพรวม</button>
-      <button onclick="switchTab('tab-paratrooper')" class="mob-tab-btn px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100" data-tab="tab-paratrooper">1. Paratrooper</button>
-      <button onclick="switchTab('tab-bombardier')" class="mob-tab-btn px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100" data-tab="tab-bombardier">2. Bombardier</button>
-      <button onclick="switchTab('tab-gunner')" class="mob-tab-btn px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100" data-tab="tab-gunner">3. Gunner</button>
-      <button onclick="switchTab('tab-wingman')" class="mob-tab-btn px-3 py-1.5 rounded-full text-xs font-medium text-slate-600 bg-slate-100" data-tab="tab-wingman">4. Wingman</button>
-    </div>
-
-    <!-- ==================== CONTENT AREA ==================== -->
-    <main class="flex-1 p-4 sm:p-6 lg:p-8">
+    <!-- MAIN SCROLLABLE CONTENT -->
+    <main id="main-scroll" class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
 
       <!-- SEARCH NOTIFICATION -->
       <div id="search-results-label" class="hidden mb-4 p-3 bg-ws-gold/10 border border-ws-gold/30 rounded-lg text-xs text-ws-dark font-medium flex justify-between items-center">
         <span>กำลังแสดงผลการค้นหาสำหรับ: "<strong id="search-query-text"></strong>"</span>
-        <button onclick="clearSearch()" class="text-ws-green underline">ล้างคำค้นหา</button>
+        <button onclick="clearSearch()" class="text-ws-green underline font-bold">ล้างคำค้นหา</button>
+      </div>
+
+      <!-- SEARCH EMPTY STATE -->
+      <div id="search-empty" class="hidden flex flex-col items-center justify-center py-12 text-slate-400">
+        <i data-lucide="search-x" class="w-12 h-12 mb-3 opacity-40"></i>
+        <p class="text-sm font-medium text-slate-600">ไม่พบขั้นตอนหรือสูตรวัตถุดิบที่คุณค้นหา</p>
       </div>
 
       <!-- ================= TAB 0: OVERVIEW & QUICK MATRIX ================= -->
-      <div id="tab-overview" class="tab-content space-y-6">
+      <div id="tab-overview" class="tab-content fade-in space-y-6">
         
         <!-- Welcome Banner -->
         <div class="bg-gradient-to-r from-ws-dark to-ws-green rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
@@ -207,7 +218,7 @@
 
         <!-- Quick Specs Cards Grid -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div class="sop-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <div class="flex items-center justify-between text-slate-500 mb-2">
               <span class="text-xs font-medium">ความสะอาด (Sanitizer)</span>
               <i data-lucide="droplet" class="w-4 h-4 text-blue-500"></i>
@@ -216,7 +227,7 @@
             <p class="text-[11px] text-slate-500 mt-1">เปลี่ยนน้ำยาลงถังทุกๆ 4 ชม.</p>
           </div>
 
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div class="sop-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <div class="flex items-center justify-between text-slate-500 mb-2">
               <span class="text-xs font-medium">อุณหภูมิเตาทอดหลัก</span>
               <i data-lucide="thermometer" class="w-4 h-4 text-red-500"></i>
@@ -225,7 +236,7 @@
             <p class="text-[11px] text-slate-500 mt-1">เตา 1 - 5 มาตรฐาน</p>
           </div>
 
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div class="sop-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <div class="flex items-center justify-between text-slate-500 mb-2">
               <span class="text-xs font-medium">ตู้ CVAP (Holding)</span>
               <i data-lucide="box" class="w-4 h-4 text-amber-500"></i>
@@ -234,7 +245,7 @@
             <p class="text-[11px] text-slate-500 mt-1">พัก 10 นาที / ใช้ได้ไม่เกิน 50 นาที</p>
           </div>
 
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div class="sop-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <div class="flex items-center justify-between text-slate-500 mb-2">
               <span class="text-xs font-medium">อุณหภูมิสุกขั้นต่ำ</span>
               <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
@@ -312,7 +323,7 @@
       </div>
 
       <!-- ================= TAB 1: PARATROOPER ================= -->
-      <div id="tab-paratrooper" class="tab-content hidden space-y-6">
+      <div id="tab-paratrooper" class="tab-content hidden fade-in space-y-6">
         
         <div class="border-b border-slate-200 pb-4">
           <div class="flex items-center gap-2 text-emerald-700 font-bold text-sm">
@@ -470,7 +481,7 @@
       </div>
 
       <!-- ================= TAB 2: BOMBARDIER ================= -->
-      <div id="tab-bombardier" class="tab-content hidden space-y-6">
+      <div id="tab-bombardier" class="tab-content hidden fade-in space-y-6">
         
         <div class="border-b border-slate-200 pb-4">
           <div class="flex items-center gap-2 text-red-600 font-bold text-sm">
@@ -592,7 +603,7 @@
       </div>
 
       <!-- ================= TAB 3: GUNNER ================= -->
-      <div id="tab-gunner" class="tab-content hidden space-y-6">
+      <div id="tab-gunner" class="tab-content hidden fade-in space-y-6">
         
         <div class="border-b border-slate-200 pb-4">
           <div class="flex items-center gap-2 text-amber-600 font-bold text-sm">
@@ -730,7 +741,7 @@
       </div>
 
       <!-- ================= TAB 4: WINGMAN ================= -->
-      <div id="tab-wingman" class="tab-content hidden space-y-6">
+      <div id="tab-wingman" class="tab-content hidden fade-in space-y-6">
         
         <div class="border-b border-slate-200 pb-4">
           <div class="flex items-center gap-2 text-blue-600 font-bold text-sm">
@@ -830,15 +841,15 @@
             
             <div class="space-y-2 text-xs">
               <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
-                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center">1</span>
+                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center shrink-0">1</span>
                 <div><strong>Shake:</strong> ไก่ใส่ผงปรุงรสวางก่อน</div>
               </div>
               <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
-                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center">2</span>
+                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center shrink-0">2</span>
                 <div><strong>Heat:</strong> รสชาติเผ็ดมากลงตาม</div>
               </div>
               <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
-                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center">3</span>
+                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center shrink-0">3</span>
                 <div><strong>Sweet:</strong> รสหวาน / BBQ อยู่ด้านบนเสมอ</div>
               </div>
             </div>
@@ -874,9 +885,41 @@
     </main>
   </div>
 
-  <!-- ==================== FOOTER ==================== -->
-  <footer class="bg-slate-900 text-slate-400 text-xs py-6 mt-auto border-t border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+  <!-- ==================== MOBILE BOTTOM NAVIGATION (APP BAR) ==================== -->
+  <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 pb-[env(safe-area-inset-bottom)] z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+    <div class="flex justify-around items-center h-16 px-1">
+      
+      <button onclick="switchTab('tab-overview')" class="nav-btn-mobile flex flex-col items-center justify-center w-full h-full text-ws-green" data-tab="tab-overview">
+        <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1 transition-transform"></i>
+        <span class="text-[10px] font-medium">ภาพรวม</span>
+      </button>
+
+      <button onclick="switchTab('tab-paratrooper')" class="nav-btn-mobile flex flex-col items-center justify-center w-full h-full text-slate-400" data-tab="tab-paratrooper">
+        <i data-lucide="chef-hat" class="w-5 h-5 mb-1 transition-transform"></i>
+        <span class="text-[10px] font-medium">1.Prep</span>
+      </button>
+
+      <button onclick="switchTab('tab-bombardier')" class="nav-btn-mobile flex flex-col items-center justify-center w-full h-full text-slate-400" data-tab="tab-bombardier">
+        <i data-lucide="flame" class="w-5 h-5 mb-1 transition-transform"></i>
+        <span class="text-[10px] font-medium">2.Classic</span>
+      </button>
+
+      <button onclick="switchTab('tab-gunner')" class="nav-btn-mobile flex flex-col items-center justify-center w-full h-full text-slate-400" data-tab="tab-gunner">
+        <i data-lucide="sparkles" class="w-5 h-5 mb-1 transition-transform"></i>
+        <span class="text-[10px] font-medium">3.Sides</span>
+      </button>
+
+      <button onclick="switchTab('tab-wingman')" class="nav-btn-mobile flex flex-col items-center justify-center w-full h-full text-slate-400" data-tab="tab-wingman">
+        <i data-lucide="package-check" class="w-5 h-5 mb-1 transition-transform"></i>
+        <span class="text-[10px] font-medium">4.Toss</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- ==================== FOOTER (DESKTOP) ==================== -->
+  <footer class="hidden md:block bg-slate-900 text-slate-400 text-xs py-4 border-t border-slate-800 flex-none">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
       <p class="font-medium text-slate-300">© 2026 Wingstop Samyan Branch - SOP Web Manual Application</p>
       <p class="text-[11px] text-slate-500">สำหรับใช้งานภายในสาขาเพื่อการควบคุมมาตรฐานการปฏิบัติงานและสุขอนามัยอาหาร</p>
     </div>
@@ -887,37 +930,60 @@
     lucide.createIcons();
 
     function switchTab(tabId) {
+      // Hide all tabs
       document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.add('hidden');
+        tab.classList.remove('fade-in');
       });
       
-      document.getElementById(tabId).classList.remove('hidden');
+      // Show selected tab with animation
+      const activeTab = document.getElementById(tabId);
+      if (activeTab) {
+        activeTab.classList.remove('hidden');
+        void activeTab.offsetWidth;
+        activeTab.classList.add('fade-in');
+      }
       
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-slate-100', 'text-ws-green', 'active-tab');
-        btn.classList.add('text-slate-700');
+      // Update Desktop Sidebar Buttons
+      document.querySelectorAll('.nav-btn-desktop').forEach(btn => {
         if (btn.dataset.tab === tabId) {
-          btn.classList.add('bg-slate-100', 'active-tab');
-          btn.classList.remove('text-slate-700');
+          btn.classList.add('bg-slate-100', 'font-bold');
+          btn.querySelector('span').classList.add('text-ws-green');
+        } else {
+          btn.classList.remove('bg-slate-100', 'font-bold');
+          btn.querySelector('span').classList.remove('text-ws-green');
         }
       });
       
-      document.querySelectorAll('.mob-tab-btn').forEach(btn => {
-        btn.classList.remove('bg-ws-green', 'text-white');
-        btn.classList.add('bg-slate-100', 'text-slate-600');
+      // Update Mobile Bottom Nav Buttons
+      document.querySelectorAll('.nav-btn-mobile').forEach(btn => {
+        const icon = btn.querySelector('i');
         if (btn.dataset.tab === tabId) {
-          btn.classList.remove('bg-slate-100', 'text-slate-600');
-          btn.classList.add('bg-ws-green', 'text-white');
+          btn.classList.remove('text-slate-400');
+          btn.classList.add('text-ws-green', 'font-semibold');
+          if (icon) icon.classList.add('scale-110');
+        } else {
+          btn.classList.remove('text-ws-green', 'font-semibold');
+          btn.classList.add('text-slate-400');
+          if (icon) icon.classList.remove('scale-110');
         }
       });
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Scroll back to top
+      document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Clear search state if user clicks a tab
+      if (document.getElementById('search-input').value.trim() !== '') {
+        clearSearch(false);
+      }
     }
 
+    // Real-time Search Logic across ALL SOP cards
     const searchInput = document.getElementById('search-input');
     const clearSearchBtn = document.getElementById('clear-search');
     const searchLabel = document.getElementById('search-results-label');
     const searchQueryText = document.getElementById('search-query-text');
+    const searchEmpty = document.getElementById('search-empty');
 
     searchInput.addEventListener('input', function(e) {
       const term = e.target.value.toLowerCase().trim();
@@ -927,58 +993,52 @@
         searchLabel.classList.remove('hidden');
         searchQueryText.textContent = term;
         
-        let foundAny = false;
+        let foundCount = 0;
         document.querySelectorAll('.sop-card').forEach(card => {
           if (card.textContent.toLowerCase().includes(term)) {
             card.style.display = 'block';
             card.classList.add('ring-2', 'ring-ws-gold', 'ring-offset-2');
-            foundAny = true;
+            foundCount++;
           } else {
             card.style.display = 'none';
             card.classList.remove('ring-2', 'ring-ws-gold', 'ring-offset-2');
           }
         });
         
-        if (foundAny) {
+        if (foundCount > 0) {
+          searchEmpty.classList.add('hidden');
+          // Show all tabs so user can see matched cards in any category
           document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('hidden'));
-          document.getElementById('tab-overview').classList.add('hidden'); 
+        } else {
+          document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+          searchEmpty.classList.remove('hidden');
         }
 
       } else {
-        clearSearch();
+        clearSearch(true);
       }
     });
 
-    function clearSearch() {
+    function clearSearch(restoreTab = true) {
       searchInput.value = '';
       clearSearchBtn.classList.add('hidden');
       searchLabel.classList.add('hidden');
+      searchEmpty.classList.add('hidden');
       
       document.querySelectorAll('.sop-card').forEach(card => {
-        card.style.display = 'block';
+        card.style.display = '';
         card.classList.remove('ring-2', 'ring-ws-gold', 'ring-offset-2');
       });
       
-      const activeTabBtn = document.querySelector('.nav-btn.active-tab');
-      if(activeTabBtn) {
-        switchTab(activeTabBtn.dataset.tab);
-      } else {
-        switchTab('tab-overview');
+      if (restoreTab) {
+        const activeMobileBtn = document.querySelector('.nav-btn-mobile.text-ws-green');
+        if (activeMobileBtn) {
+          switchTab(activeMobileBtn.dataset.tab);
+        } else {
+          switchTab('tab-overview');
+        }
       }
     }
-
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const sidebar = document.getElementById('sidebar');
-    
-    mobileMenuBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('hidden');
-      if(!sidebar.classList.contains('hidden')){
-        sidebar.classList.add('absolute', 'z-40', 'h-[calc(100vh-64px)]', 'shadow-2xl');
-      } else {
-        sidebar.classList.remove('absolute', 'z-40', 'h-[calc(100vh-64px)]', 'shadow-2xl');
-      }
-    });
-
   </script>
 </body>
 </html>
