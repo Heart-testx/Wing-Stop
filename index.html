@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>SOP Web Manual - Wingstop Samyan</title>
   
+  <!-- ==================== CACHE CONTROL METAS (ป้องกันการค้าง Cache บน Home Screen) ==================== -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <!-- ==================== APP ICONS & PWA META TAGS ==================== -->
   <meta name="theme-color" content="#005A36">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -82,30 +87,30 @@
 
   <!-- ==================== HEADER / TOP BAR ==================== -->
   <header class="bg-ws-dark text-white z-50 shadow-md border-b-2 border-ws-gold flex-none pt-[env(safe-area-inset-top)]">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-2 sm:gap-3">
       
       <!-- Brand -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3">
         <div class="bg-ws-gold text-ws-dark p-1.5 rounded-lg font-black text-lg tracking-wider flex items-center justify-center shadow">
           WS
         </div>
         <div>
-          <h1 class="font-bold text-base sm:text-lg leading-tight text-white flex items-center gap-2">
-            WINGSTOP <span class="text-ws-gold text-xs px-2 py-0.5 rounded bg-ws-darker border border-ws-gold/40">SAMYAN</span>
+          <h1 class="font-bold text-sm sm:text-lg leading-tight text-white flex items-center gap-1.5 sm:gap-2">
+            WINGSTOP <span class="text-ws-gold text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded bg-ws-darker border border-ws-gold/40">SAMYAN</span>
           </h1>
           <p class="text-[10px] text-slate-300 hidden sm:block">Standard Operating Procedure Manual (SOP)</p>
         </div>
       </div>
 
       <!-- Real-time Search Bar -->
-      <div class="flex-1 max-w-md relative">
+      <div class="flex-1 max-w-xs sm:max-w-md relative">
         <div class="relative flex items-center">
           <i data-lucide="search" class="w-4 h-4 absolute left-3 text-slate-400"></i>
           <input 
             type="text" 
             id="search-input" 
             placeholder="ค้นหาขั้นตอน, อุณหภูมิ, วัตถุดิบ..." 
-            class="w-full bg-slate-800/90 text-white placeholder-slate-400 text-sm rounded-xl pl-9 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-ws-gold border border-slate-700 transition"
+            class="w-full bg-slate-800/90 text-white placeholder-slate-400 text-xs sm:text-sm rounded-xl pl-9 pr-8 py-1.5 sm:py-2 focus:outline-none focus:ring-2 focus:ring-ws-gold border border-slate-700 transition"
           >
           <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3 text-slate-400 hover:text-white">
             <i data-lucide="x-circle" class="w-4 h-4"></i>
@@ -113,15 +118,29 @@
         </div>
       </div>
 
-      <!-- Quick Status Badges (Desktop) -->
-      <div class="hidden lg:flex items-center gap-2 text-xs">
-        <div class="bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded-full flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Sanitizer: 200-220 PPM
-        </div>
-        <div class="bg-amber-900/60 border border-amber-500/40 text-amber-300 px-3 py-1 rounded-full flex items-center gap-1.5">
-          <i data-lucide="thermometer" class="w-3.5 h-3.5"></i>
-          เตาทอด: 177°C
+      <!-- Header Actions & Badges -->
+      <div class="flex items-center gap-2">
+        <!-- REFRESH BUTTON (ปุ่มอัปเดตโค้ดระบบ) -->
+        <button 
+          onclick="forceRefresh()" 
+          id="refresh-btn" 
+          class="flex items-center gap-1.5 bg-ws-darker hover:bg-slate-800 active:scale-95 text-ws-gold border border-ws-gold/40 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow cursor-pointer shrink-0"
+          title="ดึงข้อมูลอัปเดตล่าสุด"
+        >
+          <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">อัปเดต</span>
+        </button>
+
+        <!-- Quick Status Badges (Desktop) -->
+        <div class="hidden lg:flex items-center gap-2 text-xs">
+          <div class="bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 px-3 py-1 rounded-full flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Sanitizer: 200-220 PPM
+          </div>
+          <div class="bg-amber-900/60 border border-amber-500/40 text-amber-300 px-3 py-1 rounded-full flex items-center gap-1.5">
+            <i data-lucide="thermometer" class="w-3.5 h-3.5"></i>
+            เตาทอด: 177°C
+          </div>
         </div>
       </div>
 
@@ -928,6 +947,37 @@
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
     lucide.createIcons();
+
+    // ==================== FORCE REFRESH & CLEAR CACHE FUNCTION ====================
+    async function forceRefresh() {
+      const icon = document.getElementById('refresh-icon');
+      if (icon) icon.classList.add('animate-spin');
+
+      try {
+        // 1. Clear Service Worker Caches if exist
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(name => caches.delete(name)));
+        }
+
+        // 2. Unregister Service Workers if present
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (let registration of registrations) {
+            await registration.unregister();
+          }
+        }
+      } catch (err) {
+        console.warn("Cache clearing notice:", err);
+      }
+
+      // 3. Force reload page with timestamp query parameter to bypass standalone/PWA cache
+      setTimeout(() => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('v', Date.now());
+        window.location.href = url.toString();
+      }, 300);
+    }
 
     function switchTab(tabId) {
       // Hide all tabs
