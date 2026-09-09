@@ -6,7 +6,7 @@
   <title>SOP Web Manual - Wingstop Samyan</title>
   
   <!-- ==================== CACHE CONTROL METAS (ป้องกันการค้าง Cache บน Home Screen) ==================== -->
-  <meta http-equiv="Cache-Control" conteดnt="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
@@ -261,7 +261,7 @@
               <i data-lucide="box" class="w-4 h-4 text-amber-500"></i>
             </div>
             <p class="text-lg font-bold text-slate-800">140 - 144°C </p>
-            <p class="text-[11px] text-slate-500 mt-1">พัก 10 นาที / ใช้ได้ไม่เกิน 50 นาที</p>
+            <p class="text-[11px] text-slate-500 mt-1">พัก 10 นาที / ใช้ได้ไม่เกิน 50 นาที Stir1:45นาที</p>
           </div>
 
           <div class="sop-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
@@ -511,12 +511,20 @@
         </div>
 
         <!-- Station Specs -->
-        <div class="sop-card bg-gradient-to-r from-red-900 to-slate-900 text-white p-5 rounded-xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="sop-card bg-gradient-to-r from-red-900 to-slate-900 text-white p-5 rounded-xl shadow-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
             <h3 class="font-bold text-lg text-ws-gold">ข้อกำหนดประจำสถานี (Station Specs)</h3>
             <p class="text-xs text-slate-300 mt-0.5">ประจำเตาหมายเลข 1 และ 2</p>
           </div>
           <div class="flex flex-wrap gap-3 text-xs">
+            <div class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+              <span class="text-slate-300 block text-[10px]">ระดับน้ำมันเตา 1</span>
+              <strong class="text-sm font-mono text-ws-gold">Min</strong>
+            </div>
+            <div class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+              <span class="text-slate-300 block text-[10px]">ระดับน้ำมันเตา 2</span>
+              <strong class="text-sm font-mono text-ws-gold">ระหว่าง Minกับoil level</strong>
+            </div>
             <div class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
               <span class="text-slate-300 block text-[10px]">อุณหภูมิเตา</span>
               <strong class="text-sm font-mono text-ws-gold">177°C (±10°C)</strong>
@@ -570,6 +578,7 @@
             <ul class="text-xs text-slate-600 mt-3 space-y-1 bg-slate-50 p-2 rounded">
               <li>• นำเข้าตู้ CVAP (140-144°C ) <strong>พัก 10 นาที</strong></li>
               <li>• สามารถใช้ต่อได้ภายใน <strong>50 นาที</strong></li>
+	            <li>• Stir <strong>1:45นาที นาที</strong></li>
             </ul>
           </div>
 
@@ -655,12 +664,15 @@
 
         <!-- Fryers 3 & 4 (Oil Level) -->
         <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div class="flex items-center justify-between border-b pb-3">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-              <i data-lucide="flame" class="w-5 h-5 text-amber-500"></i>
-              เตา 3 และ 4 (ระดับน้ำมัน Oil Level)
-            </h3>
-            <span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-0.5 rounded-full font-semibold">Boneless & Tender</span>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 gap-2">
+            <div>
+              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
+                <i data-lucide="flame" class="w-5 h-5 text-amber-500"></i>
+                เตา 3 และ 4 (Boneless & Tender)
+              </h3>
+              <p class="text-[11px] text-slate-500 mt-1">เตาที่ 3: ระดับน้ำมัน <strong class="text-amber-700">ระหว่าง Min oil level</strong> | เตาที่ 4: ระดับน้ำมัน <strong class="text-amber-700">oil level</strong></p>
+            </div>
+            <span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-0.5 rounded-full font-semibold w-fit">Boneless & Tender</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -696,12 +708,15 @@
 
         <!-- Fryer 5 (Oil Max) -->
         <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div class="flex items-center justify-between border-b pb-3">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-              <i data-lucide="zap" class="w-5 h-5 text-ws-gold"></i>
-              เตา 5 (ระดับน้ำมัน Oil Max)
-            </h3>
-            <span class="bg-ws-gold/20 text-ws-dark text-xs px-2.5 py-0.5 rounded-full font-semibold">Fries</span>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 gap-2">
+            <div>
+              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
+                <i data-lucide="zap" class="w-5 h-5 text-ws-gold"></i>
+                เตา 5 (Fries)
+              </h3>
+              <p class="text-[11px] text-slate-500 mt-1">เตาที่ 5: ระดับน้ำมัน <strong class="text-ws-dark font-bold">Max</strong></p>
+            </div>
+            <span class="bg-ws-gold/20 text-ws-dark text-xs px-2.5 py-0.5 rounded-full font-semibold w-fit">Fries</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -710,7 +725,7 @@
               <h4 class="font-bold text-slate-800 text-sm">🍟 Seasoning Fries</h4>
               <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
                 <li>ขนาดบรรจุถุง: <strong>2.5 kg</strong></li>
-                <li>ปริมาณการทอด: <strong>ครั้งละครึ่งถุง</strong> (เสียงดังให้ Stir)</li>
+                <li>ปริมาณการทอด: <strong>ครั้งละครึ่งถุง</strong> (เสียงดังให้ Stir ตอน1:45นาที)</li>
                 <li>เมื่อทอดเสร็จ: ใส่ผง Seasoning เขย่า <strong class="text-ws-green">10 Shake</strong></li>
               </ul>
             </div>
@@ -728,6 +743,7 @@
                 <li>ซอส Voodoo <strong class="text-red-600">200 g</strong></li>
                 <li>ซอสชีส <strong class="text-yellow-600">8 เส้น</strong></li>
                 <li>Ranch Sauce <strong class="text-blue-600">13 เส้น</strong></li>
+		<li><strong class="text-green-600">Stir ตอน1:45นาที </strong></li>
               </ol>
             </div>
           </div>
