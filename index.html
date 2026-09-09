@@ -54,15 +54,25 @@
   </script>
   
   <style>
+    * {
+      touch-action: manipulation;
+    }
     body {
       font-family: 'Prompt', sans-serif;
       background-color: #F4F7F5;
       -webkit-tap-highlight-color: transparent;
       overscroll-behavior-y: none;
     }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
     .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 4px;
+      height: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
       background: #f1f1f1;
@@ -75,10 +85,10 @@
       background: #005A36;
     }
     .fade-in {
-      animation: fadeIn 0.25s ease-in-out;
+      animation: fadeIn 0.2s ease-out;
     }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
+      from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
@@ -87,16 +97,16 @@
 
   <!-- ==================== HEADER / TOP BAR ==================== -->
   <header class="bg-ws-dark text-white z-50 shadow-md border-b-2 border-ws-gold flex-none pt-[env(safe-area-inset-top)]">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-2 sm:gap-3">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between gap-2">
       
       <!-- Brand -->
-      <div class="flex items-center gap-2 sm:gap-3">
-        <div class="bg-ws-gold text-ws-dark p-1.5 rounded-lg font-black text-lg tracking-wider flex items-center justify-center shadow">
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="bg-ws-gold text-ws-dark p-1 sm:p-1.5 rounded-lg font-black text-sm sm:text-lg tracking-wider flex items-center justify-center shadow">
           WS
         </div>
         <div>
-          <h1 class="font-bold text-sm sm:text-lg leading-tight text-white flex items-center gap-1.5 sm:gap-2">
-            WINGSTOP <span class="text-ws-gold text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded bg-ws-darker border border-ws-gold/40">SAMYAN</span>
+          <h1 class="font-bold text-xs sm:text-base leading-tight text-white flex items-center gap-1">
+            WINGSTOP <span class="text-ws-gold text-[9px] sm:text-[10px] px-1 py-0.2 rounded bg-ws-darker border border-ws-gold/40">SAMYAN</span>
           </h1>
           <p class="text-[10px] text-slate-300 hidden sm:block">Standard Operating Procedure Manual (SOP)</p>
         </div>
@@ -105,26 +115,26 @@
       <!-- Real-time Search Bar -->
       <div class="flex-1 max-w-xs sm:max-w-md relative">
         <div class="relative flex items-center">
-          <i data-lucide="search" class="w-4 h-4 absolute left-3 text-slate-400"></i>
+          <i data-lucide="search" class="w-3.5 h-3.5 sm:w-4 sm:h-4 absolute left-2.5 text-slate-400"></i>
           <input 
             type="text" 
             id="search-input" 
-            placeholder="ค้นหาขั้นตอน, ซอส, อุณหภูมิ, วัตถุดิบ..." 
-            class="w-full bg-slate-800/90 text-white placeholder-slate-400 text-xs sm:text-sm rounded-xl pl-9 pr-8 py-1.5 sm:py-2 focus:outline-none focus:ring-2 focus:ring-ws-gold border border-slate-700 transition"
+            placeholder="ค้นหาขั้นตอน, ซอส, อุณหภูมิ..." 
+            class="w-full bg-slate-800/90 text-white placeholder-slate-400 text-xs sm:text-sm rounded-xl pl-8 sm:pl-9 pr-7 py-1.5 focus:outline-none focus:ring-2 focus:ring-ws-gold border border-slate-700 transition"
           >
-          <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3 text-slate-400 hover:text-white">
-            <i data-lucide="x-circle" class="w-4 h-4"></i>
+          <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-2 text-slate-400 hover:text-white p-1">
+            <i data-lucide="x-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
           </button>
         </div>
       </div>
 
       <!-- Header Actions & Badges -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 shrink-0">
         <!-- REFRESH BUTTON -->
         <button 
           onclick="forceRefresh()" 
           id="refresh-btn" 
-          class="flex items-center gap-1.5 bg-ws-darker hover:bg-slate-800 active:scale-95 text-ws-gold border border-ws-gold/40 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition shadow cursor-pointer shrink-0"
+          class="flex items-center justify-center gap-1 bg-ws-darker hover:bg-slate-800 active:scale-95 text-ws-gold border border-ws-gold/40 p-2 sm:px-2.5 sm:py-1.5 rounded-xl text-xs font-semibold transition shadow cursor-pointer"
           title="ดึงข้อมูลอัปเดตล่าสุด"
         >
           <i data-lucide="refresh-cw" id="refresh-icon" class="w-4 h-4"></i>
@@ -206,7 +216,7 @@
     </aside>
 
     <!-- MAIN SCROLLABLE CONTENT -->
-    <main id="main-scroll" class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
+    <main id="main-scroll" class="flex-1 overflow-y-auto custom-scrollbar p-3.5 sm:p-6 lg:p-8 pb-24 md:pb-8">
 
       <!-- SEARCH NOTIFICATION -->
       <div id="search-results-label" class="hidden mb-4 p-3 bg-ws-gold/10 border border-ws-gold/30 rounded-lg text-xs text-ws-dark font-medium flex justify-between items-center">
@@ -221,153 +231,175 @@
       </div>
 
       <!-- ================= TAB 0: OVERVIEW & QUICK MATRIX ================= -->
-      <div id="tab-overview" class="tab-content fade-in space-y-6">
+      <div id="tab-overview" class="tab-content fade-in space-y-4 sm:space-y-6">
         
         <!-- Welcome Banner -->
-        <div class="bg-gradient-to-r from-ws-dark to-ws-green rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+        <div class="bg-gradient-to-r from-ws-dark to-ws-green rounded-2xl p-4 sm:p-6 text-white shadow-lg relative overflow-hidden">
           <div class="relative z-10">
-            <span class="bg-ws-gold text-ws-dark font-bold text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider">Wingstop Samyan Branch</span>
-            <h2 class="text-2xl sm:text-3xl font-bold mt-2">คู่มือการปฏิบัติงานมาตรฐาน (SOP Manual)</h2>
-            <p class="text-slate-200 text-xs sm:text-sm mt-1 max-w-2xl">
-              ระบบศูนย์รวมขั้นตอนการปฏิบัติงานสำหรับพนักงานทุกตำแหน่ง เพื่อรักษามาตรฐานความอร่อย ความสะอาด และความปลอดภัยสูงสุด
+            <span class="bg-ws-gold text-ws-dark font-bold text-[10px] sm:text-[11px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">Wingstop Samyan Branch</span>
+            <h2 class="text-xl sm:text-3xl font-bold mt-1.5 sm:mt-2">คู่มือการปฏิบัติงานมาตรฐาน (SOP)</h2>
+            <p class="text-slate-200 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
+              ระบบศูนย์รวมขั้นตอนการปฏิบัติงานสำหรับพนักงานทุกตำแหน่ง เพื่อรักษามาตรฐานความอร่อย และความปลอดภัยสูงสุด
             </p>
           </div>
-          <i data-lucide="utensils" class="absolute -right-6 -bottom-6 w-48 h-48 text-white/5 pointer-events-none"></i>
+          <i data-lucide="utensils" class="absolute -right-6 -bottom-6 w-36 h-36 sm:w-48 sm:h-48 text-white/5 pointer-events-none"></i>
         </div>
 
         <!-- Quick Specs Cards Grid -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="sop-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-            <div class="flex items-center justify-between text-slate-500 mb-2">
-              <span class="text-xs font-medium">ความสะอาด (Sanitizer)</span>
-              <i data-lucide="droplet" class="w-4 h-4 text-blue-500"></i>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+          <div class="sop-card bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] sm:text-xs font-medium">ความสะอาด (Sanitizer)</span>
+              <i data-lucide="droplet" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500 shrink-0"></i>
             </div>
-            <p class="text-lg font-bold text-slate-800">200 - 220 PPM</p>
-            <p class="text-[11px] text-slate-500 mt-1">เปลี่ยนน้ำยาลงถังทุกๆ 4 ชม.</p>
+            <p class="text-base sm:text-lg font-bold text-slate-800">200 - 220 PPM</p>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">เปลี่ยนน้ำยาลงถังทุกๆ 4 ชม.</p>
           </div>
 
-          <div class="sop-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-            <div class="flex items-center justify-between text-slate-500 mb-2">
-              <span class="text-xs font-medium">อุณหภูมิเตาทอดหลัก</span>
-              <i data-lucide="thermometer" class="w-4 h-4 text-red-500"></i>
+          <div class="sop-card bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] sm:text-xs font-medium">อุณหภูมิเตาทอดหลัก</span>
+              <i data-lucide="thermometer" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500 shrink-0"></i>
             </div>
-            <p class="text-lg font-bold text-slate-800">177°C <span class="text-xs font-normal text-slate-500">(±10°C)</span></p>
-            <p class="text-[11px] text-slate-500 mt-1">เตา 1 - 5 มาตรฐาน</p>
+            <p class="text-base sm:text-lg font-bold text-slate-800">177°C <span class="text-xs font-normal text-slate-500">(±10°C)</span></p>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">เตา 1 - 5 มาตรฐาน</p>
           </div>
 
-          <div class="sop-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-            <div class="flex items-center justify-between text-slate-500 mb-2">
-              <span class="text-xs font-medium">ตู้ CVAP (Holding)</span>
-              <i data-lucide="box" class="w-4 h-4 text-amber-500"></i>
+          <div class="sop-card bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] sm:text-xs font-medium">ตู้ CVAP (Holding)</span>
+              <i data-lucide="box" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 shrink-0"></i>
             </div>
-            <p class="text-lg font-bold text-slate-800">140 - 144°C ค่าความชื้นเลข8</p>
-            <p class="text-[11px] text-slate-500 mt-1"></p>
+            <p class="text-base sm:text-lg font-bold text-slate-800">140 - 144°C</p>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">ค่าความชื้นเลข 8</p>
           </div>
 
-          <div class="sop-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-            <div class="flex items-center justify-between text-slate-500 mb-2">
-              <span class="text-xs font-medium">อุณหภูมิสุกขั้นต่ำ</span>
-              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+          <div class="sop-card bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] sm:text-xs font-medium">อุณหภูมิสุกขั้นต่ำ</span>
+              <i data-lucide="check-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 shrink-0"></i>
             </div>
-            <p class="text-lg font-bold text-red-600">&gt; 93.3°C</p>
-            <p class="text-[11px] text-slate-500 mt-1">สุ่มวัด 3 จุด (Top-Mid-Bottom)</p>
+            <p class="text-base sm:text-lg font-bold text-red-600">&gt; 93.3°C</p>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">สุ่มวัด 3 จุด (Top-Mid-Bottom)</p>
           </div>
         </div>
 
-        <!-- QUICK SAUCE HEAT SCALE BAR -->
-        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+        <!-- QUICK SAUCE HEAT SCALE BAR (OPTIMIZED FOR MOBILE SLIDER) -->
+        <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
           <div class="flex items-center justify-between border-b pb-2">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-              <i data-lucide="flame" class="w-5 h-5 text-red-600"></i>
-              ลำดับระดับความเผ็ดของซอส 9 รสชาติ (Heat Scale Level 1 - 9)
+            <h3 class="font-bold text-slate-800 flex items-center gap-1.5 text-sm sm:text-base">
+              <i data-lucide="flame" class="w-4 h-4 sm:w-5 sm:h-5 text-red-600 shrink-0"></i>
+              ลำดับระดับความเผ็ดซอส 9 รสชาติ
             </h3>
-            <button onclick="switchTab('tab-wingman')" class="text-xs text-ws-green hover:underline font-semibold flex items-center gap-1 shrink-0">
-              ดูตารางละเอียดใน Wingman <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            <button onclick="switchTab('tab-wingman')" class="text-[11px] sm:text-xs text-ws-green hover:underline font-semibold flex items-center gap-1 shrink-0">
+              ดูตารางใน Wingman <i data-lucide="arrow-right" class="w-3 h-3"></i>
             </button>
           </div>
           
-          <div class="flex flex-wrap items-center gap-2 text-xs pt-1">
-            <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium">1. Garlic Parmesan</span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium">2. Lemon Pepper</span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 border border-amber-200 font-medium">3. Hickory Smoked BBQ</span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            <span class="px-2.5 py-1 rounded-lg bg-amber-200 text-amber-900 border border-amber-300 font-medium">4. Hot Honey Rub</span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            <span class="px-2.5 py-1 rounded-lg bg-orange-100 text-orange-800 border border-orange-200 font-medium">5. Louisiana Rub</span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            <span class="px-2.5 py-1 rounded-lg bg-red-100 text-red-800 border border-red-200 font-medium">6. Texas Buffalo</span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            <span class="px-2.5 py-1 rounded-lg bg-red-200 text-red-900 border border-red-300 font-medium">7. Mango Habanero</span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            <span class="px-2.5 py-1 rounded-lg bg-red-600 text-white font-bold">8. Inferno</span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-            <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-ws-gold font-bold border border-slate-700">9. Atomic Blast 🔥</span>
+          <!-- MOBILE HORIZONTAL SCROLL TRACK -->
+          <div class="relative">
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 snap-x snap-mandatory">
+              <div class="snap-start shrink-0 px-2.5 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium text-xs flex items-center gap-1.5">
+                <span>1. Garlic Parmesan</span>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 shrink-0"></i>
+              <div class="snap-start shrink-0 px-2.5 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium text-xs flex items-center gap-1.5">
+                <span>2. Lemon Pepper</span>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 shrink-0"></i>
+              <div class="snap-start shrink-0 px-2.5 py-1.5 rounded-xl bg-amber-100 text-amber-800 border border-amber-200 font-medium text-xs flex items-center gap-1.5">
+                <span>3. Hickory Smoked BBQ</span>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 shrink-0"></i>
+              <div class="snap-start shrink-0 px-2.5 py-1.5 rounded-xl bg-amber-200 text-amber-900 border border-amber-300 font-medium text-xs flex items-center gap-1.5">
+                <span>4. Hot Honey Rub</span>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 shrink-0"></i>
+              <div class="snap-start shrink-0 px-2.5 py-1.5 rounded-xl bg-orange-100 text-orange-800 border border-orange-200 font-medium text-xs flex items-center gap-1.5">
+                <span>5. Louisiana Rub</span>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 shrink-0"></i>
+              <div class="snap-start shrink-0 px-2.5 py-1.5 rounded-xl bg-red-100 text-red-800 border border-red-200 font-medium text-xs flex items-center gap-1.5">
+                <span>6. Texas Buffalo</span>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 shrink-0"></i>
+              <div class="snap-start shrink-0 px-2.5 py-1.5 rounded-xl bg-red-200 text-red-900 border border-red-300 font-medium text-xs flex items-center gap-1.5">
+                <span>7. Mango Habanero</span>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 shrink-0"></i>
+              <div class="snap-start shrink-0 px-2.5 py-1.5 rounded-xl bg-red-600 text-white font-bold text-xs flex items-center gap-1.5">
+                <span>8. Inferno</span>
+              </div>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 shrink-0"></i>
+              <div class="snap-start shrink-0 px-2.5 py-1.5 rounded-xl bg-slate-900 text-ws-gold font-bold text-xs border border-slate-700 flex items-center gap-1.5">
+                <span>9. Atomic Blast 🔥</span>
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-400 text-right mt-1 sm:hidden">👈 เลื่อนซ้าย-ขวา เพื่อดูทั้งหมด</p>
           </div>
         </div>
 
         <!-- Role Jump Grid -->
-        <h3 class="text-base font-bold text-slate-800 pt-2">หมวดหมู่ขั้นตอนการทำงาน (SOP Roles)</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h3 class="text-sm sm:text-base font-bold text-slate-800 pt-1">หมวดหมู่ขั้นตอนการทำงาน (SOP Roles)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-4">
           
-          <div onclick="switchTab('tab-paratrooper')" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group">
+          <div onclick="switchTab('tab-paratrooper')" class="cursor-pointer bg-white p-4 rounded-xl border border-slate-200 shadow-sm active:bg-slate-50 transition group">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div class="p-3 rounded-lg bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition">
-                  <i data-lucide="chef-hat" class="w-6 h-6"></i>
+                <div class="p-2.5 rounded-lg bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition">
+                  <i data-lucide="chef-hat" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
                 <div>
-                  <h4 class="font-bold text-slate-800 group-hover:text-ws-green transition">1. Paratrooper (การเตรียมวัตถุดิบ)</h4>
-                  <p class="text-xs text-slate-500">เตรียม Homemade Sauces, Ranch, Dip, Coleslaw และ Sanitizer</p>
+                  <h4 class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-ws-green transition">1. Paratrooper (การเตรียมวัตถุดิบ)</h4>
+                  <p class="text-[11px] text-slate-500 mt-0.5">เตรียม Homemade Sauces, Ranch, Dip, Coleslaw และ Sanitizer</p>
                 </div>
               </div>
-              <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition"></i>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 shrink-0"></i>
             </div>
           </div>
 
-          <div onclick="switchTab('tab-bombardier')" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group">
+          <div onclick="switchTab('tab-bombardier')" class="cursor-pointer bg-white p-4 rounded-xl border border-slate-200 shadow-sm active:bg-slate-50 transition group">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div class="p-3 rounded-lg bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white transition">
-                  <i data-lucide="flame" class="w-6 h-6"></i>
+                <div class="p-2.5 rounded-lg bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white transition">
+                  <i data-lucide="flame" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
                 <div>
-                  <h4 class="font-bold text-slate-800 group-hover:text-ws-green transition">2. Bombardier (ทอด Classic Wings)</h4>
-                  <p class="text-xs text-slate-500">ทอดปีก-น่อง เตา 1-2 (Full Cook, Half Cook, Final Cook)</p>
+                  <h4 class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-ws-green transition">2. Bombardier (ทอด Classic Wings)</h4>
+                  <p class="text-[11px] text-slate-500 mt-0.5">ทอดปีก-น่อง เตา 1-2 (Full Cook, Half Cook, Final Cook)</p>
                 </div>
               </div>
-              <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition"></i>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 shrink-0"></i>
             </div>
           </div>
 
-          <div onclick="switchTab('tab-gunner')" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group">
+          <div onclick="switchTab('tab-gunner')" class="cursor-pointer bg-white p-4 rounded-xl border border-slate-200 shadow-sm active:bg-slate-50 transition group">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div class="p-3 rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition">
-                  <i data-lucide="sparkles" class="w-6 h-6"></i>
+                <div class="p-2.5 rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition">
+                  <i data-lucide="sparkles" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
                 <div>
-                  <h4 class="font-bold text-slate-800 group-hover:text-ws-green transition">3. Gunner (Boneless, Tender, Fries)</h4>
-                  <p class="text-xs text-slate-500">ทอดเตา 3-5 และการจัดการอุณหภูมิตู้แช่</p>
+                  <h4 class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-ws-green transition">3. Gunner (Boneless, Tender, Fries)</h4>
+                  <p class="text-[11px] text-slate-500 mt-0.5">ทอดเตา 3-5 และการจัดการอุณหภูมิตู้แช่</p>
                 </div>
               </div>
-              <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition"></i>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 shrink-0"></i>
             </div>
           </div>
 
-          <div onclick="switchTab('tab-wingman')" class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group">
+          <div onclick="switchTab('tab-wingman')" class="cursor-pointer bg-white p-4 rounded-xl border border-slate-200 shadow-sm active:bg-slate-50 transition group">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div class="p-3 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition">
-                  <i data-lucide="package-check" class="w-6 h-6"></i>
+                <div class="p-2.5 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition">
+                  <i data-lucide="package-check" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
                 <div>
-                  <h4 class="font-bold text-slate-800 group-hover:text-ws-green transition">4. Wingman (การคลุกซอส & จัดเสิร์ฟ)</h4>
-                  <p class="text-xs text-slate-500">Sauce & Toss, ตารางระดับความเผ็ด 9 ซอส, ตักกระบวยซอส</p>
+                  <h4 class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-ws-green transition">4. Wingman (การคลุกซอส & จัดเสิร์ฟ)</h4>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Sauce & Toss, ตารางระดับความเผ็ด 9 ซอส, ตักกระบวยซอส</p>
                 </div>
               </div>
-              <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition"></i>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 shrink-0"></i>
             </div>
           </div>
 
@@ -375,112 +407,103 @@
       </div>
 
       <!-- ================= TAB 1: PARATROOPER ================= -->
-      <div id="tab-paratrooper" class="tab-content hidden fade-in space-y-6">
+      <div id="tab-paratrooper" class="tab-content hidden fade-in space-y-4 sm:space-y-6">
         
-        <div class="border-b border-slate-200 pb-4">
-          <div class="flex items-center gap-2 text-emerald-700 font-bold text-sm">
-            <i data-lucide="chef-hat" class="w-5 h-5"></i> Position 1
+        <div class="border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2 text-emerald-700 font-bold text-xs sm:text-sm">
+            <i data-lucide="chef-hat" class="w-4 h-4 sm:w-5 sm:h-5"></i> Position 1
           </div>
-          <h2 class="text-2xl font-bold text-slate-800">Paratrooper (การเตรียมวัตถุดิบและอุปกรณ์)</h2>
-          <p class="text-xs text-slate-500 mt-1">รับผิดชอบงานความสะอาด น้ำยาฆ่าเชื้อ การผสม Homemade Sauces และการเตรียม Sides</p>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-0.5">Paratrooper (การเตรียมวัตถุดิบและอุปกรณ์)</h2>
+          <p class="text-xs text-slate-500 mt-0.5">รับผิดชอบงานความสะอาด น้ำยาฆ่าเชื้อ การผสม Homemade Sauces และการเตรียม Sides</p>
         </div>
 
         <!-- 1. Sanitation -->
-        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+        <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
           <div class="flex items-center justify-between">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-              <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i>
+            <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm sm:text-base">
+              <i data-lucide="shield-check" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0"></i>
               งานความสะอาด & น้ำยา Sanitizer (Q10)
             </h3>
-            <span class="bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full border border-blue-200 font-semibold">สุขอนามัย</span>
+            <span class="bg-blue-50 text-blue-700 text-[10px] sm:text-xs px-2 py-0.5 rounded-full border border-blue-200 font-semibold">สุขอนามัย</span>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs bg-slate-50 p-4 rounded-lg">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-slate-50 p-3.5 rounded-lg">
             <div>
               <p class="text-slate-500">ค่ามาตรฐานความเข้มข้น (PPM):</p>
-              <p class="text-base font-bold text-emerald-700">200 - 220 PPM</p>
+              <p class="text-sm sm:text-base font-bold text-emerald-700">200 - 220 PPM</p>
             </div>
             <div>
               <p class="text-slate-500">รอบการเปลี่ยนน้ำยา:</p>
-              <p class="text-base font-bold text-slate-800">เปลี่ยนน้ำลงถังทุกๆ <span class="text-red-600">4 ชั่วโมง</span></p>
+              <p class="text-sm sm:text-base font-bold text-slate-800">เปลี่ยนน้ำลงถังทุกๆ <span class="text-red-600">4 ชั่วโมง</span></p>
             </div>
           </div>
         </div>
 
         <!-- 2. Homemade Sauces (4 Flavors) -->
-        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+        <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3.5">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-                <i data-lucide="flask-conical" class="w-5 h-5 text-amber-500"></i>
+              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm sm:text-base">
+                <i data-lucide="flask-conical" class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0"></i>
                 การเตรียม Homemade Sauces (4 รสชาติหลัก)
               </h3>
               <p class="text-xs text-slate-500">สูตรการผสมประจำวัน</p>
             </div>
             <!-- Stat Badge -->
-            <div class="flex flex-wrap gap-1.5 text-[11px]">
-              <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded border border-amber-200">พัก24ชม.</span>
-              <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">จัดเก็บ 7 วัน (แบ่งเปิดใช้ 6 วัน)</span>
-              <span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">.....</span>
+            <div class="flex flex-wrap gap-1.5 text-[10px] sm:text-[11px]">
+              <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded border border-amber-200">พัก 24 ชม.</span>
+              <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">จัดเก็บ 7 วัน (แบ่งใช้ 6 วัน)</span>
             </div>
           </div>
 
-          <!-- อุปกรณ์การเตรียม Homemade Sauces (NEW PATCH) -->
-          <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
-            <h4 class="font-bold text-slate-800 text-sm mb-2 flex items-center gap-1.5">
-              <i data-lucide="wrench" class="w-4 h-4 text-slate-500"></i>
+          <!-- อุปกรณ์การเตรียม Homemade Sauces -->
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <h4 class="font-bold text-slate-800 text-xs sm:text-sm mb-1.5 flex items-center gap-1.5">
+              <i data-lucide="wrench" class="w-3.5 h-3.5 text-slate-500 shrink-0"></i>
               อุปกรณ์ที่ต้องใช้
             </h4>
-            <ul class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-xs text-slate-600">
-              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green"></div> ถังควอส 7.5 ลิตร หรือ 8qt</li>
-              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green"></div> คอนเทนเนอร์ใสพลาสติก 1/3 (2 อัน)</li>
-              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green"></div> เหยือกตวง 1 ลิตร</li>
-              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green"></div> ตะกร้อมือ</li>
-              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green"></div> ไม้พาย (Spatula)</li>
-              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green"></div> ตราชั่ง</li>
-              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green"></div> กรรไกร</li>
+            <ul class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 text-xs text-slate-600">
+              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green shrink-0"></div> ถังควอส 7.5 ลิตร/8qt</li>
+              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green shrink-0"></div> คอนเทนเนอร์ใส 1/3 (2อัน)</li>
+              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green shrink-0"></div> เหยือกตวง 1 ลิตร</li>
+              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green shrink-0"></div> ตะกร้อมือ</li>
+              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green shrink-0"></div> ไม้พาย (Spatula)</li>
+              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green shrink-0"></div> ตราชั่ง</li>
+              <li class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-ws-green shrink-0"></div> กรรไกร</li>
             </ul>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <!-- Garlic Parmesan -->
-            <div class="border border-slate-200 rounded-lg p-3.5 bg-amber-50/30">
-              <div class="flex justify-between items-center mb-1">
-                <h4 class="font-bold text-slate-800 text-sm">🧄 Garlic Parmesan</h4>
-              </div>
-              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-2">
+            <div class="border border-slate-200 rounded-lg p-3 bg-amber-50/30">
+              <h4 class="font-bold text-slate-800 text-xs sm:text-sm">🧄 Garlic Parmesan</h4>
+              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-1.5">
                 <li>Butter oil: <strong>2 Gal (4 L)</strong></li>
                 <li>ผง Garlic: <strong>260 g</strong></li>
               </ul>
             </div>
 
             <!-- Lemon Pepper -->
-            <div class="border border-slate-200 rounded-lg p-3.5 bg-yellow-50/30">
-              <div class="flex justify-between items-center mb-1">
-                <h4 class="font-bold text-slate-800 text-sm">🍋 Lemon Pepper</h4>
-              </div>
-              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-2">
+            <div class="border border-slate-200 rounded-lg p-3 bg-yellow-50/30">
+              <h4 class="font-bold text-slate-800 text-xs sm:text-sm">🍋 Lemon Pepper</h4>
+              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-1.5">
                 <li>Butter oil: <strong>2 Gal (4 L)</strong></li>
                 <li>ผง Lemon: <strong>300 g</strong></li>
               </ul>
             </div>
 
             <!-- Hot Honey Rub -->
-            <div class="border border-slate-200 rounded-lg p-3.5 bg-orange-50/30">
-              <div class="flex justify-between items-center mb-1">
-                <h4 class="font-bold text-slate-800 text-sm">🍯 Hot Honey Rub</h4>
-              </div>
-              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-2">
+            <div class="border border-slate-200 rounded-lg p-3 bg-orange-50/30">
+              <h4 class="font-bold text-slate-800 text-xs sm:text-sm">🍯 Hot Honey Rub</h4>
+              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-1.5">
                 <li>Butter oil: <strong>1 Gal (2 L)</strong></li>
                 <li>ผง Honey: <strong>400 g</strong></li>
               </ul>
             </div>
 
             <!-- Louisiana Rub -->
-            <div class="border border-slate-200 rounded-lg p-3.5 bg-red-50/30">
-              <div class="flex justify-between items-center mb-1">
-                <h4 class="font-bold text-slate-800 text-sm">🌶️ Louisiana Rub</h4>
-              </div>
-              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-2">
+            <div class="border border-slate-200 rounded-lg p-3 bg-red-50/30">
+              <h4 class="font-bold text-slate-800 text-xs sm:text-sm">🌶️ Louisiana Rub</h4>
+              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside mt-1.5">
                 <li>Butter oil: <strong>2 Gal (4 L)</strong></li>
                 <li>ผง Garlic: <strong>110 g</strong> + ผง Cajun: <strong>250 g</strong></li>
               </ul>
@@ -489,26 +512,23 @@
         </div>
 
         <!-- 3. Ranch & Cheese Dip -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <!-- Ranch -->
-          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-            <div class="flex justify-between items-start">
-              <h3 class="font-bold text-slate-800 text-base">🥣 Ranch Sauce</h3>
-              <span class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded">.....</span>
-            </div>
+          <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-2.5">
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base">🥣 Ranch Sauce</h3>
             <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside bg-slate-50 p-3 rounded-lg">
               <li>นมจืด: <strong>2 Gal (4 L)</strong></li>
               <li>Mayonnaise: <strong>3 L</strong></li>
               <li>ผง Ranch: <strong>454 g</strong></li>
-              <li class="text-emerald-700 font-semibold mt-2">⚠️ แช่เย็นอย่างน้อย 1 ชั่วโมงก่อนนำออกมาใช้</li>
+              <li class="text-emerald-700 font-semibold mt-1">⚠️ แช่เย็นอย่างน้อย 1 ชั่วโมงก่อนนำออกมาใช้</li>
             </ul>
           </div>
 
           <!-- Cheese Dip -->
-          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-2.5">
             <div class="flex justify-between items-start">
-              <h3 class="font-bold text-slate-800 text-base">🧀 Cheese Dip</h3>
-              <span class="bg-amber-100 text-amber-800 text-[11px] px-2 py-0.5 rounded">อายุหลังเปิด 5 วัน</span>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base">🧀 Cheese Dip</h3>
+              <span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded">อายุหลังเปิด 5 วัน</span>
             </div>
             <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside bg-slate-50 p-3 rounded-lg">
               <li>บรรจุขวดบีบขนาด <strong>14 oz</strong></li>
@@ -519,14 +539,11 @@
         </div>
 
         <!-- 4. Inferno Crumb & Coleslaw -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <!-- Inferno Crumb -->
-          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-            <div class="flex justify-between items-start">
-              <h3 class="font-bold text-slate-800 text-base">🔥 Inferno Crumb</h3>
-              <span class="bg-red-100 text-red-800 text-[11px] px-2 py-0.5 rounded">.....</span>
-            </div>
-            <div class="text-xs text-slate-600 space-y-2 bg-slate-50 p-3 rounded-lg">
+          <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-2.5">
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base">🔥 Inferno Crumb</h3>
+            <div class="text-xs text-slate-600 space-y-1.5 bg-slate-50 p-3 rounded-lg">
               <p><strong>การผสม:</strong> น้ำเย็น 500ml + แป้ง Batter Mix 400g ใส่ขวดบีบ</p>
               <p><strong>การทอด:</strong> ทอดเตาเบอร์ 5 อุณหภูมิ 177°C บีบเป็นตัว S นาน <strong class="text-red-600">20 วินาที</strong></p>
               <p><strong>การคลุก:</strong> นำขึ้นมาคลุกผง Chilli Spice <strong>2 ช้อนโต๊ะ</strong></p>
@@ -534,12 +551,12 @@
           </div>
 
           <!-- Coleslaw -->
-          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-2.5">
             <div class="flex justify-between items-start">
-              <h3 class="font-bold text-slate-800 text-base">🥗 Coleslaw</h3>
-              <span class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded">พักอย่างน้อย2ชม.ก่อนใช้งาน</span>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base">🥗 Coleslaw</h3>
+              <span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded">พักอย่างน้อย 2 ชม. ก่อนใช้</span>
             </div>
-            <div class="text-xs text-slate-600 space-y-2 bg-slate-50 p-3 rounded-lg">
+            <div class="text-xs text-slate-600 space-y-1.5 bg-slate-50 p-3 rounded-lg">
               <p><strong>อัตราส่วน:</strong> น้ำสลัด 600g + ผักกะหล่ำ 2 ถุง (620g)</p>
               <p><strong>ขั้นตอน:</strong> คลุกเบามือ และพักตู้เย็นไว้ <strong>1 วัน</strong></p>
               <p><strong>การบรรจุ:</strong> บรรจุถ้วยกระดาษ <strong>120g / ถ้วย</strong></p>
@@ -550,129 +567,129 @@
       </div>
 
       <!-- ================= TAB 2: BOMBARDIER ================= -->
-      <div id="tab-bombardier" class="tab-content hidden fade-in space-y-6">
+      <div id="tab-bombardier" class="tab-content hidden fade-in space-y-4 sm:space-y-6">
         
-        <div class="border-b border-slate-200 pb-4">
-          <div class="flex items-center gap-2 text-red-600 font-bold text-sm">
-            <i data-lucide="flame" class="w-5 h-5"></i> Position 2
+        <div class="border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2 text-red-600 font-bold text-xs sm:text-sm">
+            <i data-lucide="flame" class="w-4 h-4 sm:w-5 sm:h-5"></i> Position 2
           </div>
-          <h2 class="text-2xl font-bold text-slate-800">Bombardier (การทอด Classic Wings)</h2>
-          <p class="text-xs text-slate-500 mt-1">รับผิดชอบการทอดปีกและน่อง (Classic Wings) ควบคุมระบบการทอดและสุขอนามัยวัตถุดิบดิบ</p>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-0.5">Bombardier (การทอด Classic Wings)</h2>
+          <p class="text-xs text-slate-500 mt-0.5">รับผิดชอบการทอดปีกและน่อง (Classic Wings) ควบคุมระบบการทอดและสุขอนามัยวัตถุดิบดิบ</p>
         </div>
 
         <!-- Station Specs -->
-        <div class="sop-card bg-gradient-to-r from-red-900 to-slate-900 text-white p-5 rounded-xl shadow-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div class="sop-card bg-gradient-to-r from-red-900 to-slate-900 text-white p-4 sm:p-5 rounded-xl shadow-sm space-y-3">
           <div>
-            <h3 class="font-bold text-lg text-ws-gold">ข้อกำหนดประจำสถานี (Station Specs)</h3>
-            <p class="text-xs text-slate-300 mt-0.5">ประจำเตาหมายเลข 1 และ 2</p>
+            <h3 class="font-bold text-base sm:text-lg text-ws-gold">ข้อกำหนดประจำสถานี (Station Specs)</h3>
+            <p class="text-[11px] text-slate-300 mt-0.5">ประจำเตาหมายเลข 1 และ 2</p>
           </div>
-          <div class="flex flex-wrap gap-3 text-xs">
-            <div class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div class="bg-white/10 p-2.5 rounded-lg border border-white/10">
               <span class="text-slate-300 block text-[10px]">ระดับน้ำมันเตา 1</span>
-              <strong class="text-sm font-mono text-ws-gold">Min</strong>
+              <strong class="text-xs sm:text-sm font-mono text-ws-gold">Min</strong>
             </div>
-            <div class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+            <div class="bg-white/10 p-2.5 rounded-lg border border-white/10">
               <span class="text-slate-300 block text-[10px]">ระดับน้ำมันเตา 2</span>
-              <strong class="text-sm font-mono text-ws-gold">ระหว่าง Min กับ oil level</strong>
+              <strong class="text-xs sm:text-sm font-mono text-ws-gold">ระหว่าง Min กับ oil level</strong>
             </div>
-            <div class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+            <div class="bg-white/10 p-2.5 rounded-lg border border-white/10">
               <span class="text-slate-300 block text-[10px]">อุณหภูมิเตา</span>
-              <strong class="text-sm font-mono text-ws-gold">177°C (±10°C)</strong>
+              <strong class="text-xs sm:text-sm font-mono text-ws-gold">177°C (±10°C)</strong>
             </div>
-            <div class="bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+            <div class="bg-white/10 p-2.5 rounded-lg border border-white/10">
               <span class="text-slate-300 block text-[10px]">ความจุสูงสุด</span>
-              <strong class="text-sm font-mono text-white">ไม่เกิน 36 ชิ้น / ตะกร้า</strong>
+              <strong class="text-xs sm:text-sm font-mono text-white">ไม่เกิน 36 ชิ้น/ตะกร้า</strong>
             </div>
           </div>
         </div>
 
         <!-- 3 Cooking Systems -->
-        <h3 class="text-base font-bold text-slate-800 pt-2">รูปแบบการทอด 3 ระบบ (Cooking Systems)</h3>
+        <h3 class="text-sm sm:text-base font-bold text-slate-800 pt-1">รูปแบบการทอด 3 ระบบ (Cooking Systems)</h3>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
           <!-- 1. Full Cook -->
-          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <div>
-              <div class="flex justify-between items-center mb-2">
+              <div class="flex justify-between items-center mb-1.5">
                 <span class="bg-red-100 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded">ระบบที่ 1</span>
                 <i data-lucide="timer" class="w-4 h-4 text-red-600"></i>
               </div>
-              <h4 class="font-bold text-slate-800 text-base">1. Full Cook</h4>
-              <p class="text-xs text-slate-500 mt-1">ทอดสุกสมบูรณ์พร้อมเสิร์ฟทันที</p>
+              <h4 class="font-bold text-slate-800 text-sm sm:text-base">1. Full Cook</h4>
+              <p class="text-xs text-slate-500 mt-0.5">ทอดสุกสมบูรณ์พร้อมเสิร์ฟทันที</p>
               
-              <div class="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 text-center">
-                <span class="text-xs text-slate-500 block">เวลาในการทอด</span>
-                <span class="text-2xl font-black text-red-600 font-mono">7:00 นาที</span>
+              <div class="mt-3 p-2.5 bg-red-50 rounded-lg border border-red-100 text-center">
+                <span class="text-[10px] text-slate-500 block">เวลาในการทอด</span>
+                <span class="text-xl font-black text-red-600 font-mono">7:00 นาที</span>
               </div>
             </div>
             <p class="text-xs text-slate-600 mt-3 bg-slate-50 p-2 rounded text-center">
-              🔔 เสียงดังให้ <strong>Stir 3.30 นาที</strong><br>เมื่อครบ 7 นาทีสามารถนำไปทำออเดอร์ได้ทันที
+              🔔 เสียงดังให้ <strong>Stir 3:30 นาที</strong><br>เมื่อครบ 7 นาทีนำไปทำออเดอร์ได้ทันที
             </p>
           </div>
 
           <!-- 2. Half Cook -->
-          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <div>
-              <div class="flex justify-between items-center mb-2">
+              <div class="flex justify-between items-center mb-1.5">
                 <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded">ระบบที่ 2</span>
                 <i data-lucide="archive" class="w-4 h-4 text-amber-600"></i>
               </div>
-              <h4 class="font-bold text-slate-800 text-base">2. Half Cook</h4>
-              <p class="text-xs text-slate-500 mt-1">ทอดกึ่งสุกเพื่อเตรียมสต็อกในตู้ CVAP</p>
+              <h4 class="font-bold text-slate-800 text-sm sm:text-base">2. Half Cook</h4>
+              <p class="text-xs text-slate-500 mt-0.5">ทอดกึ่งสุกเพื่อเตรียมสต็อกในตู้ CVAP</p>
               
-              <div class="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-100 text-center">
-                <span class="text-xs text-slate-500 block">เวลาในการทอด</span>
-                <span class="text-2xl font-black text-amber-600 font-mono">3:30 นาที</span>
+              <div class="mt-3 p-2.5 bg-amber-50 rounded-lg border border-amber-100 text-center">
+                <span class="text-[10px] text-slate-500 block">เวลาในการทอด</span>
+                <span class="text-xl font-black text-amber-600 font-mono">3:30 นาที</span>
               </div>
             </div>
             <ul class="text-xs text-slate-600 mt-3 space-y-1 bg-slate-50 p-2 rounded">
               <li>• นำเข้าตู้ CVAP (140-144°C) <strong>พัก 10 นาที</strong></li>
               <li>• สามารถใช้ต่อได้ภายใน <strong>50 นาที</strong></li>
-	            <li>• Stir <strong>1:45 นาที</strong></li>
+              <li>• Stir <strong>1:45 นาที</strong></li>
             </ul>
           </div>
 
           <!-- 3. Final Cook -->
-          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <div>
-              <div class="flex justify-between items-center mb-2">
+              <div class="flex justify-between items-center mb-1.5">
                 <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">ระบบที่ 3</span>
                 <i data-lucide="zap" class="w-4 h-4 text-emerald-600"></i>
               </div>
-              <h4 class="font-bold text-slate-800 text-base">3. Final Cook</h4>
-              <p class="text-xs text-slate-500 mt-1">ทอดซ้ำจาก Half Cook เพื่อปิดออเดอร์</p>
+              <h4 class="font-bold text-slate-800 text-sm sm:text-base">3. Final Cook</h4>
+              <p class="text-xs text-slate-500 mt-0.5">ทอดซ้ำจาก Half Cook เพื่อปิดออเดอร์</p>
               
-              <div class="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-100 text-center">
-                <span class="text-xs text-slate-500 block">เวลาในการทอด</span>
-                <span class="text-2xl font-black text-emerald-600 font-mono">1:30 นาที</span>
+              <div class="mt-3 p-2.5 bg-emerald-50 rounded-lg border border-emerald-100 text-center">
+                <span class="text-[10px] text-slate-500 block">เวลาในการทอด</span>
+                <span class="text-xl font-black text-emerald-600 font-mono">1:30 นาที</span>
               </div>
             </div>
             <div class="text-xs text-slate-600 mt-3 bg-slate-50 p-2 rounded">
               <p class="font-semibold text-red-600">⚠️ Temp Check:</p>
-              <p>สุ่มวัดอุณหภูมิไก่ 3 จุด (Top-Mid-Bottom) ต้อง <strong class="text-red-600">&gt; 93.3°C</strong> หากไม่ได้ให้ทอดต่อ 15 วินาที</p>
+              <p>สุ่มวัดอุณหภูมิไก่ 3 จุด ต้อง <strong class="text-red-600">&gt; 93.3°C</strong> หากไม่ได้ให้ทอดต่อ 15 วินาที</p>
             </div>
           </div>
         </div>
 
         <!-- Hygiene Rules -->
-        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-            <i data-lucide="hand" class="w-5 h-5 text-ws-gold"></i>
+        <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm sm:text-base">
+            <i data-lucide="hand" class="w-4 h-4 sm:w-5 sm:h-5 text-ws-gold shrink-0"></i>
             กฎสุขอนามัยและการแยกการสัมผัส (Hygiene Standard)
           </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start gap-2">
               <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
               <div>
                 <strong class="text-emerald-900 block font-semibold">มือสะอาด (Clean Hands)</strong>
-                <p class="text-emerald-800">ใช้สำหรับสัมผัสจับตู้, ภาชนะบรรจุสะอาด, หน้าจอ KDS เท่านั้น</p>
+                <p class="text-emerald-800 mt-0.5">ใช้สำหรับสัมผัสจับตู้, ภาชนะบรรจุสะอาด, หน้าจอ KDS เท่านั้น</p>
               </div>
             </div>
             <div class="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
               <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600 shrink-0 mt-0.5"></i>
               <div>
                 <strong class="text-red-900 block font-semibold">มือสัมผัสวัตถุดิบดิบ (Raw Hands)</strong>
-                <p class="text-red-800">ใช้จับ Tong (ที่คีบ) เพื่อคีบไก่ดิบเท่านั้น ห้ามจับหน้าจอหรือภาชนะสุกเด็ดขาด!</p>
+                <p class="text-red-800 mt-0.5">ใช้จับ Tong (ที่คีบ) เพื่อคีบไก่ดิบเท่านั้น ห้ามจับหน้าจอหรือภาชนะสุกเด็ดขาด!</p>
               </div>
             </div>
           </div>
@@ -681,29 +698,29 @@
       </div>
 
       <!-- ================= TAB 3: GUNNER ================= -->
-      <div id="tab-gunner" class="tab-content hidden fade-in space-y-6">
+      <div id="tab-gunner" class="tab-content hidden fade-in space-y-4 sm:space-y-6">
         
-        <div class="border-b border-slate-200 pb-4">
-          <div class="flex items-center gap-2 text-amber-600 font-bold text-sm">
-            <i data-lucide="sparkles" class="w-5 h-5"></i> Position 3
+        <div class="border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2 text-amber-600 font-bold text-xs sm:text-sm">
+            <i data-lucide="sparkles" class="w-4 h-4 sm:w-5 sm:h-5"></i> Position 3
           </div>
-          <h2 class="text-2xl font-bold text-slate-800">Gunner (การทอด Boneless, Tender, Fries)</h2>
-          <p class="text-xs text-slate-500 mt-1">รับผิดชอบการทอดเมนูไก่ไม่มีกระดูก เทนเดอร์ และเฟรนช์ฟรายส์ เตา 3, 4 และ 5</p>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-0.5">Gunner (การทอด Boneless, Tender, Fries)</h2>
+          <p class="text-xs text-slate-500 mt-0.5">รับผิดชอบการทอดเมนูไก่ไม่มีกระดูก เทนเดอร์ และเฟรนช์ฟรายส์ เตา 3, 4 และ 5</p>
         </div>
 
         <!-- Fridge Temps -->
-        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-            <i data-lucide="snowflake" class="w-5 h-5 text-blue-500"></i>
+        <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm sm:text-base">
+            <i data-lucide="snowflake" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 shrink-0"></i>
             อุณหภูมิตู้แช่ (Refrigerator & Freezer)
           </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 class="font-bold text-slate-800 text-sm mb-2">❄️ ตู้แช่แข็ง (Freeze)</h4>
-              <p class="text-xl font-bold text-blue-600 font-mono">-15°C ถึง -18°C</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="p-3.5 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 class="font-bold text-slate-800 text-xs sm:text-sm mb-1">❄️ ตู้แช่แข็ง (Freeze)</h4>
+              <p class="text-lg font-bold text-blue-600 font-mono">-15°C ถึง -18°C</p>
             </div>
-            <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-              <h4 class="font-bold text-slate-800 text-sm mb-2">🌡️ ตู้แช่เย็น (Chill)</h4>
+            <div class="p-3.5 bg-emerald-50 rounded-lg border border-emerald-200">
+              <h4 class="font-bold text-slate-800 text-xs sm:text-sm mb-1">🌡️ ตู้แช่เย็น (Chill)</h4>
               <ul class="text-slate-600 space-y-1">
                 <li>• ตู้แช่เย็นแบบเก่า: <strong class="text-emerald-700">0°C ถึง 4°C</strong></li>
                 <li>• ตู้แช่เย็นแบบใหม่: <strong class="text-emerald-700">1°C ถึง 4°C</strong></li>
@@ -713,43 +730,39 @@
         </div>
 
         <!-- Fryers 3 & 4 (Oil Level) -->
-        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 gap-2">
+        <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2.5 gap-1.5">
             <div>
-              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-                <i data-lucide="flame" class="w-5 h-5 text-amber-500"></i>
+              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm sm:text-base">
+                <i data-lucide="flame" class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0"></i>
                 เตา 3 และ 4 (Boneless & Tender)
               </h3>
-              <p class="text-[11px] text-slate-500 mt-1">เตาที่ 3: ระดับน้ำมัน <strong class="text-amber-700">ระหว่าง Min oil level</strong> | เตาที่ 4: ระดับน้ำมัน <strong class="text-amber-700">oil level</strong></p>
+              <p class="text-[11px] text-slate-500 mt-0.5">เตาที่ 3: ระดับน้ำมัน <strong class="text-amber-700">ระหว่าง Min oil level</strong> | เตาที่ 4: ระดับน้ำมัน <strong class="text-amber-700">oil level</strong></p>
             </div>
             <span class="bg-amber-100 text-amber-800 text-xs px-2.5 py-0.5 rounded-full font-semibold w-fit">Boneless & Tender</span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <!-- Boneless -->
-            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
+            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
               <div>
-                <div class="flex justify-between items-center mb-2">
-                  <h4 class="font-bold text-slate-800 text-sm">🍗 Boneless Wings</h4>
-                </div>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm mb-1">🍗 Boneless Wings</h4>
                 <div class="space-y-1 text-xs text-slate-600">
                   <p>• ปริมาณทอดสูงสุด: <strong class="text-slate-800">50 ชิ้น</strong> / ตะกร้า</p>
                   <p>• เวลาในการทอด: <strong class="text-slate-800">4:30 นาที</strong></p>
-                  <p class="pt-2 text-amber-700 font-medium">🔔 เสียงดังให้ Stir: เก่า 2.30 นาที / ใหม่ 2.15 นาที</p>
+                  <p class="pt-1 text-amber-700 font-medium">🔔 เสียงดังให้ Stir: เก่า 2:30 นาที / ใหม่ 2:15 นาที</p>
                 </div>
               </div>
             </div>
 
             <!-- Tender -->
-            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
+            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200 flex flex-col justify-between">
               <div>
-                <div class="flex justify-between items-center mb-2">
-                  <h4 class="font-bold text-slate-800 text-sm">🥩 Chicken Tenders</h4>
-                </div>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm mb-1">🥩 Chicken Tenders</h4>
                 <div class="space-y-1 text-xs text-slate-600">
                   <p>• ปริมาณทอดสูงสุด: <strong class="text-slate-800">16 ชิ้น</strong> / ตะกร้า</p>
                   <p>• เวลาในการทอด: <strong class="text-slate-800">5:15 นาที</strong></p>
-                  <p class="pt-2 text-amber-700 font-medium">🔔 เสียงดังให้ Stir: เก่า 2.15 นาที / ใหม่ 1 นาที</p>
+                  <p class="pt-1 text-amber-700 font-medium">🔔 เสียงดังให้ Stir: เก่า 2:15 นาที / ใหม่ 1:00 นาที</p>
                 </div>
               </div>
             </div>
@@ -757,23 +770,23 @@
         </div>
 
         <!-- Fryer 5 (Oil Max) -->
-        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 gap-2">
+        <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2.5 gap-1.5">
             <div>
-              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-                <i data-lucide="zap" class="w-5 h-5 text-ws-gold"></i>
+              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm sm:text-base">
+                <i data-lucide="zap" class="w-4 h-4 sm:w-5 sm:h-5 text-ws-gold shrink-0"></i>
                 เตา 5 (Fries)
               </h3>
-              <p class="text-[11px] text-slate-500 mt-1">เตาที่ 5: ระดับน้ำมัน <strong class="text-ws-dark font-bold">Max</strong></p>
+              <p class="text-[11px] text-slate-500 mt-0.5">เตาที่ 5: ระดับน้ำมัน <strong class="text-ws-dark font-bold">Max</strong></p>
             </div>
             <span class="bg-ws-gold/20 text-ws-dark text-xs px-2.5 py-0.5 rounded-full font-semibold w-fit">Fries</span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <!-- Seasoning Fries -->
-            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
-              <h4 class="font-bold text-slate-800 text-sm">🍟 Seasoning Fries</h4>
-              <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
+            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+              <h4 class="font-bold text-slate-800 text-xs sm:text-sm">🍟 Seasoning Fries</h4>
+              <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside">
                 <li>ขนาด R : <strong>90-100 g.</strong></li>
                 <li>ขนาด L : <strong>140-150 g.</strong></li>
                 <li><strong class="text-ws-green">(เสียงดังให้ Stir ตอน 1:45 นาที)</strong></li>
@@ -781,44 +794,19 @@
             </div>
 
             <!-- Voodoo Fries -->
-            <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+            <div class="p-3.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
               <div class="flex justify-between items-center">
-                <h4 class="font-bold text-slate-800 text-sm">🧀 Voodoo Fries</h4>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm">🧀 Voodoo Fries</h4>
                 <span class="text-[10px] bg-red-100 text-red-800 px-1.5 py-0.5 rounded">พักบนไลน์ได้ 5 นาที</span>
               </div>
-              <p class="text-xs text-slate-500">ขั้นตอนการทำ:</p>
               <ol class="text-xs text-slate-700 space-y-1 list-decimal list-inside font-medium bg-white p-2.5 rounded border border-slate-200">
                 <li>ทอดเฟรนช์ฟรายส์ครึ่งถุง</li>
                 <li>ใส่ผง Cajun <strong class="text-amber-600">10 Shake</strong></li>
                 <li>ซอส Voodoo <strong class="text-red-600">200 g</strong></li>
                 <li>ซอสชีส <strong class="text-yellow-600">8 เส้น</strong></li>
                 <li>Ranch Sauce <strong class="text-blue-600">13 เส้น</strong></li>
-		            <li><strong class="text-green-600">Stir ตอน 1:45 นาที</strong></li>
+                <li><strong class="text-green-600">Stir ตอน 1:45 นาที</strong></li>
               </ol>
-            </div>
-          </div>
-        </div>
-
-        <!-- Hygiene Rules -->
-        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-            <i data-lucide="hand" class="w-5 h-5 text-ws-gold"></i>
-            กฎสุขอนามัยและการแยกการสัมผัส (Hygiene Standard)
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start gap-2">
-              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
-              <div>
-                <strong class="text-emerald-900 block font-semibold">มือสะอาด (Clean Hands)</strong>
-                <p class="text-emerald-800">ใช้สำหรับสัมผัสจับตู้, ภาชนะบรรจุสะอาด, หน้าจอ KDS เท่านั้น</p>
-              </div>
-            </div>
-            <div class="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-              <i data-lucide="alert-triangle" class="w-4 h-4 text-red-600 shrink-0 mt-0.5"></i>
-              <div>
-                <strong class="text-red-900 block font-semibold">มือสัมผัสวัตถุดิบดิบ (Raw Hands)</strong>
-                <p class="text-red-800">ใช้จับ Tong (ที่คีบ) เพื่อคีบไก่ดิบเท่านั้น ห้ามจับหน้าจอหรือภาชนะสุกเด็ดขาด!</p>
-              </div>
             </div>
           </div>
         </div>
@@ -826,169 +814,169 @@
       </div>
 
       <!-- ================= TAB 4: WINGMAN ================= -->
-      <div id="tab-wingman" class="tab-content hidden fade-in space-y-6">
+      <div id="tab-wingman" class="tab-content hidden fade-in space-y-4 sm:space-y-6">
         
-        <div class="border-b border-slate-200 pb-4">
-          <div class="flex items-center gap-2 text-blue-600 font-bold text-sm">
-            <i data-lucide="package-check" class="w-5 h-5"></i> Position 4
+        <div class="border-b border-slate-200 pb-3">
+          <div class="flex items-center gap-2 text-blue-600 font-bold text-xs sm:text-sm">
+            <i data-lucide="package-check" class="w-4 h-4 sm:w-5 sm:h-5"></i> Position 4
           </div>
-          <h2 class="text-2xl font-bold text-slate-800">Wingman (การคลุกซอส และจัดเสิร์ฟ)</h2>
-          <p class="text-xs text-slate-500 mt-1">รับผิดชอบ Sauce & Toss ตักซอส จัดวางไก่ลงภาชนะ และบรรจุห่อเสิร์ฟลูกค้า</p>
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mt-0.5">Wingman (การคลุกซอส และจัดเสิร์ฟ)</h2>
+          <p class="text-xs text-slate-500 mt-0.5">รับผิดชอบ Sauce & Toss ตักซอส จัดวางไก่ลงภาชนะ และบรรจุห่อเสิร์ฟลูกค้า</p>
         </div>
 
         <!-- NEW DETAILED SAUCE HEAT SCALE & FLAVOR MATRIX -->
-        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 gap-2">
+        <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3.5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2.5 gap-1.5">
             <div>
-              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-                <i data-lucide="flame" class="w-5 h-5 text-red-600"></i>
-                ตารางระดับความเผ็ดของซอส 9 รสชาติ (Heat Scale & Flavor Profile)
+              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm sm:text-base">
+                <i data-lucide="flame" class="w-4 h-4 sm:w-5 sm:h-5 text-red-600 shrink-0"></i>
+                ตารางระดับความเผ็ดซอส 9 รสชาติ (Heat Scale & Profile)
               </h3>
-              <p class="text-xs text-slate-500 mt-0.5">เรียงลำดับซอสจากเผ็ดน้อยไปเผ็ดมากที่สุด (Mild to Extreme Heat Scale)</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">เรียงลำดับซอสจากเผ็ดน้อยไปเผ็ดมากที่สุด (Mild to Extreme Heat Scale)</p>
             </div>
-            <span class="bg-red-50 text-red-700 text-xs px-2.5 py-1 rounded-full border border-red-200 font-bold shrink-0">9 Flavors Standard</span>
+            <span class="bg-red-50 text-red-700 text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full border border-red-200 font-bold shrink-0 w-fit">9 Flavors Standard</span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
             <!-- 1. Garlic Parmesan -->
-            <div class="p-3.5 rounded-lg border border-slate-200 bg-slate-50 flex flex-col justify-between">
+            <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">LEVEL 1 • ไม่เผ็ด</span>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">LEVEL 1 • ไม่เผ็ด</span>
                   <span class="text-xs font-mono font-bold text-slate-500">1/2 oz.</span>
                 </div>
-                <h4 class="font-bold text-slate-800 text-sm">1. Garlic Parmesan</h4>
-                <p class="text-[11px] text-slate-600 mt-1">ผงกระเทียม + พาร์เมซานชีส หอมมัน กลมกล่อม</p>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm">1. Garlic Parmesan</h4>
+                <p class="text-[11px] text-slate-600 mt-0.5">ผงกระเทียม + พาร์เมซานชีส หอมมัน กลมกล่อม</p>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-slate-200 text-[10px] text-slate-500 flex justify-between items-center">
+              <div class="mt-2 pt-1.5 border-t border-slate-200 text-[10px] text-slate-500 flex justify-between items-center">
                 <span>ประเภท: <strong class="text-slate-700">Dry Rub</strong></span>
                 <span class="text-emerald-700 font-semibold">โรย Parm 3 Shake</span>
               </div>
             </div>
 
             <!-- 2. Lemon Pepper -->
-            <div class="p-3.5 rounded-lg border border-slate-200 bg-slate-50 flex flex-col justify-between">
+            <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">LEVEL 2 • ไม่เผ็ด</span>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">LEVEL 2 • ไม่เผ็ด</span>
                   <span class="text-xs font-mono font-bold text-slate-500">1/2 oz.</span>
                 </div>
-                <h4 class="font-bold text-slate-800 text-sm">2. Lemon Pepper</h4>
-                <p class="text-[11px] text-slate-600 mt-1">เปรี้ยวเลมอนสดชื่น หอมเค็มพริกไทยดำเอกลักษณ์</p>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm">2. Lemon Pepper</h4>
+                <p class="text-[11px] text-slate-600 mt-0.5">เปรี้ยวเลมอนสดชื่น หอมเค็มพริกไทยดำเอกลักษณ์</p>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-slate-200 text-[10px] text-slate-500 flex justify-between items-center">
+              <div class="mt-2 pt-1.5 border-t border-slate-200 text-[10px] text-slate-500 flex justify-between items-center">
                 <span>ประเภท: <strong class="text-slate-700">Dry Rub</strong></span>
                 <span>ฝา: <strong class="text-amber-700">ส้มอิฐ</strong></span>
               </div>
             </div>
 
             <!-- 3. Hickory Smoked BBQ -->
-            <div class="p-3.5 rounded-lg border border-amber-200 bg-amber-50/40 flex flex-col justify-between">
+            <div class="p-3 rounded-lg border border-amber-200 bg-amber-50/40 flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">LEVEL 3 • 🌶️ เผ็ดน้อย</span>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">LEVEL 3 • 🌶️ เผ็ดน้อย</span>
                   <span class="text-xs font-mono font-bold text-amber-700">2 oz.</span>
                 </div>
-                <h4 class="font-bold text-slate-800 text-sm">3. Hickory Smoked BBQ</h4>
-                <p class="text-[11px] text-slate-600 mt-1">ซอสบาร์บีคิวรมควัน รสหวานกลมกล่อม หอมไม้ฮิกคอรี่</p>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm">3. Hickory Smoked BBQ</h4>
+                <p class="text-[11px] text-slate-600 mt-0.5">ซอสบาร์บีคิวรมควัน รสหวานกลมกล่อม หอมไม้ฮิกคอรี่</p>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-amber-200/60 text-[10px] text-slate-500 flex justify-between items-center">
+              <div class="mt-2 pt-1.5 border-t border-amber-200/60 text-[10px] text-slate-500 flex justify-between items-center">
                 <span>ประเภท: <strong class="text-slate-700">Wet Sauce</strong></span>
                 <span>จัดวาง: <strong class="text-amber-800">โซน Sweet (บน)</strong></span>
               </div>
             </div>
 
             <!-- 4. Hot Honey Rub -->
-            <div class="p-3.5 rounded-lg border border-amber-200 bg-amber-50/70 flex flex-col justify-between">
+            <div class="p-3 rounded-lg border border-amber-200 bg-amber-50/70 flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-200 text-amber-900">LEVEL 4 • 🌶️ เผ็ดน้อย-ปานกลาง</span>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-200 text-amber-900">LEVEL 4 • 🌶️ เผ็ดน้อย-ปานกลาง</span>
                   <span class="text-xs font-mono font-bold text-amber-800">1/2 oz.</span>
                 </div>
-                <h4 class="font-bold text-slate-800 text-sm">4. Hot Honey Rub</h4>
-                <p class="text-[11px] text-slate-600 mt-1">หวานน้ำผึ้งฉ่ำ ตัดรสเผ็ดร้อนปลายลิ้นลงตัว</p>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm">4. Hot Honey Rub</h4>
+                <p class="text-[11px] text-slate-600 mt-0.5">หวานน้ำผึ้งฉ่ำ ตัดรสเผ็ดร้อนปลายลิ้นลงตัว</p>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-amber-200 text-[10px] text-slate-500 flex justify-between items-center">
+              <div class="mt-2 pt-1.5 border-t border-amber-200 text-[10px] text-slate-500 flex justify-between items-center">
                 <span>ประเภท: <strong class="text-slate-700">Dry Rub</strong></span>
                 <span>ฝา: <strong class="text-yellow-600">สีเหลือง</strong></span>
               </div>
             </div>
 
             <!-- 5. Louisiana Rub -->
-            <div class="p-3.5 rounded-lg border border-orange-200 bg-orange-50/50 flex flex-col justify-between">
+            <div class="p-3 rounded-lg border border-orange-200 bg-orange-50/50 flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-800">LEVEL 5 • 🌶️🌶️ เผ็ดปานกลาง</span>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-800">LEVEL 5 • 🌶️🌶️ เผ็ดปานกลาง</span>
                   <span class="text-xs font-mono font-bold text-orange-700">1/2 oz.</span>
                 </div>
-                <h4 class="font-bold text-slate-800 text-sm">5. Louisiana Rub</h4>
-                <p class="text-[11px] text-slate-600 mt-1">ผงกาจุน + กระเทียม หอมเครื่องเทศเผ็ดสไตล์หลุยเซียนา</p>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm">5. Louisiana Rub</h4>
+                <p class="text-[11px] text-slate-600 mt-0.5">ผงกาจุน + กระเทียม หอมเครื่องเทศเผ็ดสไตล์หลุยเซียนา</p>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-orange-200 text-[10px] text-slate-500 flex justify-between items-center">
+              <div class="mt-2 pt-1.5 border-t border-orange-200 text-[10px] text-slate-500 flex justify-between items-center">
                 <span>ประเภท: <strong class="text-slate-700">Dry Rub</strong></span>
                 <span>ฝา: <strong class="text-yellow-600">สีเหลือง (Cajun)</strong></span>
               </div>
             </div>
 
             <!-- 6. Texas Buffalo -->
-            <div class="p-3.5 rounded-lg border border-red-200 bg-red-50/40 flex flex-col justify-between">
+            <div class="p-3 rounded-lg border border-red-200 bg-red-50/40 flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-800">LEVEL 6 • 🌶️🌶️ เผ็ดเข้มข้น</span>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-800">LEVEL 6 • 🌶️🌶️ เผ็ดเข้มข้น</span>
                   <span class="text-xs font-mono font-bold text-red-700">2 oz.</span>
                 </div>
-                <h4 class="font-bold text-slate-800 text-sm">6. Texas Buffalo</h4>
-                <p class="text-[11px] text-slate-600 mt-1">ซอสบัฟฟาโลรสเปรี้ยวเผ็ดเข้มข้น จัดจ้านสไตล์เท็กซัส</p>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm">6. Texas Buffalo</h4>
+                <p class="text-[11px] text-slate-600 mt-0.5">ซอสบัฟฟาโลรสเปรี้ยวเผ็ดเข้มข้น จัดจ้านสไตล์เท็กซัส</p>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-red-200/60 text-[10px] text-slate-500 flex justify-between items-center">
+              <div class="mt-2 pt-1.5 border-t border-red-200/60 text-[10px] text-slate-500 flex justify-between items-center">
                 <span>ประเภท: <strong class="text-slate-700">Wet Sauce</strong></span>
                 <span>จัดวาง: <strong class="text-red-700">โซน Heat</strong></span>
               </div>
             </div>
 
             <!-- 7. Mango Habanero -->
-            <div class="p-3.5 rounded-lg border border-red-300 bg-red-50/70 flex flex-col justify-between">
+            <div class="p-3 rounded-lg border border-red-300 bg-red-50/70 flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-red-200 text-red-900">LEVEL 7 • 🌶️🌶️🌶️ เผ็ดมาก</span>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-200 text-red-900">LEVEL 7 • 🌶️🌶️🌶️ เผ็ดมาก</span>
                   <span class="text-xs font-mono font-bold text-red-800">2 oz.</span>
                 </div>
-                <h4 class="font-bold text-slate-800 text-sm">7. Mango Habanero</h4>
-                <p class="text-[11px] text-slate-600 mt-1">หวานฉ่ำมะม่วงสุก ตามด้วยความเผ็ดร้อนแรงจากพริกฮาบาเนโร</p>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm">7. Mango Habanero</h4>
+                <p class="text-[11px] text-slate-600 mt-0.5">หวานฉ่ำมะม่วงสุก ตามด้วยความเผ็ดร้อนแรงจากพริกฮาบาเนโร</p>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-red-200 text-[10px] text-slate-500 flex justify-between items-center">
+              <div class="mt-2 pt-1.5 border-t border-red-200 text-[10px] text-slate-500 flex justify-between items-center">
                 <span>ประเภท: <strong class="text-slate-700">Wet Sauce</strong></span>
                 <span>รสชาติ: <strong class="text-red-800">Sweet & Spicy</strong></span>
               </div>
             </div>
 
             <!-- 8. Inferno -->
-            <div class="p-3.5 rounded-lg border border-red-400 bg-red-100/60 flex flex-col justify-between">
+            <div class="p-3 rounded-lg border border-red-400 bg-red-100/60 flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-red-600 text-white">LEVEL 8 • 🌶️🌶️🌶️🌶️ เผ็ดมากพิเศษ</span>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-600 text-white">LEVEL 8 • 🌶️🌶️🌶️🌶️ เผ็ดมากพิเศษ</span>
                   <span class="text-xs font-mono font-bold text-red-900">1 oz.</span>
                 </div>
-                <h4 class="font-bold text-slate-800 text-sm">8. Inferno</h4>
-                <p class="text-[11px] text-slate-600 mt-1">เผ็ดดุดัน ลุกเป็นไฟ หอมพริกอบแห้งเข้มข้น</p>
+                <h4 class="font-bold text-slate-800 text-xs sm:text-sm">8. Inferno</h4>
+                <p class="text-[11px] text-slate-600 mt-0.5">เผ็ดดุดัน ลุกเป็นไฟ หอมพริกอบแห้งเข้มข้น</p>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-red-300 text-[10px] text-slate-600 flex justify-between items-center">
+              <div class="mt-2 pt-1.5 border-t border-red-300 text-[10px] text-slate-600 flex justify-between items-center">
                 <span>ประเภท: <strong class="text-slate-800">Wet Sauce</strong></span>
                 <span class="text-red-700 font-bold">โรย Crumb 1 ช้อนโต๊ะ</span>
               </div>
             </div>
 
             <!-- 9. Atomic Blast -->
-            <div class="p-3.5 rounded-lg border border-purple-900 bg-slate-900 text-white flex flex-col justify-between shadow-md">
+            <div class="p-3 rounded-lg border border-purple-900 bg-slate-900 text-white flex flex-col justify-between shadow-md">
               <div>
-                <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[10px] font-black px-2 py-0.5 rounded bg-ws-gold text-slate-900">LEVEL 9 • 🔥 MAX HEAT</span>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-ws-gold text-slate-900">LEVEL 9 • 🔥 MAX HEAT</span>
                   <span class="text-xs font-mono font-bold text-ws-gold">2 oz.</span>
                 </div>
-                <h4 class="font-bold text-ws-gold text-sm">9. Atomic Blast</h4>
-                <p class="text-[11px] text-slate-300 mt-1">เผ็ดที่สุดระดับตำนาน ร้อนแรงทะลุพิกัด สะใจสายเผ็ดตัวจริง</p>
+                <h4 class="font-bold text-ws-gold text-xs sm:text-sm">9. Atomic Blast</h4>
+                <p class="text-[11px] text-slate-300 mt-0.5">เผ็ดที่สุดระดับตำนาน ร้อนแรงทะลุพิกัด สะใจสายเผ็ดตัวจริง</p>
               </div>
-              <div class="mt-2.5 pt-2 border-t border-slate-700 text-[10px] text-slate-400 flex justify-between items-center">
+              <div class="mt-2 pt-1.5 border-t border-slate-700 text-[10px] text-slate-400 flex justify-between items-center">
                 <span>ประเภท: <strong class="text-white">Wet Sauce</strong></span>
                 <span class="text-ws-gold font-bold">ระดับเผ็ดสูงสุด</span>
               </div>
@@ -997,42 +985,42 @@
         </div>
 
         <!-- Ladle Standards -->
-        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-            <i data-lucide="spoon" class="w-5 h-5 text-blue-600"></i>
+        <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm sm:text-base">
+            <i data-lucide="spoon" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 shrink-0"></i>
             มาตรฐานขนาดกระบวยตักซอส (Ladle Size Standards)
           </h3>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
             <!-- 2 oz -->
-            <div class="p-3.5 bg-blue-50/60 rounded-lg border border-blue-200">
-              <div class="flex justify-between items-center mb-1.5">
-                <span class="font-bold text-blue-900 text-sm">2 oz. Ladle</span>
-                <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+            <div class="p-3 bg-blue-50/60 rounded-lg border border-blue-200">
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-blue-900 text-xs sm:text-sm">2 oz. Ladle</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
               </div>
-              <p class="text-slate-600 leading-relaxed">
+              <p class="text-slate-600 leading-relaxed text-[11px]">
                 <strong class="text-slate-800">• Atomic Blast, Mango Habanero, Hickory Smoked BBQ, Texas Buffalo</strong>
               </p>
             </div>
 
             <!-- 1 oz -->
-            <div class="p-3.5 bg-red-50/60 rounded-lg border border-red-200">
-              <div class="flex justify-between items-center mb-1.5">
-                <span class="font-bold text-red-900 text-sm">1 oz. Ladle</span>
-                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+            <div class="p-3 bg-red-50/60 rounded-lg border border-red-200">
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-red-900 text-xs sm:text-sm">1 oz. Ladle</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
               </div>
-              <p class="text-slate-600 leading-relaxed">
+              <p class="text-slate-600 leading-relaxed text-[11px]">
                 <strong class="text-slate-800">• Inferno</strong>
               </p>
             </div>
 
             <!-- 1/2 oz -->
-            <div class="p-3.5 bg-amber-50/60 rounded-lg border border-amber-200">
-              <div class="flex justify-between items-center mb-1.5">
-                <span class="font-bold text-amber-900 text-sm">1/2 oz. Ladle</span>
-                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+            <div class="p-3 bg-amber-50/60 rounded-lg border border-amber-200">
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-amber-900 text-xs sm:text-sm">1/2 oz. Ladle</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
               </div>
-              <p class="text-slate-600 leading-relaxed">
+              <p class="text-slate-600 leading-relaxed text-[11px]">
                 Homemade Sauces: <br>
                 <strong class="text-slate-800">• Garlic Parm, Lemon Pepper, Hot Honey, Louisiana Rub</strong>
               </p>
@@ -1041,89 +1029,89 @@
         </div>
 
         <!-- Shaker Cap Colors -->
-        <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
-            <i data-lucide="palette" class="w-5 h-5 text-ws-gold"></i>
+        <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm sm:text-base">
+            <i data-lucide="palette" class="w-4 h-4 sm:w-5 sm:h-5 text-ws-gold shrink-0"></i>
             สีกระปุกผงปรุงรส (Shaker Cap Color Codes)
           </h3>
 
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-center text-xs">
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-              <div class="w-6 h-6 rounded-full bg-orange-600 mx-auto mb-1 border border-black/10"></div>
-              <span class="font-bold text-slate-800 block">Lemon Pepper</span>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-center text-xs">
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+              <div class="w-5 h-5 rounded-full bg-orange-600 mx-auto mb-1 border border-black/10"></div>
+              <span class="font-bold text-slate-800 block text-[11px]">Lemon Pepper</span>
               <span class="text-[10px] text-slate-500">ฝาส้มอิฐ</span>
             </div>
 
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-              <div class="w-6 h-6 rounded-full bg-orange-600 mx-auto mb-1 border border-black/10"></div>
-              <span class="font-bold text-slate-800 block">Seasoning Fry</span>
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+              <div class="w-5 h-5 rounded-full bg-orange-600 mx-auto mb-1 border border-black/10"></div>
+              <span class="font-bold text-slate-800 block text-[11px]">Seasoning Fry</span>
               <span class="text-[10px] text-slate-500">ฝาส้มอิฐ</span>
             </div>
 
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-              <div class="w-6 h-6 rounded-full bg-white border border-slate-300 mx-auto mb-1"></div>
-              <span class="font-bold text-slate-800 block">Parmesan</span>
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+              <div class="w-5 h-5 rounded-full bg-white border border-slate-300 mx-auto mb-1"></div>
+              <span class="font-bold text-slate-800 block text-[11px]">Parmesan</span>
               <span class="text-[10px] text-slate-500">ฝาขาว</span>
             </div>
 
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-              <div class="w-6 h-6 rounded-full bg-yellow-400 mx-auto mb-1 border border-black/10"></div>
-              <span class="font-bold text-slate-800 block">Hot Honey</span>
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+              <div class="w-5 h-5 rounded-full bg-yellow-400 mx-auto mb-1 border border-black/10"></div>
+              <span class="font-bold text-slate-800 block text-[11px]">Hot Honey</span>
               <span class="text-[10px] text-slate-500">ฝาเหลือง</span>
             </div>
 
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-              <div class="w-6 h-6 rounded-full bg-yellow-400 mx-auto mb-1 border border-black/10"></div>
-              <span class="font-bold text-slate-800 block">Cajun</span>
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+              <div class="w-5 h-5 rounded-full bg-yellow-400 mx-auto mb-1 border border-black/10"></div>
+              <span class="font-bold text-slate-800 block text-[11px]">Cajun</span>
               <span class="text-[10px] text-slate-500">ฝาเหลือง</span>
             </div>
           </div>
         </div>
 
         <!-- Placement Rules & Special Warnings -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <!-- 3 Placement Rules -->
-          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
-              <i data-lucide="layers" class="w-5 h-5 text-ws-green"></i>
+          <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-2.5">
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+              <i data-lucide="layers" class="w-4 h-4 sm:w-5 sm:h-5 text-ws-green shrink-0"></i>
               3 หลักการจัดวางไก่ลงภาชนะ
             </h3>
             <p class="text-xs text-slate-500">เรียงลงจาก <strong class="text-slate-800">มุมซ้ายล่าง</strong> เสมอ:</p>
             
-            <div class="space-y-2 text-xs">
-              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
-                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center shrink-0">1</span>
+            <div class="space-y-1.5 text-xs">
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center shrink-0">1</span>
                 <div><strong>Shake:</strong> ไก่ใส่ผงปรุงรสวางก่อน (Garlic Parm, Lemon Pep, Hot Honey, Louisiana)</div>
               </div>
-              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
-                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center shrink-0">2</span>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center shrink-0">2</span>
                 <div><strong>Heat:</strong> รสชาติเผ็ดมากลงตาม (Texas Buffalo, Mango Hab, Inferno, Atomic)</div>
               </div>
-              <div class="p-2.5 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
-                <span class="w-5 h-5 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center shrink-0">3</span>
+              <div class="p-2 bg-slate-50 rounded border border-slate-200 flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full bg-ws-green text-white font-bold text-[10px] flex items-center justify-center shrink-0">3</span>
                 <div><strong>Sweet:</strong> รสหวาน / BBQ อยู่ด้านบนเสมอ (Hickory BBQ)</div>
               </div>
             </div>
           </div>
 
           <!-- Special Warnings -->
-          <div class="sop-card bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
-              <i data-lucide="alert-circle" class="w-5 h-5 text-red-600"></i>
+          <div class="sop-card bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm space-y-2.5">
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+              <i data-lucide="alert-circle" class="w-4 h-4 sm:w-5 sm:h-5 text-red-600 shrink-0"></i>
               ข้อควรระวังพิเศษก่อนเสิร์ฟ
             </h3>
-            <div class="space-y-2.5 text-xs">
-              <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <div class="space-y-2 text-xs">
+              <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg">
                 <strong class="text-amber-900 block font-semibold">🧄 Garlic Parmesan:</strong>
                 <p class="text-amber-800 mt-0.5">ต้องโรยผง Parmesan <strong class="text-red-600">3 Shake</strong> ก่อนเสิร์ฟ</p>
               </div>
 
-              <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div class="p-2.5 bg-red-50 border border-red-200 rounded-lg">
                 <strong class="text-red-900 block font-semibold">🔥 Inferno:</strong>
                 <p class="text-red-800 mt-0.5">ต้องโรย Inferno Crumb <strong class="text-red-600">1 ช้อนโต๊ะ</strong> ก่อนเสิร์ฟ</p>
               </div>
 
-              <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg">
                 <strong class="text-emerald-900 block font-semibold">🥗 ทานที่ร้าน (Dine-in):</strong>
                 <p class="text-emerald-800 mt-0.5">ให้ใช้ <strong class="text-ws-green">Tong สีเขียว</strong></p>
               </div>
@@ -1137,40 +1125,40 @@
   </div>
 
   <!-- ==================== MOBILE BOTTOM NAVIGATION (APP BAR) ==================== -->
-  <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 pb-[env(safe-area-inset-bottom)] z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
-    <div class="flex justify-around items-center h-16 px-1">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 pb-[env(safe-area-inset-bottom)] z-50 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+    <div class="grid grid-cols-5 h-14 items-center">
       
-      <button onclick="switchTab('tab-overview')" class="nav-btn-mobile flex flex-col items-center justify-center w-full h-full text-ws-green" data-tab="tab-overview">
-        <i data-lucide="layout-dashboard" class="w-5 h-5 mb-1 transition-transform"></i>
-        <span class="text-[10px] font-medium">ภาพรวม</span>
+      <button onclick="switchTab('tab-overview')" class="nav-btn-mobile flex flex-col items-center justify-center h-full text-ws-green" data-tab="tab-overview">
+        <i data-lucide="layout-dashboard" class="w-4 h-4 mb-0.5 transition-transform"></i>
+        <span class="text-[9px] font-semibold tracking-tight">ภาพรวม</span>
       </button>
 
-      <button onclick="switchTab('tab-paratrooper')" class="nav-btn-mobile flex flex-col items-center justify-center w-full h-full text-slate-400" data-tab="tab-paratrooper">
-        <i data-lucide="chef-hat" class="w-5 h-5 mb-1 transition-transform"></i>
-        <span class="text-[10px] font-medium">1.Paratrooper</span>
+      <button onclick="switchTab('tab-paratrooper')" class="nav-btn-mobile flex flex-col items-center justify-center h-full text-slate-400" data-tab="tab-paratrooper">
+        <i data-lucide="chef-hat" class="w-4 h-4 mb-0.5 transition-transform"></i>
+        <span class="text-[9px] font-medium tracking-tight">1. Prep</span>
       </button>
 
-      <button onclick="switchTab('tab-bombardier')" class="nav-btn-mobile flex flex-col items-center justify-center w-full h-full text-slate-400" data-tab="tab-bombardier">
-        <i data-lucide="flame" class="w-5 h-5 mb-1 transition-transform"></i>
-        <span class="text-[10px] font-medium">2.Bombardier</span>
+      <button onclick="switchTab('tab-bombardier')" class="nav-btn-mobile flex flex-col items-center justify-center h-full text-slate-400" data-tab="tab-bombardier">
+        <i data-lucide="flame" class="w-4 h-4 mb-0.5 transition-transform"></i>
+        <span class="text-[9px] font-medium tracking-tight">2. Wings</span>
       </button>
 
-      <button onclick="switchTab('tab-gunner')" class="nav-btn-mobile flex flex-col items-center justify-center w-full h-full text-slate-400" data-tab="tab-gunner">
-        <i data-lucide="sparkles" class="w-5 h-5 mb-1 transition-transform"></i>
-        <span class="text-[10px] font-medium">3.Gunner</span>
+      <button onclick="switchTab('tab-gunner')" class="nav-btn-mobile flex flex-col items-center justify-center h-full text-slate-400" data-tab="tab-gunner">
+        <i data-lucide="sparkles" class="w-4 h-4 mb-0.5 transition-transform"></i>
+        <span class="text-[9px] font-medium tracking-tight">3. Sides</span>
       </button>
 
-      <button onclick="switchTab('tab-wingman')" class="nav-btn-mobile flex flex-col items-center justify-center w-full h-full text-slate-400" data-tab="tab-wingman">
-        <i data-lucide="package-check" class="w-5 h-5 mb-1 transition-transform"></i>
-        <span class="text-[10px] font-medium">4.Wing man</span>
+      <button onclick="switchTab('tab-wingman')" class="nav-btn-mobile flex flex-col items-center justify-center h-full text-slate-400" data-tab="tab-wingman">
+        <i data-lucide="package-check" class="w-4 h-4 mb-0.5 transition-transform"></i>
+        <span class="text-[9px] font-medium tracking-tight">4. Toss</span>
       </button>
 
     </div>
   </nav>
 
   <!-- ==================== FOOTER (DESKTOP) ==================== -->
-  <footer class="hidden md:block bg-slate-900 text-slate-400 text-xs py-4 border-t border-slate-800 flex-none">
-    <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
+  <footer class="hidden md:block bg-slate-900 text-slate-400 text-xs py-3 border-t border-slate-800 flex-none">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-0.5">
       <p class="font-medium text-slate-300">© 2026 Wingstop Samyan Branch - SOP Web Manual Application</p>
       <p class="text-[11px] text-slate-500">สำหรับใช้งานภายในสาขาเพื่อการควบคุมมาตรฐานการปฏิบัติงานและสุขอนามัยอาหาร</p>
     </div>
@@ -1233,13 +1221,22 @@
       
       document.querySelectorAll('.nav-btn-mobile').forEach(btn => {
         const icon = btn.querySelector('i');
+        const text = btn.querySelector('span');
         if (btn.dataset.tab === tabId) {
           btn.classList.remove('text-slate-400');
-          btn.classList.add('text-ws-green', 'font-semibold');
+          btn.classList.add('text-ws-green');
+          if (text) {
+            text.classList.remove('font-medium');
+            text.classList.add('font-bold');
+          }
           if (icon) icon.classList.add('scale-110');
         } else {
-          btn.classList.remove('text-ws-green', 'font-semibold');
+          btn.classList.remove('text-ws-green');
           btn.classList.add('text-slate-400');
+          if (text) {
+            text.classList.remove('font-bold');
+            text.classList.add('font-medium');
+          }
           if (icon) icon.classList.remove('scale-110');
         }
       });
@@ -1270,11 +1267,11 @@
         document.querySelectorAll('.sop-card').forEach(card => {
           if (card.textContent.toLowerCase().includes(term)) {
             card.style.display = 'block';
-            card.classList.add('ring-2', 'ring-ws-gold', 'ring-offset-2');
+            card.classList.add('ring-2', 'ring-ws-gold', 'ring-offset-1');
             foundCount++;
           } else {
             card.style.display = 'none';
-            card.classList.remove('ring-2', 'ring-ws-gold', 'ring-offset-2');
+            card.classList.remove('ring-2', 'ring-ws-gold', 'ring-offset-1');
           }
         });
         
@@ -1299,7 +1296,7 @@
       
       document.querySelectorAll('.sop-card').forEach(card => {
         card.style.display = '';
-        card.classList.remove('ring-2', 'ring-ws-gold', 'ring-offset-2');
+        card.classList.remove('ring-2', 'ring-ws-gold', 'ring-offset-1');
       });
       
       if (restoreTab) {
